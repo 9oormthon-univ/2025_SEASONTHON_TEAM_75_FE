@@ -4,6 +4,7 @@ import GlobalStyle from "@styles/GlobalStyle";
 import Layout from "@styles/Layout";
 import Home from "@routes/home/Home";
 import Onboarding from "@routes/onboarding/Onboarding";
+import Map from "@routes/map/Location";
 import Scan from "@routes/scan/Scan";
 import Chat from "@routes/chat/Chat";
 import History from "@routes/history/History";
@@ -23,6 +24,14 @@ function App() {
               element={
                 <Layout showNavbar={false}>
                   <Onboarding />
+                </Layout>
+              }
+            />
+            <Route
+              path="/map"
+              element={
+                <Layout showNavbar={false}>
+                  <Map />
                 </Layout>
               }
             />
