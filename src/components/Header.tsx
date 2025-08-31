@@ -14,7 +14,7 @@ const Container = styled.div`
   height: 64px;
   padding: 0 16px;
   background-color: #ffffff;
-  border-bottom: 1px solid #d8d9d8;
+  // border-bottom: 1px solid #d8d9d8;
 `;
 
 const BackButton = styled.button`
@@ -24,6 +24,10 @@ const BackButton = styled.button`
   height: 100%;
   display: flex;
   align-items: center;
+
+  &:focus {
+    outline: none;
+  }
 `;
 
 const Title = styled.p`

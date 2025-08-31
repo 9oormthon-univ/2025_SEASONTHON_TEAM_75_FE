@@ -61,6 +61,10 @@ const CancelButton = styled.button`
 
   border-radius: 10.5px;
   background: #f0f0f0;
+
+  &:focus {
+    outline: none;
+  }
 `;
 
 const ConfirmButton = styled.button`
@@ -74,6 +78,10 @@ const ConfirmButton = styled.button`
 
   border-radius: 10.5px;
   background: ${({ theme }) => theme.colors.button};
+
+  &:focus {
+    outline: none;
+  }
 `;
 
 function LocationModal(props: ModalProps) {
