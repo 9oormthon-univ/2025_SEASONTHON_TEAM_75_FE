@@ -1,0 +1,48 @@
+import styled from "styled-components";
+
+export const Page = styled.div`
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+
+  background: #ffffff;
+`;
+
+export const SearchBox = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 3px;
+
+  height: 40px;
+  border-radius: 32.5px;
+  border: 0 solid #f7f8f9;
+  padding: 0 11px;
+  margin: 10px 16px 0 16px;
+
+  background: ${({ theme }) => theme.colors.box};
+
+  input {
+    all: unset;
+    width: 100%;
+
+    color: ${({ theme }) => theme.colors.text1};
+    font-size: 16px;
+    font-weight: 500;
+  }
+
+  button {
+    all: unset;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  ::placeholder {
+    color: ${({ theme }) => theme.colors.text3};
+  }
+`;
+
+export const SearchList = styled.div`
+  margin-top: 4px;
+`;
