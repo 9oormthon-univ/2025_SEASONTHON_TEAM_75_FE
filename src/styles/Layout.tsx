@@ -13,8 +13,10 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
-  padding-bottom: 96px;
+  padding-bottom: 60px;
   overflow-y: scroll;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
   -ms-overflow-style: none;
   scrollbar-width: none;
   &::-webkit-scrollbar {

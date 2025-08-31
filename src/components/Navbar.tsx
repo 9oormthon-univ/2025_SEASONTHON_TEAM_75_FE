@@ -7,6 +7,7 @@ import NavHistoryIcon from "@assets/nav_history.svg";
 import NavSettingIcon from "@/assets/nav_setting.svg";
 
 const NavContainer = styled.nav`
+  background-color: #ffffff;
   position: fixed;
   bottom: 0;
   left: 50%;
@@ -17,15 +18,14 @@ const NavContainer = styled.nav`
   display: flex;
   justify-content: space-around;
   align-items: center;
-  background: #ffffff;
   box-sizing: border-box;
   border-top-left-radius: 15px;
   border-top-right-radius: 15px;
   box-shadow: 0 -2px 7px 0 rgba(0, 0, 0, 0.07);
 
-  /* PC 환경에서 중앙 고정 */
-  @media (hover: hover) and (pointer: fine) {
+  @media screen and (min-width: 1025px) {
     width: 393px;
+    margin: 0 auto;
   }
 `;
 
@@ -35,11 +35,17 @@ const NavItem = styled(Link)`
   align-items: center;
   justify-content: center;
   text-decoration: none;
-  gap: 4px;
+  gap: 1px;
   color: ${({ theme }) => theme.colors.text3};
   font-size: 10px;
   font-weight: 500;
   flex: 1;
+  padding-bottom: 20px;
+
+  &:visited,
+  &:active {
+    color: ${({ theme }) => theme.colors.text3};
+  }
 `;
 
 const NavIcon = styled.img`
