@@ -25,6 +25,10 @@ const GlobalStyle = createGlobalStyle`
     border: none;
     background: none;
     cursor: pointer;
+
+    &:focus {
+      outline: none;
+    }
   }
 
   html, body, #root {
