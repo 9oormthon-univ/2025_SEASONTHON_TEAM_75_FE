@@ -17,6 +17,8 @@ const Container = styled.div<{ $hasNavbar: boolean }>`
   overflow-y: scroll;
   -ms-overflow-style: none;
   scrollbar-width: none;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
   &::-webkit-scrollbar {
     display: none;
   }

@@ -49,7 +49,6 @@ const GlobalStyle = createGlobalStyle`
   }
 
   body {
-    background-color: var(--box);
     color: var(--text1);
   }
 `;
