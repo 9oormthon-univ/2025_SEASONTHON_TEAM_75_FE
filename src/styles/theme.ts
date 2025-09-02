@@ -1,6 +1,7 @@
 const colors = {
-  main: "#7FDCD2",
-  sub: "#CCF8F3",
+  main: "#0AC2A6",
+  sub1: "#EBFCFA",
+  sub2: "#E7FCD1",
   box: "#F7F8F9",
   text5: "#F0F2F3",
   text4: "#D8D9DB",

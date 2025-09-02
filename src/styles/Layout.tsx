@@ -13,7 +13,6 @@ const Container = styled.div<{ $hasNavbar: boolean }>`
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
-  padding-bottom: ${({ $hasNavbar }) => ($hasNavbar ? "96px" : "0")};
   overflow-y: scroll;
   -ms-overflow-style: none;
   scrollbar-width: none;

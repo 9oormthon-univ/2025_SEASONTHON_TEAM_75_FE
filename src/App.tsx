@@ -9,6 +9,9 @@ import ProfileSetting from "@routes/onboarding/ProfileSetting";
 import Location from "@routes/location/Location";
 import LocationSearch from "@routes/location/LocationSearch";
 import Scan from "@routes/scan/Scan";
+import ScanLoading from "@routes/scan/ScanLoading";
+import ScanFail from "@routes/scan/ScanFail";
+import ScanResult from "@routes/scan/ScanResult";
 import Chat from "@routes/chat/Chat";
 import History from "@routes/history/History";
 import Setting from "@routes/setting/Setting";
@@ -79,14 +82,40 @@ function App() {
                 </Layout>
               }
             />
-            <Route
-              path="/scan"
-              element={
-                <Layout showNavbar={false}>
-                  <Scan />
-                </Layout>
-              }
-            />
+            <Route path="/scan">
+              <Route
+                index
+                element={
+                  <Layout showNavbar={false}>
+                    <Scan />
+                  </Layout>
+                }
+              />
+              <Route
+                path="loading"
+                element={
+                  <Layout showNavbar={false}>
+                    <ScanLoading />
+                  </Layout>
+                }
+              />
+              <Route
+                path="fail"
+                element={
+                  <Layout showNavbar={false}>
+                    <ScanFail />
+                  </Layout>
+                }
+              />
+              <Route
+                path="result"
+                element={
+                  <Layout showNavbar={true}>
+                    <ScanResult />
+                  </Layout>
+                }
+              />
+            </Route>
             <Route
               path="/chat"
               element={
