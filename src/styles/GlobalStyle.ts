@@ -9,6 +9,7 @@ const GlobalStyle = createGlobalStyle`
     font-family: 'Pretendard';
     background-color: #fff;
     margin: 0;
+    padding: 0;
     overflow-x: hidden;
     min-width: 100vw;
     min-height: 100vh;
