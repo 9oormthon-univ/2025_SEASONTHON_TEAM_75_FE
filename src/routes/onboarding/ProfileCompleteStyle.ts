@@ -1,0 +1,62 @@
+import styled from "styled-components";
+
+export const Page = styled.div`
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 0 16px;
+
+  height: 100%;
+  background-color: white;
+
+  color: ${({ theme }) => theme.colors.text1};
+  text-align: center;
+  font-family: Pretendard;
+`;
+
+export const Image = styled.div`
+  background-color: ${({ theme }) => theme.colors.text4};
+  width: 245px;
+  height: 245px;
+
+  margin-bottom: 79px;
+`;
+
+export const Title = styled.div`
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 12px;
+`;
+
+export const SubTitle = styled.div`
+  color: ${({ theme }) => theme.colors.text2};
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 140%;
+  white-space: pre-wrap;
+
+  margin-bottom: 60px;
+`;
+
+export const ButtonGroup = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+
+  position: absolute;
+  bottom: 70px;
+`;
+
+export const Button = styled.button`
+  color: ${({ theme }) => theme.colors.text3};
+  font-family: Pretendard;
+  font-size: 16px;
+  font-weight: 500;
+  text-decoration-line: underline;
+  text-underline-offset: 18%;
+  padding: 0;
+`;
