@@ -130,5 +130,5 @@ export const TrashCardList = styled.div`
   flex-direction: column;
   gap: 12px;
   padding: 0 1.5rem;
-  margin-bottom: 50px;
+  margin-bottom: 100px;
 `;
