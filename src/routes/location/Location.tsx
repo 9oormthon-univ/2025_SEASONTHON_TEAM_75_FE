@@ -1,15 +1,9 @@
 import * as L from "./LocationStyle";
 import { Map, MapMarker, useKakaoLoader } from "react-kakao-maps-sdk";
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useReducer,
-  useState,
-} from "react";
+import { useCallback, useEffect, useMemo, useReducer, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import Header from "@components/Header";
-import LocationModal from "@components/LocationModal";
+import LocationModal from "@components/location/LocationModal";
 import InfoIcon from "@assets/info.svg";
 import PlusIcon from "@assets/plus.svg";
 import LocationSelectButton from "@components/location/LocationSelectButton";

@@ -3,7 +3,9 @@ import { ThemeProvider } from "styled-components";
 import GlobalStyle from "@styles/GlobalStyle";
 import Layout from "@styles/Layout";
 import Home from "@routes/home/Home";
-import Onboarding from "@routes/onboarding/Onboarding";
+import Splash from "@routes/onboarding/Splash";
+import Login from "@routes/onboarding/Login";
+import ProfileSetting from "@routes/onboarding/ProfileSetting";
 import Location from "@routes/location/Location";
 import LocationSearch from "@routes/location/LocationSearch";
 import Scan from "@routes/scan/Scan";
@@ -15,6 +17,7 @@ import History from "@routes/history/History";
 import Setting from "@routes/setting/Setting";
 import NotFound from "@routes/NotFound";
 import theme from "@styles/theme";
+import ProfileComplete from "@routes/onboarding/ProfileComplete";
 
 function App() {
   return (
@@ -27,7 +30,31 @@ function App() {
               path="/"
               element={
                 <Layout showNavbar={false}>
-                  <Onboarding />
+                  <Splash />
+                </Layout>
+              }
+            />
+            <Route
+              path="/login"
+              element={
+                <Layout showNavbar={false}>
+                  <Login />
+                </Layout>
+              }
+            />
+            <Route
+              path="/profile"
+              element={
+                <Layout showNavbar={false}>
+                  <ProfileSetting />
+                </Layout>
+              }
+            />
+            <Route
+              path="/profile-complete"
+              element={
+                <Layout showNavbar={false}>
+                  <ProfileComplete />
                 </Layout>
               }
             />

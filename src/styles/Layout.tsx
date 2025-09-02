@@ -6,7 +6,7 @@ interface LayoutProps {
   showNavbar?: boolean;
 }
 
-const Container = styled.div`
+const Container = styled.div<{ $hasNavbar: boolean }>`
   width: 100vw;
   height: 100dvh;
   margin: 0 auto;
@@ -35,7 +35,7 @@ const Content = styled.main`
 
 export default function Layout({ children, showNavbar = true }: LayoutProps) {
   return (
-    <Container>
+    <Container $hasNavbar={showNavbar}>
       <Content>{children}</Content>
       {showNavbar && <Navbar />}
     </Container>
