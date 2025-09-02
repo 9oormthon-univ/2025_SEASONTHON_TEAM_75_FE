@@ -24,7 +24,7 @@ const Container = styled.div<{ $selected: boolean }>`
     ${({ theme, $selected }) =>
       $selected ? theme.colors.main : theme.colors.text4};
   background: ${({ theme, $selected }) =>
-    $selected ? theme.colors.sub : "white"};
+    $selected ? theme.colors.sub1 : "white"};
 
   img {
     width: 24px;
