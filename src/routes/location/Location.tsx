@@ -15,7 +15,11 @@ const MODAL_DISMISSED_KEY = "locationModalDismissed";
 const DEFAULT_CENTER: LatLng = { lat: 37.525121, lng: 126.96339 };
 
 type GeocoderStatus = "OK" | "ZERO_RESULT" | "ERROR";
-type RegionCodeResult = { code: string; region_type: string };
+type RegionCodeResult = {
+  code: string;
+  region_type: string;
+  address_name: string;
+};
 
 type GeocoderLike = {
   coord2RegionCode: (

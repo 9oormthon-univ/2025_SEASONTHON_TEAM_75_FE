@@ -43,6 +43,23 @@ export const SearchBox = styled.div`
   }
 `;
 
+export const Now = styled.button`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 48px;
+  gap: 6px;
+  border-radius: 10px;
+  border: 1px solid ${({ theme }) => theme.colors.text4};
+
+  color: ${({ theme }) => theme.colors.text1};
+  font-family: Pretendard;
+  font-size: 16px;
+  font-weight: 500;
+
+  margin: 10px 16px 10px 16px;
+`;
+
 export const SearchList = styled.div`
   margin-top: 4px;
 `;

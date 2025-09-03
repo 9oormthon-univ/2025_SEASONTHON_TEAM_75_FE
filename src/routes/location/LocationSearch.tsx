@@ -4,7 +4,9 @@ import * as L from "./LocationSearchStyle";
 import Header from "@components/Header";
 import SearchIcon from "@/assets/search.svg";
 import XIcon from "@/assets/search_x.svg";
+import ScopeIcon from "@/assets/scope.svg";
 import LocationSearchItem from "@components/location/LocationSearchItem";
+import { useKakaoLoader } from "react-kakao-maps-sdk";
 
 type Sigungu = {
   code: string;
@@ -21,7 +23,11 @@ const LocationSearch = () => {
   const [keyword, setKeyword] = useState("");
   const navigate = useNavigate();
 
-  // sig.json 데이터 저장
+  const [loading, error] = useKakaoLoader({
+    appkey: import.meta.env.VITE_KAKAO_JS_KEY as string,
+    libraries: ["services"],
+  });
+
   const [sigunguList, setSigunguList] = useState<Sigungu[]>([]);
 
   useEffect(() => {
@@ -38,9 +44,7 @@ const LocationSearch = () => {
   }, []);
 
   const filteredList = useMemo(() => {
-    if (!keyword) {
-      return [];
-    }
+    if (!keyword) return [];
     return sigunguList.filter((sgg) => sgg.name.includes(keyword));
   }, [keyword, sigunguList]);
 
@@ -53,6 +57,49 @@ const LocationSearch = () => {
         sigCode: sigCode,
       },
     });
+  };
+
+  const handleFindByCurrentLocation = () => {
+    if (loading || error) {
+      alert(
+        "지도 서비스 로딩 중이거나 오류가 발생했습니다. 잠시 후 다시 시도해주세요."
+      );
+      return;
+    }
+
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          const geocoder = new window.kakao.maps.services.Geocoder();
+
+          geocoder.coord2RegionCode(longitude, latitude, (result, status) => {
+            if (status === window.kakao.maps.services.Status.OK) {
+              const region = result.find(
+                (r) => r.region_type === "H" || r.region_type === "B"
+              );
+              if (region) {
+                const title = region.address_name;
+                const sigCode = region.code.slice(0, 5);
+                handlePick(title, sigCode);
+              } else {
+                alert("현재 위치의 지역 정보를 찾을 수 없습니다.");
+              }
+            } else {
+              alert("현재 위치의 지역 정보를 가져오는 데 실패했습니다.");
+            }
+          });
+        },
+        (err) => {
+          console.error(err);
+          alert(
+            "위치 정보를 가져오는 데 실패했습니다. 위치 정보 접근을 허용했는지 확인해주세요."
+          );
+        }
+      );
+    } else {
+      alert("이 브라우저에서는 위치 기능을 사용할 수 없습니다.");
+    }
   };
 
   return (
@@ -73,6 +120,11 @@ const LocationSearch = () => {
           </button>
         )}
       </L.SearchBox>
+
+      <L.Now onClick={handleFindByCurrentLocation}>
+        <img src={ScopeIcon} alt="현재 위치" />
+        <p>현재 위치로 찾기</p>
+      </L.Now>
 
       <L.SearchList>
         {filteredList.map((sgg) => (
