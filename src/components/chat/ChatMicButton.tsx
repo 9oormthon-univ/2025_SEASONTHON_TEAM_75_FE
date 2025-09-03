@@ -1,7 +1,13 @@
 import styled from "styled-components";
-import MicIcon from "@assets/chat_no_mic.svg";
+import NoMicIcon from "@assets/chat_no_mic.svg";
+import MicIcon from "@assets/chat_mic.svg";
 
-const Button = styled.button`
+type MicProps = {
+  active?: boolean;
+  onClick?: () => void;
+};
+
+const Button = styled.button<{ $active?: boolean }>`
   position: absolute;
   display: flex;
   justify-content: center;
@@ -13,10 +19,15 @@ const Button = styled.button`
   padding: 0;
 `;
 
-const ChatMicButton = () => {
+const ChatMicButton = ({ active = false, onClick }: MicProps) => {
+  const handleClick = () => {
+    if (!active) return;
+    onClick?.();
+  };
+
   return (
-    <Button>
-      <img src={MicIcon} alt="마이크" />
+    <Button onClick={handleClick} $active={active}>
+      <img src={active ? MicIcon : NoMicIcon} alt="마이크" />
     </Button>
   );
 };

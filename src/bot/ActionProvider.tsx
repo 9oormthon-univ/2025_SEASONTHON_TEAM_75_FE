@@ -20,13 +20,18 @@ type PossiblyWidgetMessage = {
 
 export type Actions = {
   selectSearchMode: (mode: "word" | "category", title: string) => void;
+  setSelectedMode: (mode: "word" | "category" | null) => void;
 };
 
-type ActionProviderProps = {
+export type ActionProviderProps = {
   createChatBotMessage: typeof _createChatBotMessage;
   createClientMessage?: typeof _makeClientMessage;
   setState: React.Dispatch<React.SetStateAction<ChatState>>;
   children: React.ReactNode;
+
+  setSelectedMode: React.Dispatch<
+    React.SetStateAction<"word" | "category" | null>
+  >;
 };
 
 function isPossiblyWidgetMessage(
@@ -40,6 +45,7 @@ const ActionProvider: React.FC<ActionProviderProps> = ({
   createClientMessage,
   setState,
   children,
+  setSelectedMode,
 }) => {
   const clientMsg = (
     text: string,
@@ -94,6 +100,11 @@ const ActionProvider: React.FC<ActionProviderProps> = ({
 
         return { ...prev, messages: [...msgs, userMsg, next] };
       });
+
+      setSelectedMode(mode);
+    },
+    setSelectedMode: (mode) => {
+      setState((prev) => ({ ...prev, selectedMode: mode }));
     },
   };
 
