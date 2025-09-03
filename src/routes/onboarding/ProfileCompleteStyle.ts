@@ -16,12 +16,10 @@ export const Page = styled.div`
   font-family: Pretendard;
 `;
 
-export const Image = styled.div`
-  background-color: ${({ theme }) => theme.colors.text4};
-  width: 245px;
-  height: 245px;
+export const Image = styled.img`
+  width: 134px;
 
-  margin-bottom: 79px;
+  margin-bottom: 36px;
 `;
 
 export const Title = styled.div`
