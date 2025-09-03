@@ -5,6 +5,11 @@ export const HomeContainer = styled.div`
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 `;
 
 export const HomeHeader = styled.div`
@@ -51,17 +56,17 @@ export const MainSection = styled.div`
   font-family: "Pretendard";
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
   width: calc(100% - 2rem);
   margin: 0 auto;
   box-sizing: border-box;
-  height: 345px;
+  height: 350px;
   border-radius: 30px;
-  background-image: url("/home_card.svg");
+  background-image: url("/home_bg.svg");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
   padding: 1.3rem;
+  margin-top: 1.3rem;
 `;
 
 export const Today = styled.div`
@@ -75,38 +80,49 @@ export const Today = styled.div`
   align-items: center;
 `;
 
-export const Titles = styled.div``;
-
-export const TitleTop = styled.div`
+export const Titles = styled.div`
+  color: ${({ theme }) => theme.colors.text1};
   font-weight: 500;
   font-size: 26px;
+  margin: 10px 0;
 `;
 
-export const TitleBottom = styled.div`
-  font-weight: 500;
-  font-size: 26px;
-`;
+export const TitleTop = styled.div``;
+
+export const TitleBottom = styled.div``;
 
 export const Highlight1 = styled.span`
   font-weight: 700;
-  margin: 0;
 `;
 
 export const Highlight2 = styled.span`
-  color: #5bd6c9;
+  color: ${({ theme }) => theme.colors.main};
   font-weight: 700;
-  margin: 0;
 `;
 
 export const SubTitle = styled.div`
-  font-weight: 600;
-  font-size: 18px;
-  margin: 0.8rem 0;
+  font-weight: 500;
+  font-size: 16px;
+  color: #6f7274;
+  margin-top: 10px;
+`;
+
+export const MainIcon = styled.div`
+  width: 100%;
+  flex: 1;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  img {
+    height: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
 `;
 
 export const BgBox = styled.div`
   background-color: #f8f8f8;
-  border-radius: 25px 25px 0 0;
   width: 100%;
   margin-top: 1rem;
   flex: 1;
