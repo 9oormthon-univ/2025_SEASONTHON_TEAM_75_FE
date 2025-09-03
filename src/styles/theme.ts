@@ -9,6 +9,8 @@ const colors = {
   text2: "#6F7274",
   text1: "#2F2F2E",
   button: "#5BD6C9",
+  nav: "#BABFC0",
+  navAct: "#565C5C",
 };
 
 const theme = {

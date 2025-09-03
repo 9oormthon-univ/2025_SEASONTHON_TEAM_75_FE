@@ -1,10 +1,17 @@
 import styled from "styled-components";
-import { Link } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 import NavHomeIcon from "@assets/nav_home.svg";
-import NavChatIcon from "@assets/nav_chat.svg";
+import NavChatIcon from "@assets/nav_chat.png";
 import NavScanIcon from "@assets/nav_scan.svg";
 import NavHistoryIcon from "@assets/nav_history.svg";
 import NavSettingIcon from "@/assets/nav_setting.svg";
+import NavHomeIconAct from "@assets/nav_home_act.svg";
+import NavHistoryIconAct from "@assets/nav_history_act.svg";
+import NavSettingIconAct from "@/assets/nav_setting_act.svg";
+
+interface NavItemProps {
+  $isActive: boolean;
+}
 
 const NavContainer = styled.nav`
   background-color: #ffffff;
@@ -22,6 +29,7 @@ const NavContainer = styled.nav`
   border-top-left-radius: 15px;
   border-top-right-radius: 15px;
   box-shadow: 0 -2px 7px 0 rgba(0, 0, 0, 0.07);
+  pointer-events: auto;
 
   @media screen and (min-width: 1025px) {
     width: 393px;
@@ -29,22 +37,24 @@ const NavContainer = styled.nav`
   }
 `;
 
-const NavItem = styled(Link)`
+const NavItem = styled(NavLink)<NavItemProps>`
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   text-decoration: none;
   gap: 1px;
-  color: ${({ theme }) => theme.colors.text3};
+  color: ${({ theme, $isActive }) =>
+    $isActive ? theme.colors.navAct : theme.colors.nav};
   font-size: 10px;
   font-weight: 500;
   flex: 1;
   padding-bottom: 20px;
 
-  &:visited,
-  &:active {
-    color: ${({ theme }) => theme.colors.text3};
+  &:active,
+  &:visited {
+    color: ${({ theme, $isActive }) =>
+      $isActive ? theme.colors.navAct : theme.colors.nav};
   }
 `;
 
@@ -53,7 +63,7 @@ const NavIcon = styled.img`
   height: 30px;
 `;
 
-const ScanButton = styled(Link)`
+const ScanButton = styled(NavLink)`
   width: 68px;
   height: 68px;
   border-radius: 46.9px;
@@ -71,25 +81,35 @@ const ScanButton = styled(Link)`
 `;
 
 function Navbar() {
+  const location = useLocation();
+  const isHomeActive = location.pathname.startsWith("/home");
+  const isHistoryActive = location.pathname.startsWith("/history");
+  const isSettingActive = location.pathname.startsWith("/setting");
   return (
     <NavContainer>
-      <NavItem to="/home">
-        <NavIcon src={NavHomeIcon} alt="홈" />
+      <NavItem to="/home" $isActive={isHomeActive}>
+        <NavIcon src={isHomeActive ? NavHomeIconAct : NavHomeIcon} alt="홈" />
         <span>홈</span>
       </NavItem>
-      <NavItem to="/chat">
+      <NavItem to="/chat" $isActive={false}>
         <NavIcon src={NavChatIcon} alt="챗봇" />
         <span>챗봇</span>
       </NavItem>
       <ScanButton to="/scan">
         <img src={NavScanIcon} alt="스캔" />
       </ScanButton>
-      <NavItem to="/history">
-        <NavIcon src={NavHistoryIcon} alt="최근기록" />
+      <NavItem to="/history" $isActive={isHistoryActive}>
+        <NavIcon
+          src={isHistoryActive ? NavHistoryIconAct : NavHistoryIcon}
+          alt="최근기록"
+        />
         <span>최근기록</span>
       </NavItem>
-      <NavItem to="/setting">
-        <NavIcon src={NavSettingIcon} alt="설정" />
+      <NavItem to="/setting" $isActive={isSettingActive}>
+        <NavIcon
+          src={isSettingActive ? NavSettingIconAct : NavSettingIcon}
+          alt="설정"
+        />
         <span>설정</span>
       </NavItem>
     </NavContainer>
