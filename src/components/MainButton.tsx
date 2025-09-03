@@ -18,7 +18,7 @@ const Button = styled.button`
   font-weight: 700;
   letter-spacing: -0.165px;
 
-  background-color: ${({ theme }) => theme.colors.button};
+  background-color: ${({ theme }) => theme.colors.main};
   border-radius: 12px;
   height: 59px;
   width: 100%;

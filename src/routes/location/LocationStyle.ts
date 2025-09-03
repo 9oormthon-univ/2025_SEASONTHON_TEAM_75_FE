@@ -18,7 +18,7 @@ export const Top = styled.div`
 export const Bottom = styled.div<{ $setup?: boolean }>`
   position: fixed;
   bottom: 0;
-  height: ${({ $setup }) => ($setup ? "334px" : "408px")};
+  height: ${({ $setup }) => ($setup ? "254px" : "408px")};
   padding: 24px 16px;
   box-sizing: border-box; /* 패딩 포함 width 계산 */
 
@@ -26,7 +26,7 @@ export const Bottom = styled.div<{ $setup?: boolean }>`
   background: #ffffff;
 
   color: ${({ theme }) => theme.colors.text1};
-  font-size: ${({ $setup }) => ($setup ? "16px" : "20px")};
+  font-size: ${({ $setup }) => ($setup ? "18px" : "20px")};
   font-weight: 700;
 
   z-index: 1;
@@ -42,28 +42,21 @@ export const Bottom = styled.div<{ $setup?: boolean }>`
   }
 `;
 
-export const LocationGroup = styled.div`
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 10px;
-  margin-top: 16px;
-  margin-bottom: 39px;
-`;
-
-export const RegisterButton = styled.div`
+export const Warn = styled.div`
   display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  width: 100%;
-  height: 64px;
 
-  color: white;
-  font-size: 20px;
-  font-weight: 700;
+  padding: 14px;
+  justify-content: flex-start;
+  gap: 7px;
 
-  border-radius: 16px;
-  background: ${({ theme }) => theme.colors.button};
+  border-radius: 12px;
+  background: var(--red2, #fdf4f4);
+
+  color: #eb455b;
+  font-size: 14px;
+  font-weight: 500;
+
+  margin: 20px 0 16px 0;
 `;
 
 export const ButtonGroup = styled.div`

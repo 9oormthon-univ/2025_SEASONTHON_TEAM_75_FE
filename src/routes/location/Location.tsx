@@ -6,8 +6,13 @@ import Header from "@components/Header";
 import LocationModal from "@components/location/LocationModal";
 import InfoIcon from "@assets/info.svg";
 import PlusIcon from "@assets/plus.svg";
-import LocationSelectButton from "@components/location/LocationSelectButton";
+import WarnIcon from "@assets/warning.svg";
 import LocationList from "@components/location/LocationList";
+import MainButton from "@components/MainButton";
+
+// 상수
+const MODAL_DISMISSED_KEY = "locationModalDismissed";
+const DEFAULT_CENTER: LatLng = { lat: 37.525121, lng: 126.96339 };
 
 type GeocoderStatus = "OK" | "ZERO_RESULT" | "ERROR";
 type RegionCodeResult = { code: string; region_type: string };
@@ -20,14 +25,23 @@ type GeocoderLike = {
   ) => void;
 };
 
+type KakaoLatLng = {
+  getLat: () => number;
+  getLng: () => number;
+};
+
 declare global {
   interface Window {
     kakao: {
       maps: {
-        LatLng: new (lat: number, lng: number) => unknown;
+        LatLng: new (lat: number, lng: number) => KakaoLatLng;
+
         LatLngBounds: new () => {
-          extend: (latlng: unknown) => void;
+          extend: (latlng: KakaoLatLng) => void;
+          getSouthWest: () => KakaoLatLng;
+          getNorthEast: () => KakaoLatLng;
         };
+
         services: {
           Geocoder: new () => GeocoderLike;
         };
@@ -74,17 +88,14 @@ type LocationState = {
   source?: "location_search";
   setup?: boolean;
   selected?: string;
+  sigCode?: string;
 } | null;
 
 export type MyLocationItem = {
   id: string | number;
-  type: "집" | "회사" | "기타";
   title: string;
+  sigCode: string;
 };
-
-// 상수
-const MODAL_DISMISSED_KEY = "locationModalDismissed";
-const DEFAULT_CENTER: LatLng = { lat: 37.525121, lng: 126.96339 };
 
 // Hooks
 function useQueryLocationState() {
@@ -94,6 +105,7 @@ function useQueryLocationState() {
     isFromSearch,
     setup: isFromSearch && !!state?.setup,
     selectedTitleFromQuery: isFromSearch ? state?.selected : undefined,
+    sigCodeFromQuery: isFromSearch ? state?.sigCode : undefined, // sigCode 추출
   } as const;
 }
 
@@ -191,29 +203,19 @@ function useLocationGuideModal(isSetupMode: boolean) {
 // 설정 패널
 function SetupPanel({
   selectedTitle,
-  selectedType,
-  onChangeType,
   onRegister,
 }: {
   selectedTitle?: string;
-  selectedType: "집" | "회사" | "기타";
-  onChangeType: (t: "집" | "회사" | "기타") => void;
   onRegister: () => void;
 }) {
   return (
     <L.Bottom $setup>
       <p>{selectedTitle ?? "선택한 동네"}</p>
-      <L.LocationGroup>
-        {(["집", "회사", "기타"] as const).map((t) => (
-          <LocationSelectButton
-            key={t}
-            title={t}
-            selected={selectedType === t}
-            onClick={() => onChangeType(t)}
-          />
-        ))}
-      </L.LocationGroup>
-      <L.RegisterButton onClick={onRegister}>등록</L.RegisterButton>
+      <L.Warn>
+        <img src={WarnIcon} alt="경고" />
+        <p>지도의 표시와 실제 주소가 맞는지 확인해주세요.</p>
+      </L.Warn>
+      <MainButton title="등록" onClick={onRegister} />
     </L.Bottom>
   );
 }
@@ -240,7 +242,6 @@ function ListPanel({
           <LocationList
             key={loc.id}
             id={loc.id}
-            type={loc.type}
             title={loc.title}
             selected={selectedId === loc.id}
             onClick={() => onSelect(loc.id)}
@@ -263,16 +264,22 @@ export default function LocationPage() {
     isFromSearch,
     setup: setupFromQuery,
     selectedTitleFromQuery,
+    sigCodeFromQuery,
   } = useQueryLocationState();
 
   const [isSetupMode, setIsSetupMode] = useState<boolean>(setupFromQuery);
-  const [selectedType, setSelectedType] = useState<"집" | "회사" | "기타">(
-    "집"
-  );
   const [selectedTitle, setSelectedTitle] = useState<string | undefined>(
     selectedTitleFromQuery
   );
   const [showInfo, setShowInfo] = useState<boolean>(false);
+  const [mapCenter, setMapCenter] = useState<LatLng>(DEFAULT_CENTER); // 포커스
+
+  // 내 동네 목록
+  const initialItems = useMemo<MyLocationItem[]>(() => [], []);
+  const [state, dispatch] = useReducer(reducer, {
+    items: initialItems,
+    selectedId: initialItems.length ? initialItems[0].id : null,
+  } as State);
 
   // Kakao SDK
   const [loading] = useKakaoLoader({
@@ -280,11 +287,23 @@ export default function LocationPage() {
     libraries: ["services"],
   });
 
-  // 내 위치
+  // 포커스 위치
   const { pos: myLocation, error: geoError } = useGeoPosition();
   useEffect(() => {
     if (geoError) alert(geoError);
   }, [geoError]);
+
+  useEffect(() => {
+    const isLocationSelected = setupFromQuery || state.selectedId !== null;
+
+    if (
+      (myLocation.lat !== DEFAULT_CENTER.lat ||
+        myLocation.lng !== DEFAULT_CENTER.lng) &&
+      !isLocationSelected
+    ) {
+      setMapCenter(myLocation);
+    }
+  }, [myLocation, setupFromQuery, state.selectedId]);
 
   // 시군구 GeoJSON 로드
   const [features, setFeatures] = useState<GeoJSONFeature[] | null>(null);
@@ -298,50 +317,41 @@ export default function LocationPage() {
       .catch((e: unknown) => console.error("sig.json 로드 실패:", e));
   }, []);
 
-  // 현재 좌표 -> 시군구 코드
-  const [sigCode, setSigCode] = useState<string | null>(null);
   useEffect(() => {
-    if (
-      loading ||
-      !window.kakao?.maps?.services ||
-      (myLocation.lat === DEFAULT_CENTER.lat &&
-        myLocation.lng === DEFAULT_CENTER.lng)
-    ) {
-      return;
-    }
-
-    const geocoder: GeocoderLike = new window.kakao.maps.services.Geocoder();
-
-    geocoder.coord2RegionCode(
-      myLocation.lng,
-      myLocation.lat,
-      (results: RegionCodeResult[], status: GeocoderStatus) => {
-        if (status !== "OK") return;
-        const code10: string | undefined = results[0]?.code;
-        if (code10) {
-          const fiveDigitCode = code10.slice(0, 5);
-          console.log("지역코드:", fiveDigitCode);
-          setSigCode(fiveDigitCode);
-        }
-      }
-    );
-  }, [myLocation, loading]);
+    setIsSetupMode(setupFromQuery);
+    setSelectedTitle(selectedTitleFromQuery);
+  }, [setupFromQuery, selectedTitleFromQuery]);
 
   // 폴리곤 path
   const [sigPaths, setSigPaths] = useState<LatLng[][]>([]);
   useEffect(() => {
-    if (!features || !sigCode) return;
+    let codeToDisplay: string | undefined = undefined;
+
+    if (isSetupMode) {
+      codeToDisplay = sigCodeFromQuery;
+    } else {
+      const selectedItem = state.items.find(
+        (item) => item.id === state.selectedId
+      );
+      codeToDisplay = selectedItem?.sigCode;
+    }
+
+    if (!features || !codeToDisplay) {
+      setSigPaths([]);
+      return;
+    }
+
     const f: GeoJSONFeature | undefined = features.find(
-      (ft) => ft.properties.SIG_CD === sigCode
+      (ft) => ft.properties.SIG_CD === codeToDisplay
     );
+
     if (!f) {
       setSigPaths([]);
       return;
     }
     setSigPaths(toLatLngPaths(f.geometry));
-  }, [features, sigCode]);
+  }, [features, state.selectedId, state.items, isSetupMode, sigCodeFromQuery]);
 
-  // 맵 인스턴스 & 폴리곤 bounds 맞추기(옵션)
   const [map, setMap] = useState<unknown>(null);
   useEffect(() => {
     if (!map || sigPaths.length === 0) return;
@@ -352,29 +362,20 @@ export default function LocationPage() {
         bounds.extend(new window.kakao.maps.LatLng(lat, lng))
       )
     );
+
     (map as { setBounds: (b: unknown) => void }).setBounds(bounds);
+
+    const sw = bounds.getSouthWest();
+    const ne = bounds.getNorthEast();
+
+    const centerLat = (sw.getLat() + ne.getLat()) / 2;
+    const centerLng = (sw.getLng() + ne.getLng()) / 2;
+
+    setMapCenter({ lat: centerLat, lng: centerLng });
   }, [map, sigPaths]);
 
   // 모달
   const modal = useLocationGuideModal(isSetupMode);
-
-  // 내 동네 목록
-  const initialItems = useMemo<MyLocationItem[]>(
-    () => [
-      { id: 1, type: "기타", title: "서울시 마포구 합정동" },
-      { id: 2, type: "집", title: "서울시 용산구 이촌동" },
-    ],
-    []
-  );
-  const [state, dispatch] = useReducer(reducer, {
-    items: initialItems,
-    selectedId: initialItems.length ? initialItems[0].id : null,
-  } as State);
-
-  useEffect(() => {
-    setIsSetupMode(setupFromQuery);
-    setSelectedTitle(selectedTitleFromQuery);
-  }, [setupFromQuery, selectedTitleFromQuery]);
 
   // 삭제 확인
   const [deleteTargetId, setDeleteTargetId] = useState<string | number | null>(
@@ -407,11 +408,28 @@ export default function LocationPage() {
     [navigate]
   );
   const handleRegister = useCallback(() => {
-    console.log("동네 등록:", selectedTitle, myLocation, selectedType);
+    if (selectedTitle && sigCodeFromQuery) {
+      const newItem: MyLocationItem = {
+        id: Date.now(),
+        title: selectedTitle,
+        sigCode: sigCodeFromQuery,
+      };
+      dispatch({ type: "add", item: newItem });
+    }
+
     setIsSetupMode(false);
     setSelectedTitle(undefined);
     if (isFromSearch) navigate(".", { replace: true, state: null });
-  }, [selectedTitle, myLocation, selectedType, isFromSearch, navigate]);
+  }, [isFromSearch, navigate, selectedTitle, sigCodeFromQuery]);
+
+  if (loading) {
+    return (
+      <L.Page>
+        <Header title={"내 동네 설정"} />
+        <div style={{ padding: "20px" }}>지도 로딩중...</div>
+      </L.Page>
+    );
+  }
 
   return (
     <L.Page>
@@ -426,9 +444,9 @@ export default function LocationPage() {
       />
 
       <Map
-        center={myLocation}
+        center={mapCenter}
         level={7}
-        style={{ width: "100%", height: "50%" }}
+        style={{ width: "100%", height: isSetupMode ? "70%" : "50%" }}
         onCreate={setMap}
       >
         <MapMarker position={myLocation} />
@@ -446,12 +464,7 @@ export default function LocationPage() {
       </Map>
 
       {isSetupMode ? (
-        <SetupPanel
-          selectedTitle={selectedTitle}
-          selectedType={selectedType}
-          onChangeType={setSelectedType}
-          onRegister={handleRegister}
-        />
+        <SetupPanel selectedTitle={selectedTitle} onRegister={handleRegister} />
       ) : (
         <ListPanel
           items={state.items}

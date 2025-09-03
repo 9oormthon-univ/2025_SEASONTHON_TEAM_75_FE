@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import * as L from "./LocationSearchStyle";
 import Header from "@components/Header";
@@ -6,23 +6,58 @@ import SearchIcon from "@/assets/search.svg";
 import XIcon from "@/assets/search_x.svg";
 import LocationSearchItem from "@components/location/LocationSearchItem";
 
+type Sigungu = {
+  code: string;
+  name: string;
+};
+
+type GeoJSONFeature = {
+  type: "Feature";
+  properties: { SIG_CD: string; SIG_KOR_NM: string };
+};
+type GeoJSON = { type: "FeatureCollection"; features: GeoJSONFeature[] };
+
 const LocationSearch = () => {
   const [keyword, setKeyword] = useState("");
   const navigate = useNavigate();
 
-  const handlePick = (title: string) => {
+  // sig.json 데이터 저장
+  const [sigunguList, setSigunguList] = useState<Sigungu[]>([]);
+
+  useEffect(() => {
+    fetch("/sig.json")
+      .then((res) => res.json())
+      .then((data: GeoJSON) => {
+        const list = data.features.map((feature) => ({
+          code: feature.properties.SIG_CD,
+          name: feature.properties.SIG_KOR_NM,
+        }));
+        setSigunguList(list);
+      })
+      .catch((e) => console.error("sig.json 로드 실패:", e));
+  }, []);
+
+  const filteredList = useMemo(() => {
+    if (!keyword) {
+      return [];
+    }
+    return sigunguList.filter((sgg) => sgg.name.includes(keyword));
+  }, [keyword, sigunguList]);
+
+  const handlePick = (title: string, sigCode: string) => {
     navigate("/location", {
       state: {
         source: "location_search",
         setup: true,
         selected: title,
+        sigCode: sigCode,
       },
     });
   };
 
   return (
     <L.Page>
-      <Header title={"내 동네 설정"} onBack={() => console.log("뒤로가기")} />
+      <Header title={"내 동네 설정"} onBack={() => navigate(-1)} />
 
       <L.SearchBox>
         <img src={SearchIcon} alt="검색" />
@@ -40,20 +75,16 @@ const LocationSearch = () => {
       </L.SearchBox>
 
       <L.SearchList>
-        <LocationSearchItem
-          title="서울시 마포구 성산동"
-          onClick={() => handlePick("서울시 마포구 성산동")}
-        />
-        <LocationSearchItem
-          title="서울시 마포구 망원동"
-          onClick={() => handlePick("서울시 마포구 망원동")}
-        />
-        <LocationSearchItem
-          title="서울시 마포구 서교동"
-          onClick={() => handlePick("서울시 마포구 서교동")}
-        />
+        {filteredList.map((sgg) => (
+          <LocationSearchItem
+            key={sgg.code}
+            title={sgg.name}
+            onClick={() => handlePick(sgg.name, sgg.code)}
+          />
+        ))}
       </L.SearchList>
     </L.Page>
   );
 };
+
 export default LocationSearch;
