@@ -123,7 +123,13 @@ const Chat: React.FC = () => {
             }}
           />
         )}
-        placeholderText={isListening ? "듣는 중..." : "옵션을 선택하세요"}
+        placeholderText={
+          isListening
+            ? "단어형태로 말씀해주세요"
+            : selectedMode === "word"
+            ? "메시지를 입력해주세요"
+            : "옵션을 선택하세요"
+        }
       />
 
       <ChatMicButton
