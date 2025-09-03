@@ -17,7 +17,7 @@ const ProfileSetting = () => {
 
   const handleComplete = () => {
     if (nickname.trim().length === 0) return;
-    navigate("/profile-complete");
+    navigate("/profile/complete");
   };
 
   return (
