@@ -1,5 +1,7 @@
 import styled from "styled-components";
-import RankingIcon from "@assets/rankingIcon.svg";
+import RankingUp from "@assets/rankingUp.svg";
+import RankingDown from "@assets/rankingDown.svg";
+import RecyclingIcon from "@assets/recycling.svg";
 
 export const ItemContainer = styled.div`
   width: 221px;
@@ -14,26 +16,26 @@ export const ItemContainer = styled.div`
 
 export const Rank = styled.div`
   position: absolute;
-  top: 3.2%;
+  top: 4%;
+  left: 4%;
   background-color: #ffffff;
   color: ${({ theme }) => theme.colors.main};
   font-family: "Pretendard";
   font-weight: 700;
   font-size: 14px;
-  width: 40px;
-  height: 20px;
-  border-radius: 12px;
+  width: 35px;
+  height: 21px;
+  border-radius: 18px;
   text-align: center;
   align-items: center;
 `;
 
 export const ItemImage = styled.img`
-  width: 93.6%;
-  height: 56.8%;
+  width: 100%;
+  height: 59%;
   object-fit: cover;
-  border-radius: 12px;
+  border-radius: 12px 12px 0 0;
   align-self: center;
-  margin-top: 3.2%;
 `;
 
 export const InfoWrapper = styled.div`
@@ -49,14 +51,23 @@ export const Name = styled.div`
   font-size: 18px;
 `;
 
-export const SearchCount = styled.div`
+export const Type = styled.div`
   color: ${({ theme }) => theme.colors.text3};
   font-family: "Pretendard";
   font-weight: 500;
   font-size: 13px;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+
+  img {
+    width: 12px;
+    height: 12px;
+    margin-right: 5px;
+  }
 `;
 
-export const ChangeBox = styled.div`
+export const SearchCountBoxUP = styled.div`
   border-radius: 5px;
   background-color: #fdf4f4;
   display: flex;
@@ -64,16 +75,28 @@ export const ChangeBox = styled.div`
   width: fit-content;
   padding: 3px 5px;
   gap: 5px;
-  margin: 5px 0 0 0;
+  margin: 10px 0 0 0;
+  color: #eb455b;
 `;
 
-export const ChangeIcon = styled.img`
+export const SearchCountBoxDown = styled.div`
+  border-radius: 5px;
+  background-color: #f2f8fe;
+  display: flex;
+  align-items: center;
+  width: fit-content;
+  padding: 3px 5px;
+  gap: 5px;
+  margin: 5px 0 0 0;
+  color: #3899e8;
+`;
+
+export const CountIcon = styled.img`
   width: 11px;
   height: 7px;
 `;
 
-export const ChangePercent = styled.div`
-  color: #eb455b;
+export const SearchCount = styled.div`
   font-family: "Pretendard";
   font-weight: 600;
   font-size: 11px;
@@ -83,16 +106,18 @@ interface RankingItemProps {
   rank: number;
   imageUrl: string;
   name: string;
+  type: string;
+  isUp: boolean;
   searchCount: number;
-  changePercentage: number;
 }
 
 const RankingItem = ({
   rank,
   imageUrl,
   name,
+  type,
+  isUp,
   searchCount,
-  changePercentage,
 }: RankingItemProps) => {
   return (
     <ItemContainer>
@@ -100,11 +125,21 @@ const RankingItem = ({
       <ItemImage src={imageUrl} alt={name} />
       <InfoWrapper>
         <Name>{name}</Name>
-        <SearchCount>검색량 {searchCount.toLocaleString()}회</SearchCount>
-        <ChangeBox>
-          <ChangeIcon src={RankingIcon} alt="랭킹 아이콘"></ChangeIcon>
-          <ChangePercent>전주 대비 +{changePercentage}%</ChangePercent>
-        </ChangeBox>
+        <Type>
+          <img src={RecyclingIcon} alt="재활용 아이콘" />
+          {type}
+        </Type>
+        {isUp ? (
+          <SearchCountBoxUP>
+            <CountIcon src={RankingUp} alt="랭킹 상승 아이콘" />
+            <SearchCount>검색량 {searchCount.toLocaleString()}회</SearchCount>
+          </SearchCountBoxUP>
+        ) : (
+          <SearchCountBoxDown>
+            <CountIcon src={RankingDown} alt="랭킹 하락 아이콘" />
+            <SearchCount>검색량 {searchCount.toLocaleString()}회</SearchCount>
+          </SearchCountBoxDown>
+        )}
       </InfoWrapper>
     </ItemContainer>
   );

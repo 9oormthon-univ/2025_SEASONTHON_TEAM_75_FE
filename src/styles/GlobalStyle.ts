@@ -16,6 +16,11 @@ const GlobalStyle = createGlobalStyle`
     @supports (-webkit-touch-callout: none) {
       min-height: -webkit-fill-available;
     }
+    &::-webkit-scrollbar {
+    display: none;
+  }
+  scrollbar-width: none;
+  -ms-overflow-style: none;
   }
   a {
     color: inherit;
