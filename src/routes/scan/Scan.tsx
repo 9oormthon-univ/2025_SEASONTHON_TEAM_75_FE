@@ -67,7 +67,7 @@ const Scan: React.FC = () => {
   const processImageAndNavigate = (imageDataUrl: string) => {
     try {
       console.log("이미지 처리 완료, ScanResult 페이지로 이동합니다.");
-      navigate("/scan/result", {
+      navigate("/scan/result/1", {
         state: {
           capturedImage: imageDataUrl,
         },

@@ -1,0 +1,126 @@
+import styled from "styled-components";
+import VinylIcon from "@assets/vinyl.svg";
+import PetIcon from "@assets/pet.svg";
+import ClothIcon from "@assets/cloth.svg";
+import RecyclingIcon from "@assets/recycling.svg";
+import Arrow from "@assets/history_arrow.svg";
+import NonSelectIcon from "@assets/history_nosel.svg";
+import SelectIcon from "@assets/history_sel.svg";
+
+export const Container = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px;
+  background-color: #ffffff;
+  border-radius: 11px;
+  box-shadow: 0 0 6px 0 rgba(0, 0, 0, 0.07);
+  cursor: pointer;
+  width: 100%;
+`;
+
+export const LeftSection = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+`;
+
+export const TrashImage = styled.img`
+  width: 63px;
+  height: 63px;
+  object-fit: cover;
+`;
+
+export const InfoWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+`;
+
+export const Name = styled.div`
+  color: ${({ theme }) => theme.colors.text1};
+  font-family: "Pretendard";
+  font-weight: 600;
+  font-size: 18px;
+`;
+
+export const Type = styled.div`
+  color: ${({ theme }) => theme.colors.text2};
+  font-family: "Pretendard";
+  font-weight: 500;
+  font-size: 14px;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+`;
+
+export const Icon = styled.img`
+  width: 14px;
+  height: 14px;
+  margin-right: 5px;
+`;
+
+export const RightSection = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-right: 5px;
+`;
+
+interface HistoryCardProps {
+  id: number;
+  type: string;
+  name: string;
+  mode: "view" | "edit";
+  isSelected?: boolean;
+  onClick: (id: number) => void;
+}
+
+const HistorytCard = ({
+  id,
+  type,
+  name,
+  mode,
+  isSelected,
+  onClick,
+}: HistoryCardProps) => {
+  const getMainIconForType = () => {
+    switch (type) {
+      case "PET(투명페트병)":
+        return PetIcon;
+      case "비닐류":
+        return VinylIcon;
+      case "의류·섬유류":
+        return ClothIcon;
+      default:
+        return PetIcon;
+    }
+  };
+
+  const renderRightIcon = () => {
+    if (mode === "edit") {
+      return (
+        <img src={isSelected ? SelectIcon : NonSelectIcon} alt="선택 아이콘" />
+      );
+    }
+    return <img src={Arrow} alt="상세보기 화살표" />;
+  };
+
+  return (
+    <Container onClick={() => onClick(id)}>
+      <LeftSection>
+        <TrashImage src={getMainIconForType()} alt={type} />
+        <InfoWrapper>
+          <Name>{name}</Name>
+          <Type>
+            <Icon src={RecyclingIcon} alt="재활용 아이콘" />
+            {type}
+          </Type>
+        </InfoWrapper>
+      </LeftSection>
+      <RightSection>{renderRightIcon()}</RightSection>
+    </Container>
+  );
+};
+
+export default HistorytCard;
