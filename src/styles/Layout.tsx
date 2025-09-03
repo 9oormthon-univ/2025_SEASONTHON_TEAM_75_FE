@@ -10,6 +10,7 @@ const Container = styled.div<{ $hasNavbar: boolean }>`
   width: 100vw;
   height: 100dvh;
   margin: 0 auto;
+  padding: 0;
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
@@ -31,6 +32,8 @@ const Container = styled.div<{ $hasNavbar: boolean }>`
 const Content = styled.main`
   flex: 1;
   overflow-y: auto;
+  margin: 0;
+  padding: 0;
 `;
 
 export default function Layout({ children, showNavbar = true }: LayoutProps) {

@@ -14,6 +14,7 @@ import ScanFail from "@routes/scan/ScanFail";
 import ScanResult from "@routes/scan/ScanResult";
 import Chat from "@routes/chat/Chat";
 import History from "@routes/history/History";
+import HistoryEdit from "@routes/history/HistoryEdit";
 import Setting from "@routes/setting/Setting";
 import NotFound from "@routes/NotFound";
 import theme from "@styles/theme";
@@ -108,7 +109,7 @@ function App() {
                 }
               />
               <Route
-                path="result"
+                path="result/:id"
                 element={
                   <Layout showNavbar={true}>
                     <ScanResult />
@@ -124,14 +125,24 @@ function App() {
                 </Layout>
               }
             />
-            <Route
-              path="/history"
-              element={
-                <Layout showNavbar={true}>
-                  <History />
-                </Layout>
-              }
-            />
+            <Route path="/history">
+              <Route
+                index
+                element={
+                  <Layout showNavbar={true}>
+                    <History />
+                  </Layout>
+                }
+              />
+              <Route
+                path="edit"
+                element={
+                  <Layout showNavbar={false}>
+                    <HistoryEdit />
+                  </Layout>
+                }
+              />
+            </Route>
             <Route
               path="/setting"
               element={
