@@ -34,12 +34,6 @@ const ScanResult: React.FC = () => {
     navigate("/chat");
   };
 
-  interface PartCardData {
-    id: number;
-    name: string;
-    type: string;
-  }
-
   const partCardData = [
     {
       id: 1,

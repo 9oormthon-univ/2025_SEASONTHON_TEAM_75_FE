@@ -115,6 +115,6 @@ export const Button = styled.button`
   background-color: ${({ theme }) => theme.colors.button};
 
   &:disabled {
-    background-color: ${({ theme }) => theme.colors.sub};
+    background-color: ${({ theme }) => theme.colors.sub1};
   }
 `;
