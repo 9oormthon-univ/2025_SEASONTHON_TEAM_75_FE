@@ -404,7 +404,7 @@ export default function LocationPage() {
     []
   );
   const handleAddLocation = useCallback(
-    () => navigate("/location_search"),
+    () => navigate("/location/search"),
     [navigate]
   );
   const handleRegister = useCallback(() => {

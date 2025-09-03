@@ -42,38 +42,42 @@ function App() {
                 </Layout>
               }
             />
-            <Route
-              path="/profile"
-              element={
-                <Layout showNavbar={false}>
-                  <ProfileSetting />
-                </Layout>
-              }
-            />
-            <Route
-              path="/profile-complete"
-              element={
-                <Layout showNavbar={false}>
-                  <ProfileComplete />
-                </Layout>
-              }
-            />
-            <Route
-              path="/location"
-              element={
-                <Layout showNavbar={false}>
-                  <Location />
-                </Layout>
-              }
-            />
-            <Route
-              path="/location_search"
-              element={
-                <Layout showNavbar={false}>
-                  <LocationSearch />
-                </Layout>
-              }
-            />
+            <Route path="/profile">
+              <Route
+                index
+                element={
+                  <Layout showNavbar={false}>
+                    <ProfileSetting />
+                  </Layout>
+                }
+              />
+              <Route
+                path="complete"
+                element={
+                  <Layout showNavbar={false}>
+                    <ProfileComplete />
+                  </Layout>
+                }
+              />
+            </Route>
+            <Route path="/location">
+              <Route
+                index
+                element={
+                  <Layout showNavbar={false}>
+                    <Location />
+                  </Layout>
+                }
+              />
+              <Route
+                path="search"
+                element={
+                  <Layout showNavbar={false}>
+                    <LocationSearch />
+                  </Layout>
+                }
+              />
+            </Route>
             <Route
               path="/home"
               element={
