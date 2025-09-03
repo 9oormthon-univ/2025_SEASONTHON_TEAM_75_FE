@@ -16,13 +16,13 @@ export const ModalOverlay = styled.div`
 export const ModalContainer = styled.div`
   background-color: #ffffff;
   border-radius: 20px;
-  padding: 40px 20px 20px 20px;
+  padding: 40px 25px 25px 25px;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
   align-items: center;
   box-shadow: 0 0 16px 0 rgba(0, 0, 0, 0.25);
-  width: 90%;
+  width: 85%;
 `;
 
 export const Title = styled.div`
@@ -30,8 +30,14 @@ export const Title = styled.div`
   font-weight: 700;
   font-size: 20px;
   color: ${({ theme }) => theme.colors.text1};
-  margin-bottom: 20px;
   text-align: center;
+`;
+
+export const Divider = styled.div`
+  width: 95%;
+  height: 1px;
+  background-color: ${({ theme }) => theme.colors.text4};
+  margin: 15px 0;
 `;
 
 export const Description = styled.div`
@@ -48,7 +54,7 @@ export const ConfirmButton = styled.button`
   padding: 12px 0;
   border: none;
   border-radius: 10px;
-  background-color: ${({ theme }) => theme.colors.button};
+  background-color: ${({ theme }) => theme.colors.main};
   color: #ffffff;
   font-family: "Pretendard";
   font-weight: 700;
@@ -79,6 +85,7 @@ const TrashCardModal = ({
     <ModalOverlay onClick={onClose}>
       <ModalContainer onClick={(e) => e.stopPropagation()}>
         <Title>{title}</Title>
+        <Divider />
         <Description>{content}</Description>
         <ConfirmButton onClick={onClose}>확인</ConfirmButton>
       </ModalContainer>

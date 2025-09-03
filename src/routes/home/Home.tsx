@@ -7,31 +7,40 @@ import RankingItem from "@components/home/RankingItem";
 import RankingImg from "@assets/rankingImg.svg";
 import TrashCard from "@components/home/TrashCard";
 import TrashClothImg from "@assets/cloth.svg";
-import TrashPaperImg from "@assets/paper.svg";
+import TrashPackImg from "@assets/pack.svg";
 import { useState } from "react";
 import TrashCardModal from "@components/home/TrashCardModal";
+import DefaultIcon from "@assets/main_default.svg";
+import EarthIcon from "@assets/main_earth.svg";
+import FoodIcon from "@assets/main_food.svg";
+import PetIcon from "@assets/main_pet.svg";
+import CalIcon from "@assets/main_cal.svg";
+import LocationSelectModal from "@components/home/LocationSelectModal";
 
 const rankingData = [
   {
     rank: 1,
     imageUrl: RankingImg,
     name: "플라스틱 병",
+    type: "PET(투명페트병)",
     searchCount: 1234,
-    changePercentage: 15,
+    isUp: true,
   },
   {
     rank: 2,
     imageUrl: RankingImg,
-    name: "알루미늄 캔",
+    name: "플라스틱 병",
+    type: "PET(투명페트병)",
     searchCount: 1234,
-    changePercentage: 15,
+    isUp: false,
   },
   {
     rank: 3,
     imageUrl: RankingImg,
-    name: "알루미늄 캔",
+    name: "플라스틱 병",
+    type: "PET(투명페트병)",
     searchCount: 1234,
-    changePercentage: 15,
+    isUp: false,
   },
 ];
 
@@ -53,7 +62,7 @@ const trashCardData = [
   },
   {
     id: 2,
-    imageUrl: TrashPaperImg,
+    imageUrl: TrashPackImg,
     type: "종이팩",
     description: "종이류와 별도 배출",
     date: new Date("2025-03-01"),
@@ -64,21 +73,23 @@ const modalContentMap: { [key: string]: { title: string; content: string } } = {
   의류·섬유류: {
     title: "의류 및 섬유 제품 분리수거 의무화",
     content:
-      "2025년 1월부터 의류 및 섬유 제품을 일반 쓰레기통에 버리는 것이 금지됩니다. 모든 의류와 섬유 제품(헌 옷, 침구류, 커튼, 수건 등)은 헌 옷 수거함(Altkleidercontainer)에 별도로 배출해야 합니다.\n의류 및 섬유 제품 분리배출 방법:\n1. 깨끗하게 세탁한 후 배출해 주세요\n2. 젖지 않도록 건조한 상태로 배출해 주세요\n3. 가능한 비닐봉투에 담아 헌 옷 수거함에 넣어주세요",
+      " 2025년 1월부터 의류 및 섬유 제품을 일반 쓰레기통에 버리는 것이 금지됩니다. 모든 의류와 섬유 제품(헌 옷, 침구류, 커튼, 수건 등)은 헌 옷 수거함(Altkleidercontainer)에 별도로 배출해야 합니다.\n\n의류 및 섬유 제품 분리배출 방법:\n1. 깨끗하게 세탁한 후 배출해 주세요\n2. 젖지 않도록 건조한 상태로 배출해 주세요\n3. 가능한 비닐봉투에 담아 헌 옷 수거함에 넣어주세요",
   },
   종이팩: {
     title: "종이팩 분리수거 방법 변경",
     content:
-      "2025년 3월부터는 종이팩을 일반 종이류와 함께 배출하는 것이 금지됩니다. 종이팩은 별도의 수거 장소에 배출해야 하며, 이 규정을 지키지 않을 경우 과태료가 부과될 수 있습니다.\n종이팩 분리배출 올바른 방법:\n1. 내용물을 비우고 물로 헹궈주세요\n2. 접어서 말린 후 별도 수거함에 배출해 주세요\n3. 종이류와 함께 배출하지 마세요",
+      " 2025년 3월부터는 종이팩을 일반 종이류와 함께 배출하는 것이 금지됩니다. 종이팩은 별도의 수거 장소에 배출해야 하며, 이 규정을 지키지 않을 경우 과태료가 부과될 수 있습니다.\n\n종이팩 분리배출 올바른 방법:\n1. 내용물을 비우고 물로 헹궈주세요\n2. 접어서 말린 후 별도 수거함에 배출해 주세요\n3. 종이류와 함께 배출하지 마세요",
   },
 };
 
 const Home = () => {
-  const location = "강남구";
+  const [location, setLocation] = useState("강남구 역삼동");
+  const [isModalOpen, setModalOpen] = useState(false);
   const today = new Date();
   const month = String(today.getMonth() + 1).padStart(2, "0");
   const day = String(today.getDate()).padStart(2, "0");
   const formattedDate = `${month}.${day}`;
+  const trashType: string | null | undefined = "투명페트병/비닐";
 
   const [selectedCard, setSelectedCard] = useState<TrashCardData | null>(null);
 
@@ -90,31 +101,77 @@ const Home = () => {
     setSelectedCard(null);
   };
 
+  const handleLocationSelect = (selectedLocation: string) => {
+    setLocation(selectedLocation);
+  };
+
+  const getMainIcon = () => {
+    if (!location) {
+      return CalIcon;
+    }
+    switch (trashType) {
+      case "일반/음식물쓰레기":
+        return FoodIcon;
+      case "투명페트병/비닐":
+        return PetIcon;
+      case null:
+      case undefined:
+      case "":
+        return EarthIcon;
+      default:
+        return DefaultIcon;
+    }
+  };
+
   return (
     <H.HomeContainer>
       <H.HomeHeader>
         <H.Logo src={logo} alt="로고"></H.Logo>
-        <H.LocationBox>
-          <H.LocationIcon src={locationIcon} alt="위치 아이콘"></H.LocationIcon>
-          <H.LocationName>{location}</H.LocationName>
-          <H.LocationDropdown
-            src={dropdownIcon}
-            alt="드롭다운 아이콘"
-          ></H.LocationDropdown>
+        <H.LocationBox
+          onClick={() => setModalOpen(true)}
+          style={{ cursor: "pointer" }}
+        >
+          <H.LocationIcon src={locationIcon} alt="위치 아이콘" />
+          <H.LocationName>
+            {location ? location.split(" ")[0] : "동네 설정"}
+          </H.LocationName>
+          <H.LocationDropdown src={dropdownIcon} alt="드롭다운 아이콘" />
         </H.LocationBox>
       </H.HomeHeader>
-      <SectionHeader title="오늘의 분리수거"></SectionHeader>
       <H.MainSection>
         <H.Today>{formattedDate}</H.Today>
-        <H.Titles>
-          <H.TitleTop>
-            오늘은 <H.Highlight1>{location}</H.Highlight1>
-          </H.TitleTop>
-          <H.TitleBottom>
-            <H.Highlight2>투명페트병/비닐</H.Highlight2> 버리는 날
-          </H.TitleBottom>
-          <H.SubTitle>오늘도 한 봉지 깔끔하게 비워볼까요?</H.SubTitle>
-        </H.Titles>
+        {!location ? (
+          <H.Titles>
+            <H.TitleTop>현재 설정된</H.TitleTop>
+            <H.TitleBottom>
+              <H.Highlight1>동네가 없어요</H.Highlight1>
+            </H.TitleBottom>
+            <H.SubTitle>동네를 설정하면 분리수거 날짜를 알려드려요!</H.SubTitle>
+          </H.Titles>
+        ) : trashType ? (
+          <H.Titles>
+            <H.TitleTop>
+              오늘은 <H.Highlight1>{location}</H.Highlight1>
+            </H.TitleTop>
+            <H.TitleBottom>
+              <H.Highlight2>{trashType}</H.Highlight2> 버리는 날
+            </H.TitleBottom>
+            <H.SubTitle>오늘도 한 봉지 깔끔하게 비워볼까요?</H.SubTitle>
+          </H.Titles>
+        ) : (
+          <H.Titles>
+            <H.TitleTop>
+              <H.Highlight1>오늘은</H.Highlight1>
+            </H.TitleTop>
+            <H.TitleBottom>
+              <H.Highlight2>분리수거 없는 날</H.Highlight2>
+            </H.TitleBottom>
+            <H.SubTitle>오늘은 버리지 말고 차곡차곡 모아둬요!</H.SubTitle>
+          </H.Titles>
+        )}
+        <H.MainIcon>
+          <img src={getMainIcon()} alt="메인 아이콘" />
+        </H.MainIcon>
       </H.MainSection>
       <H.BgBox>
         <SectionHeader
@@ -128,8 +185,9 @@ const Home = () => {
               rank={item.rank}
               imageUrl={item.imageUrl}
               name={item.name}
+              type={item.type}
               searchCount={item.searchCount}
-              changePercentage={item.changePercentage}
+              isUp={item.isUp}
             />
           ))}
         </H.RankingWrapper>
@@ -157,6 +215,12 @@ const Home = () => {
         content={
           selectedCard ? modalContentMap[selectedCard.type]?.content : ""
         }
+      />
+      <LocationSelectModal
+        isOpen={isModalOpen}
+        onClose={() => setModalOpen(false)}
+        currentLocation={location}
+        onSelect={handleLocationSelect}
       />
     </H.HomeContainer>
   );
