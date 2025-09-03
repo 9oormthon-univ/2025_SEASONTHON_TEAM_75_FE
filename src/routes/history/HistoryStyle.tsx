@@ -2,7 +2,7 @@ import styled from "styled-components";
 
 export const Container = styled.div`
   width: 100%;
-  min-height: 100vh;
+  min-height: 100dvh;
   display: flex;
   flex-direction: column;
   &::-webkit-scrollbar {
@@ -38,6 +38,8 @@ export const EditBtn = styled.button`
   font-family: "Pretendard";
   font-weight: 500;
   font-size: 16px;
+  padding: 2px 0;
+  box-sizing: border-box;
 
   &:disabled {
     display: none;

@@ -5,6 +5,7 @@ import WhiteCheckIcon from "@assets/history_checkW.svg";
 import HistoryCard from "@components/history/HistoryCard";
 import DeleteModal from "@components/history/DeleteModal";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 interface HistoryItem {
   id: number;
@@ -13,6 +14,7 @@ interface HistoryItem {
 }
 
 const HistoryEdit = () => {
+  const navigate = useNavigate();
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [historyItems, setHistoryItems] = useState<HistoryItem[]>([
@@ -51,6 +53,7 @@ const HistoryEdit = () => {
     );
     setSelectedIds([]);
     setIsModalOpen(false);
+    navigate("/history");
   };
 
   return (

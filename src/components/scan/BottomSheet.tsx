@@ -62,7 +62,7 @@ const BottomSheet: React.FC<CustomBottomSheetProps> = ({
                 backgroundColor: "#D8D9DB",
               }}
             />
-            <div style={{ width: "100%", margin: "0 auto 200px auto" }}>
+            <div style={{ width: "100%", margin: "0 auto 170px auto" }}>
               {children}
             </div>
           </ScrollableContainer>
