@@ -119,7 +119,7 @@ function App() {
             <Route
               path="/chat"
               element={
-                <Layout showNavbar={true}>
+                <Layout showNavbar={false}>
                   <Chat />
                 </Layout>
               }
