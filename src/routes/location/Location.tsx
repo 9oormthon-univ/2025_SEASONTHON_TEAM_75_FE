@@ -272,6 +272,9 @@ export default function LocationPage() {
   );
   const [showInfo, setShowInfo] = useState<boolean>(false);
   const [mapCenter, setMapCenter] = useState<LatLng>(DEFAULT_CENTER); // 포커스
+  const [defaultUserDistrictId, setDefaultUserDistrictId] = useState<
+    string | number | null
+  >(null); // 디폴트 자치구
 
   // 내 동네 목록
   const initialItems = useMemo<MyLocationItem[]>(() => [], []);
@@ -391,6 +394,11 @@ export default function LocationPage() {
         };
       });
 
+      const def =
+        data.data.find((x: UserDistrict) => x.isDefault)?.userDistrictId ??
+        null;
+      setDefaultUserDistrictId(def); // 디폴트 설정
+
       // 디폴트가 맨 위
       const defaultId = data.data.find(
         (x: UserDistrict) => x.isDefault
@@ -451,9 +459,31 @@ export default function LocationPage() {
 
   // Handlers
   const handleSelectLocation = useCallback(
-    (id: string | number) => dispatch({ type: "select", id }),
-    []
+    async (id: string | number) => {
+      if (isSetupMode) return;
+
+      // 이미 디폴트면 API 불필요
+      if (id === defaultUserDistrictId) {
+        if (state.selectedId !== id) dispatch({ type: "select", id });
+        return;
+      }
+      dispatch({ type: "select", id });
+
+      try {
+        await apiClient.patch(
+          `/api/v1/users/districts/${id}`,
+          {},
+          { withCredentials: true }
+        );
+        // 서버 갱신
+        await fetchDistricts();
+      } catch (e) {
+        console.error("기본 자치구 변경 실패:", e);
+      }
+    },
+    [isSetupMode, defaultUserDistrictId, state.selectedId, fetchDistricts]
   );
+
   const handleAddLocation = useCallback(
     () => navigate("/location/search"),
     [navigate]
