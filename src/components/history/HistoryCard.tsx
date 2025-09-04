@@ -1,11 +1,9 @@
 import styled from "styled-components";
-import VinylIcon from "@assets/vinyl.svg";
-import PetIcon from "@assets/pet.svg";
-import ClothIcon from "@assets/cloth.svg";
 import RecyclingIcon from "@assets/recycling.svg";
 import Arrow from "@assets/history_arrow.svg";
 import NonSelectIcon from "@assets/history_nosel.svg";
 import SelectIcon from "@assets/history_sel.svg";
+import { getTrashType } from "@utils/trashType";
 
 export const Container = styled.div`
   display: flex;
@@ -84,18 +82,7 @@ const HistorytCard = ({
   isSelected,
   onClick,
 }: HistoryCardProps) => {
-  const getMainIconForType = () => {
-    switch (type) {
-      case "PET(투명페트병)":
-        return PetIcon;
-      case "비닐류":
-        return VinylIcon;
-      case "의류·섬유류":
-        return ClothIcon;
-      default:
-        return PetIcon;
-    }
-  };
+  const trashType = getTrashType(type);
 
   const renderRightIcon = () => {
     if (mode === "edit") {
@@ -109,12 +96,12 @@ const HistorytCard = ({
   return (
     <Container onClick={() => onClick(id)}>
       <LeftSection>
-        <TrashImage src={getMainIconForType()} alt={type} />
+        <TrashImage src={trashType.icon} alt={trashType.nameKo} />
         <InfoWrapper>
           <Name>{name}</Name>
           <Type>
             <Icon src={RecyclingIcon} alt="재활용 아이콘" />
-            {type}
+            {trashType.nameKo}
           </Type>
         </InfoWrapper>
       </LeftSection>
