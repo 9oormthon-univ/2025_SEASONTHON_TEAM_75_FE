@@ -2,16 +2,9 @@ import styled from "styled-components";
 
 export const Container = styled.div`
   width: 100%;
-  min-height: 100dvh;
+  height: 100dvh;
   display: flex;
   flex-direction: column;
-  &::-webkit-scrollbar {
-    display: none;
-  }
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-  margin: 0;
-  padding: 0;
   background-color: ${({ theme }) => theme.colors.box};
 `;
 
@@ -56,7 +49,7 @@ export const NoHistoryBox = styled.div`
   font-weight: 500;
   font-size: 16px;
   gap: 40px;
-  margin-top: 40%;
+  margin-top: 25%;
   img {
     width: 131px;
     height: 148px;
@@ -69,6 +62,13 @@ export const CardWrapper = styled.div`
   justify-content: flex-start;
   align-items: center;
   gap: 10px;
-  padding: 0 1.5rem;
+  padding: 0 1.5rem 110px 1.5rem;
   box-sizing: border-box;
+  flex: 1;
+  overflow-y: auto;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 `;

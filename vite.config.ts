@@ -11,6 +11,8 @@ export default defineConfig({
       { find: "@styles", replacement: "/src/styles" },
       { find: "@assets", replacement: "/src/assets" },
       { find: "@components", replacement: "/src/components" },
+      { find: "@stores", replacement: "/src/stores" },
+      { find: "@utils", replacement: "/src/utils" },
     ],
   },
   build: {

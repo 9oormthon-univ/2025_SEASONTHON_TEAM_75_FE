@@ -1,23 +1,30 @@
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import * as H from "@routes/history/HistoryStyle";
 import Header from "@components/Header";
 import NoHistoryIcon from "@assets/history_zero.svg";
-import { useNavigate } from "react-router-dom";
 import HistoryCard from "@components/history/HistoryCard";
-
-interface HistoryItem {
-  id: number;
-  type: string;
-  name: string;
-}
+import apiClient from "@utils/apiClient";
+import { useHistoryStore, type ApiHistoryItem } from "@stores/historyStore";
 
 const History = () => {
   const navigate = useNavigate();
+  const { historyItems, setHistoryItems } = useHistoryStore();
 
-  const historyItems: HistoryItem[] = [
-    { id: 1, type: "비닐류", name: "비닐 라벨" },
-    { id: 2, type: "PET(투명페트병)", name: "페트병 뚜껑" },
-    { id: 3, type: "의류·섬유류", name: "반팔" },
-  ];
+  useEffect(() => {
+    const fetchHistoryData = async () => {
+      try {
+        const response = await apiClient.get<{ data: ApiHistoryItem[] }>(
+          "/api/v1/trash/my"
+        );
+        setHistoryItems(response.data.data);
+      } catch (err) {
+        console.error("최근 기록을 불러오는 데 실패했습니다:", err);
+      }
+    };
+
+    fetchHistoryData();
+  }, []);
 
   const historyCount = historyItems.length;
 
