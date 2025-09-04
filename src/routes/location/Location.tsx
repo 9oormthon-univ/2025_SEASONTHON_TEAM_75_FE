@@ -413,21 +413,37 @@ export default function LocationPage() {
   }, [fetchDistricts]);
 
   // 삭제 확인
+  const handleDelete = useCallback(
+    async (userDistrictId: number | string) => {
+      try {
+        await apiClient.delete(`/api/v1/users/districts/${userDistrictId}`);
+        await fetchDistricts();
+      } catch (e) {
+        console.error("자치구 삭제 실패:", e);
+      }
+    },
+    [fetchDistricts]
+  );
+
   const [deleteTargetId, setDeleteTargetId] = useState<string | number | null>(
     null
   );
+
   const requestRemove = useCallback((id: string | number) => {
     setDeleteTargetId(id);
   }, []);
+
   const confirmRemove = useCallback(() => {
     if (deleteTargetId != null) {
-      dispatch({ type: "remove", id: deleteTargetId });
+      handleDelete(deleteTargetId);
     }
     setDeleteTargetId(null);
-  }, [deleteTargetId]);
+  }, [deleteTargetId, handleDelete]);
+
   const cancelRemove = useCallback(() => {
     setDeleteTargetId(null);
   }, []);
+
   const deleteTarget = useMemo<MyLocationItem | undefined>(
     () => state.items.find((i) => i.id === deleteTargetId),
     [state.items, deleteTargetId]
