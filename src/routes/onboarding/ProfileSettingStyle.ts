@@ -23,6 +23,14 @@ export const Profile = styled.div`
 
   margin-top: 20px;
 
+  img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+    border-radius: 50%;
+  }
+
   button {
     display: flex;
 

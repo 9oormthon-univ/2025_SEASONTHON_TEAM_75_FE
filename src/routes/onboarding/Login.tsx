@@ -1,4 +1,3 @@
-// Login.tsx
 import Kakao from "@/assets/kakao_login.svg";
 import Background from "@assets/start_back.svg";
 import * as L from "./LoginStyle";

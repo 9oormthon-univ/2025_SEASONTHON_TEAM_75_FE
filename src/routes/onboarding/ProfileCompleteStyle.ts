@@ -39,22 +39,8 @@ export const SubTitle = styled.div`
 `;
 
 export const ButtonGroup = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 14px;
-  width: 100%;
-
   position: absolute;
-  bottom: 70px;
-`;
-
-export const Button = styled.button`
-  color: ${({ theme }) => theme.colors.text3};
-  font-family: Pretendard;
-  font-size: 16px;
-  font-weight: 500;
-  text-decoration-line: underline;
-  text-underline-offset: 18%;
-  padding: 0;
+  bottom: 55px;
+  left: 16px;
+  right: 16px;
 `;
