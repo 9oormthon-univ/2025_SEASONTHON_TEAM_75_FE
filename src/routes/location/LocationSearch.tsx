@@ -7,6 +7,14 @@ import XIcon from "@/assets/search_x.svg";
 import ScopeIcon from "@/assets/scope.svg";
 import LocationSearchItem from "@components/location/LocationSearchItem";
 import { useKakaoLoader } from "react-kakao-maps-sdk";
+import apiClient from "@utils/apiClient";
+
+type District = {
+  districtId: string;
+  sido: string;
+  sigugn: string;
+  eupmyeondong: string;
+};
 
 type Sigungu = {
   code: string;
@@ -20,8 +28,10 @@ type GeoJSONFeature = {
 type GeoJSON = { type: "FeatureCollection"; features: GeoJSONFeature[] };
 
 const LocationSearch = () => {
-  const [keyword, setKeyword] = useState("");
   const navigate = useNavigate();
+
+  const [keyword, setKeyword] = useState("");
+  const [results, setResults] = useState<District[]>([]); // api 응답
 
   const [loading, error] = useKakaoLoader({
     appkey: import.meta.env.VITE_KAKAO_JS_KEY as string,
@@ -29,6 +39,15 @@ const LocationSearch = () => {
   });
 
   const [sigunguList, setSigunguList] = useState<Sigungu[]>([]);
+
+  useEffect(() => {
+    if (error) {
+      console.error("카카오 SDK 로드 실패:", error);
+    }
+    if (loading) {
+      console.log("카카오 SDK 로딩중:", loading);
+    }
+  }, [error, loading]);
 
   useEffect(() => {
     fetch("/sig.json")
@@ -43,68 +62,57 @@ const LocationSearch = () => {
       .catch((e) => console.error("sig.json 로드 실패:", e));
   }, []);
 
-  const filteredList = useMemo(() => {
-    if (!keyword) return [];
-    return sigunguList.filter((sgg) => sgg.name.includes(keyword));
-  }, [keyword, sigunguList]);
+  const sigunguMap = useMemo(() => {
+    return new Map(sigunguList.map((s) => [s.code, s]));
+  }, [sigunguList]);
 
-  const handlePick = (title: string, sigCode: string) => {
+  // const filteredList = useMemo(() => {
+  //   if (!keyword) return [];
+  //   return sigunguList.filter((sgg) => sgg.name.includes(keyword));
+  // }, [keyword, sigunguList]);
+
+  const handleSearch = () => {
+    const [sido, sigungu] = keyword.trim().split(/\s+/, 2);
+    if (!sido) return;
+
+    apiClient
+      .get("/api/v1/districts", {
+        params: {
+          sido,
+          ...(sigungu ? { sigungu } : {}),
+        },
+      })
+      .then((res) => {
+        setResults(res.data.data ?? []);
+      })
+      .catch((e) => {
+        console.error("검색 실패:", e);
+        setResults([]);
+      });
+  };
+
+  const handlePick = (d: District) => {
+    const title = [d.sido, d.sigugn, d.eupmyeondong].filter(Boolean).join(" ");
+    const sig5 = (d.districtId ?? "").slice(0, 5); // 앞 5자리
+
+    // SIG_CD와 동일한 코드 찾기
+    const sgg = sigunguMap.get(sig5);
+
     navigate("/location", {
       state: {
         source: "location_search",
         setup: true,
         selected: title,
-        sigCode: sigCode,
+        sigCode: sig5,
+        sigName: sgg?.name ?? null,
+        districtId: d.districtId,
       },
     });
   };
 
-  const handleFindByCurrentLocation = () => {
-    if (loading || error) {
-      alert(
-        "지도 서비스 로딩 중이거나 오류가 발생했습니다. 잠시 후 다시 시도해주세요."
-      );
-      return;
-    }
-
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const { latitude, longitude } = position.coords;
-          const geocoder = new window.kakao.maps.services.Geocoder();
-
-          geocoder.coord2RegionCode(longitude, latitude, (result, status) => {
-            if (status === window.kakao.maps.services.Status.OK) {
-              const region = result.find(
-                (r) => r.region_type === "H" || r.region_type === "B"
-              );
-              if (region) {
-                const title = region.address_name;
-                const sigCode = region.code.slice(0, 5);
-                handlePick(title, sigCode);
-              } else {
-                alert("현재 위치의 지역 정보를 찾을 수 없습니다.");
-              }
-            } else {
-              alert("현재 위치의 지역 정보를 가져오는 데 실패했습니다.");
-            }
-          });
-        },
-        (err) => {
-          console.error(err);
-          alert(
-            "위치 정보를 가져오는 데 실패했습니다. 위치 정보 접근을 허용했는지 확인해주세요."
-          );
-        }
-      );
-    } else {
-      alert("이 브라우저에서는 위치 기능을 사용할 수 없습니다.");
-    }
-  };
-
   return (
     <L.Page>
-      <Header title={"내 동네 설정"} onBack={() => navigate(-1)} />
+      <Header title="내 동네 설정" onBack={() => navigate(-1)} />
 
       <L.SearchBox>
         <img src={SearchIcon} alt="검색" />
@@ -113,6 +121,9 @@ const LocationSearch = () => {
           placeholder="내 동네를 검색하세요"
           value={keyword}
           onChange={(e) => setKeyword(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") handleSearch();
+          }}
         />
         {keyword && (
           <button onClick={() => setKeyword("")}>
@@ -121,19 +132,24 @@ const LocationSearch = () => {
         )}
       </L.SearchBox>
 
-      <L.Now onClick={handleFindByCurrentLocation}>
+      <L.Now onClick={handleSearch}>
         <img src={ScopeIcon} alt="현재 위치" />
         <p>현재 위치로 찾기</p>
       </L.Now>
 
       <L.SearchList>
-        {filteredList.map((sgg) => (
-          <LocationSearchItem
-            key={sgg.code}
-            title={sgg.name}
-            onClick={() => handlePick(sgg.name, sgg.code)}
-          />
-        ))}
+        {results.map((d) => {
+          const label = [d.sido, d.sigugn, d.eupmyeondong]
+            .filter(Boolean)
+            .join(" ");
+          return (
+            <LocationSearchItem
+              key={d.districtId}
+              title={label}
+              onClick={() => handlePick(d)}
+            />
+          );
+        })}
       </L.SearchList>
     </L.Page>
   );
