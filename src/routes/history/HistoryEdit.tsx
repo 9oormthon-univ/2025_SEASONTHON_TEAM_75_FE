@@ -4,57 +4,52 @@ import GrayCheckIcon from "@assets/history_checkG.svg";
 import WhiteCheckIcon from "@assets/history_checkW.svg";
 import HistoryCard from "@components/history/HistoryCard";
 import DeleteModal from "@components/history/DeleteModal";
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-
-interface HistoryItem {
-  id: number;
-  type: string;
-  name: string;
-}
+import { useHistoryStore } from "@stores/historyStore";
+import apiClient from "@utils/apiClient";
 
 const HistoryEdit = () => {
   const navigate = useNavigate();
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [historyItems, setHistoryItems] = useState<HistoryItem[]>([
-    { id: 1, type: "비닐류", name: "비닐 라벨" },
-    { id: 2, type: "PET(투명페트병)", name: "페트병 뚜껑" },
-    { id: 3, type: "의류·섬유류", name: "반팔" },
-  ]);
-
+  const { historyItems, deleteHistoryItems } = useHistoryStore();
   const historyCount = historyItems.length;
-
   const isAllSelected = historyCount > 0 && selectedIds.length === historyCount;
 
-  const handleCardClick = (id: number) => {
-    setSelectedIds((prevIds) => {
-      if (prevIds.includes(id)) {
-        return prevIds.filter((prevId) => prevId !== id);
-      } else {
-        return [...prevIds, id];
-      }
-    });
-  };
+  const handleCardClick = useCallback((id: number) => {
+    setSelectedIds((prevIds) =>
+      prevIds.includes(id)
+        ? prevIds.filter((prevId) => prevId !== id)
+        : [...prevIds, id]
+    );
+  }, []);
 
-  const handleSelectAll = () => {
+  const handleSelectAll = useCallback(() => {
     if (isAllSelected) {
       setSelectedIds([]);
     } else {
       setSelectedIds(historyItems.map((item) => item.id));
     }
-  };
+  }, [isAllSelected, historyItems]);
 
-  const handleConfirmDelete = () => {
+  const handleConfirmDelete = useCallback(async () => {
     if (selectedIds.length === 0) return;
-    console.log("삭제될 아이템 ID:", selectedIds);
-    setHistoryItems((prevItems) =>
-      prevItems.filter((item) => !selectedIds.includes(item.id))
-    );
-    setSelectedIds([]);
-    setIsModalOpen(false);
-    navigate("/history");
-  };
+
+    try {
+      const deletePromises = selectedIds.map((id) =>
+        apiClient.delete(`/api/v1/trash/${id}`)
+      );
+      await Promise.all(deletePromises);
+      deleteHistoryItems(selectedIds);
+      setSelectedIds([]);
+      setIsModalOpen(false);
+      navigate("/history");
+    } catch (err) {
+      console.error("삭제 요청 중 일부 또는 전체가 실패했습니다:", err);
+      setIsModalOpen(false);
+    }
+  }, [selectedIds, deleteHistoryItems, navigate]);
 
   return (
     <H.Container>

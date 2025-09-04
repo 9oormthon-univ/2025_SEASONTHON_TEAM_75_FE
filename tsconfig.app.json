@@ -28,7 +28,8 @@
       "@routes/*": ["src/routes/*"],
       "@styles/*": ["src/styles/*"],
       "@utils/*": ["src/utils/*"],
-      "@components/*": ["src/components/*"]
+      "@components/*": ["src/components/*"],
+      "@stores/*": ["src/stores/*"]
     }
   },
   "include": ["src"]
