@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import styled, { keyframes } from "styled-components";
+import Logo from "@assets/splash_logo.svg";
 
 const fadeIn = keyframes`
   from { opacity: 0; transform: scale(0.98); }
@@ -31,7 +32,7 @@ const Splash = () => {
 
   return (
     <Container>
-      <img src="" alt="로고" />
+      <img src={Logo} alt="로고" />
     </Container>
   );
 };
