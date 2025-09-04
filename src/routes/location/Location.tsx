@@ -14,6 +14,7 @@ import apiClient from "@utils/apiClient";
 // 상수
 const DEFAULT_CENTER: LatLng = { lat: 37.525121, lng: 126.96339 };
 
+// 타입
 type GeocoderStatus = "OK" | "ZERO_RESULT" | "ERROR";
 type RegionCodeResult = {
   code: string;
@@ -32,6 +33,18 @@ type GeocoderLike = {
 type KakaoLatLng = {
   getLat: () => number;
   getLng: () => number;
+};
+
+// API 타입
+type UserDistrict = {
+  response: {
+    districtId: string;
+    sido: string;
+    sigugn: string;
+    eupmyeondong: string | null;
+  };
+  userDistrictId: number;
+  isDefault: boolean;
 };
 
 declare global {
@@ -360,6 +373,45 @@ export default function LocationPage() {
     setMapCenter({ lat: centerLat, lng: centerLng });
   }, [map, sigPaths]);
 
+  // 내 자치구 API
+  const fetchDistricts = useCallback(async () => {
+    try {
+      const { data } = await apiClient.get("/api/v1/users/my/districts");
+
+      // 서버 응답 -> 화면용 아이템
+      const items: MyLocationItem[] = data.data.map((ud: UserDistrict) => {
+        const r = ud.response;
+        const title = [r.sido, r.sigugn, r.eupmyeondong ?? undefined]
+          .filter(Boolean)
+          .join(" ");
+        return {
+          id: ud.userDistrictId,
+          title,
+          sigCode: r.districtId.slice(0, 5),
+        };
+      });
+
+      // 디폴트가 맨 위
+      const defaultId = data.data.find(
+        (x: UserDistrict) => x.isDefault
+      )?.userDistrictId;
+      const ordered = [...items].sort((a, b) => {
+        const aIsDef = a.id === defaultId ? 0 : 1;
+        const bIsDef = b.id === defaultId ? 0 : 1;
+        return aIsDef - bIsDef;
+      });
+
+      // 리스트 교체
+      dispatch({ type: "replace", items: ordered });
+    } catch (e) {
+      console.error("내 자치구 불러오기 실패:", e);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchDistricts();
+  }, [fetchDistricts]);
+
   // 삭제 확인
   const [deleteTargetId, setDeleteTargetId] = useState<string | number | null>(
     null
@@ -400,13 +452,7 @@ export default function LocationPage() {
     try {
       await apiClient.post(`/api/v1/users/districts/${districtId}`, {});
 
-      // 로컬 목록에 추가
-      const newItem: MyLocationItem = {
-        id: Date.now(),
-        title: selectedTitle,
-        sigCode: districtId,
-      };
-      dispatch({ type: "add", item: newItem });
+      await fetchDistricts();
 
       // 자치구 설정 알림
 
@@ -417,7 +463,13 @@ export default function LocationPage() {
     } catch (e) {
       console.error("자치구 업데이트 실패:", e);
     }
-  }, [isFromSearch, navigate, selectedTitle, districtIdFromQuery]);
+  }, [
+    isFromSearch,
+    navigate,
+    selectedTitle,
+    districtIdFromQuery,
+    fetchDistricts,
+  ]);
 
   if (loading) {
     return (
