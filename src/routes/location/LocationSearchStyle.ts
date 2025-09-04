@@ -9,6 +9,7 @@ export const Page = styled.div`
 `;
 
 export const SearchBox = styled.div`
+  flex: 0 0 auto;
   display: flex;
   align-items: center;
   gap: 3px;
@@ -61,5 +62,7 @@ export const Now = styled.button`
 `;
 
 export const SearchList = styled.div`
+  flex: 1;
+  overflow-y: auto;
   margin-top: 4px;
 `;
