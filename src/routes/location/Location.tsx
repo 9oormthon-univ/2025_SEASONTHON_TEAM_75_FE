@@ -9,9 +9,9 @@ import PlusIcon from "@assets/plus.svg";
 import WarnIcon from "@assets/warning.svg";
 import LocationList from "@components/location/LocationList";
 import MainButton from "@components/MainButton";
+import apiClient from "@utils/apiClient";
 
 // 상수
-const MODAL_DISMISSED_KEY = "locationModalDismissed";
 const DEFAULT_CENTER: LatLng = { lat: 37.525121, lng: 126.96339 };
 
 type GeocoderStatus = "OK" | "ZERO_RESULT" | "ERROR";
@@ -93,6 +93,7 @@ type LocationState = {
   setup?: boolean;
   selected?: string;
   sigCode?: string;
+  districtId?: string;
 } | null;
 
 export type MyLocationItem = {
@@ -110,6 +111,7 @@ function useQueryLocationState() {
     setup: isFromSearch && !!state?.setup,
     selectedTitleFromQuery: isFromSearch ? state?.selected : undefined,
     sigCodeFromQuery: isFromSearch ? state?.sigCode : undefined, // sigCode 추출
+    districtIdFromQuery: isFromSearch ? state?.districtId : undefined,
   } as const;
 }
 
@@ -183,27 +185,6 @@ function reducer(state: State, action: Action): State {
   }
 }
 
-// 안내 모달
-function useLocationGuideModal(isSetupMode: boolean) {
-  const [open, setOpen] = useState<boolean>(false);
-  useEffect(() => {
-    const dismissed = localStorage.getItem(MODAL_DISMISSED_KEY) === "1";
-    const shouldOpen = !dismissed && !isSetupMode;
-    setOpen(shouldOpen);
-  }, [isSetupMode]);
-
-  const cancel = (): void => {
-    localStorage.setItem(MODAL_DISMISSED_KEY, "1");
-    setOpen(false);
-  };
-  const confirm = (): void => {
-    localStorage.setItem(MODAL_DISMISSED_KEY, "1");
-    setOpen(false);
-    console.log("내 위치 등록");
-  };
-  return { open, cancel, confirm } as const;
-}
-
 // 설정 패널
 function SetupPanel({
   selectedTitle,
@@ -269,6 +250,7 @@ export default function LocationPage() {
     setup: setupFromQuery,
     selectedTitleFromQuery,
     sigCodeFromQuery,
+    districtIdFromQuery,
   } = useQueryLocationState();
 
   const [isSetupMode, setIsSetupMode] = useState<boolean>(setupFromQuery);
@@ -378,9 +360,6 @@ export default function LocationPage() {
     setMapCenter({ lat: centerLat, lng: centerLng });
   }, [map, sigPaths]);
 
-  // 모달
-  const modal = useLocationGuideModal(isSetupMode);
-
   // 삭제 확인
   const [deleteTargetId, setDeleteTargetId] = useState<string | number | null>(
     null
@@ -411,20 +390,34 @@ export default function LocationPage() {
     () => navigate("/location/search"),
     [navigate]
   );
-  const handleRegister = useCallback(() => {
-    if (selectedTitle && sigCodeFromQuery) {
+  const handleRegister = useCallback(async () => {
+    const districtId = districtIdFromQuery;
+
+    if (!selectedTitle || !districtId) {
+      return;
+    }
+
+    try {
+      await apiClient.post(`/api/v1/users/districts/${districtId}`, {});
+
+      // 로컬 목록에 추가
       const newItem: MyLocationItem = {
         id: Date.now(),
         title: selectedTitle,
-        sigCode: sigCodeFromQuery,
+        sigCode: districtId,
       };
       dispatch({ type: "add", item: newItem });
-    }
 
-    setIsSetupMode(false);
-    setSelectedTitle(undefined);
-    if (isFromSearch) navigate(".", { replace: true, state: null });
-  }, [isFromSearch, navigate, selectedTitle, sigCodeFromQuery]);
+      // 자치구 설정 알림
+
+      setIsSetupMode(false);
+      setSelectedTitle(undefined);
+
+      if (isFromSearch) navigate(".", { replace: true, state: null });
+    } catch (e) {
+      console.error("자치구 업데이트 실패:", e);
+    }
+  }, [isFromSearch, navigate, selectedTitle, districtIdFromQuery]);
 
   if (loading) {
     return (
@@ -476,17 +469,6 @@ export default function LocationPage() {
           onSelect={handleSelectLocation}
           onRemove={requestRemove}
           onAdd={handleAddLocation}
-        />
-      )}
-
-      {/* 위치 안내 모달 */}
-      {!isSetupMode && (
-        <LocationModal
-          title={"현재 내 위치 '마포구'\n등록할까요?"}
-          confirmText="확인"
-          isOpen={modal.open}
-          onCancel={modal.cancel}
-          onConfirm={modal.confirm}
         />
       )}
 
