@@ -1,5 +1,6 @@
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
+import apiClient from "@utils/apiClient";
 
 export const ModalOverlay = styled.div`
   position: fixed;
@@ -49,20 +50,31 @@ export const GoToLocation = styled(Option)`
   }
 `;
 
-const locationData = ["마포구 연남동", "강남구 역삼동"];
+interface Location {
+  districtId: string;
+  sido: string;
+  sigugn: string;
+  eupmyeondong: string;
+}
+
+interface UserDistrict {
+  response: Location;
+  userDistrictId: number;
+  isDefault: boolean;
+}
 
 interface LocationSelectModalProps {
   isOpen: boolean;
   onClose: () => void;
-  currentLocation: string;
-  onSelect: (location: string) => void;
+  districts: UserDistrict[];
+  onDefaultChange: () => void;
 }
 
 const LocationSelectModal = ({
   isOpen,
   onClose,
-  currentLocation,
-  onSelect,
+  districts,
+  onDefaultChange,
 }: LocationSelectModalProps) => {
   const navigate = useNavigate();
 
@@ -70,10 +82,21 @@ const LocationSelectModal = ({
     return null;
   }
 
-  const handleOptionClick = (location: string) => {
-    console.log(location);
-    onSelect(location);
-    onClose();
+  const handleOptionClick = async (district: UserDistrict) => {
+    if (district.isDefault) {
+      onClose();
+      return;
+    }
+    try {
+      await apiClient.patch(
+        `/api/v1/users/districts/${district.userDistrictId}`
+      );
+      onDefaultChange();
+      onClose();
+    } catch (error) {
+      console.error("기본 자치구 변경에 실패했습니다.", error);
+      alert("기본 동네 변경에 실패했습니다. 다시 시도해주세요.");
+    }
   };
 
   const handleNavigate = () => {
@@ -84,15 +107,18 @@ const LocationSelectModal = ({
   return (
     <ModalOverlay onClick={onClose}>
       <ModalContainer onClick={(e) => e.stopPropagation()}>
-        {locationData.map((loc) => (
-          <Option
-            key={loc}
-            isSelected={loc === currentLocation}
-            onClick={() => handleOptionClick(loc)}
-          >
-            {loc}
-          </Option>
-        ))}
+        {districts.map((district) => {
+          const locString = `${district.response.sigugn} ${district.response.eupmyeondong}`;
+          return (
+            <Option
+              key={district.userDistrictId}
+              isSelected={district.isDefault}
+              onClick={() => handleOptionClick(district)}
+            >
+              {locString}
+            </Option>
+          );
+        })}
         <GoToLocation isSelected={false} onClick={handleNavigate}>
           내 동네 설정
         </GoToLocation>

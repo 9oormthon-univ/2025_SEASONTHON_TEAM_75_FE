@@ -14,17 +14,12 @@ export const HomeContainer = styled.div`
 
 export const HomeHeader = styled.div`
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   align-items: center;
   flex-direction: row;
   width: 100%;
   padding: 1rem 1.5rem 0rem 1.5rem;
   box-sizing: border-box;
-`;
-
-export const Logo = styled.img`
-  width: 62px;
-  height: 32px;
 `;
 
 export const LocationBox = styled.div`
@@ -59,7 +54,6 @@ export const MainSection = styled.div`
   width: calc(100% - 2rem);
   margin: 0 auto;
   box-sizing: border-box;
-  height: 350px;
   border-radius: 30px;
   background-image: url("/home_bg.svg");
   background-size: cover;
@@ -89,7 +83,10 @@ export const Titles = styled.div`
 
 export const TitleTop = styled.div``;
 
-export const TitleBottom = styled.div``;
+export const TitleBottom = styled.div`
+  line-height: 1.2;
+  margin-top: 3px;
+`;
 
 export const Highlight1 = styled.span`
   font-weight: 700;
@@ -132,7 +129,7 @@ export const RankingWrapper = styled.div`
   display: flex;
   overflow-x: auto;
   gap: 16px;
-  padding: 0 0 0 1.5rem;
+  padding: 0 1.5rem;
 
   &::-webkit-scrollbar {
     display: none;
@@ -146,5 +143,5 @@ export const TrashCardList = styled.div`
   flex-direction: column;
   gap: 12px;
   padding: 0 1.5rem;
-  margin-bottom: 100px;
+  margin-bottom: 110px;
 `;
