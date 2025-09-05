@@ -99,7 +99,18 @@ const LocationSearch = () => {
     try {
       await apiClient.post(`/api/v1/users/districts/${d.districtId}`);
 
-      navigate("/location", { replace: true, state: null });
+      const label = [d.sido, d.sigugn, d.eupmyeondong]
+        .filter(Boolean)
+        .join(" ");
+
+      navigate("/location", {
+        replace: true,
+        state: {
+          source: "location_search",
+          setup: false,
+          selected: label,
+        },
+      });
     } catch (e) {
       console.error("자치구 등록 실패:", e);
     }

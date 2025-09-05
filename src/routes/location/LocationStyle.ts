@@ -129,3 +129,21 @@ export const Info = styled.div`
     margin: 0;
   }
 `;
+
+export const Toast = styled.div`
+  position: relative;
+  bottom: 115px;
+
+  padding: 16px;
+  margin: 0 16px;
+  border-radius: 12px;
+  background: rgba(47, 47, 46, 0.75);
+  z-index: 100;
+
+  color: white;
+  text-align: left;
+  font-family: Pretendard;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: -0.165px;
+`;
