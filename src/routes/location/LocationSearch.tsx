@@ -74,24 +74,46 @@ const LocationSearch = () => {
       .catch((e) => console.error("sig.json 로드 실패:", e));
   }, []);
 
-  const handleSearch = () => {
-    const [sido, sigungu] = keyword.trim().split(/\s+/, 2);
-    if (!sido) return;
+  const handleSearch = async () => {
+    const parts = keyword.trim().split(/\s+/).filter(Boolean);
+    if (!parts.length) return;
 
-    apiClient
-      .get("/api/v1/districts", {
-        params: {
-          sido,
-          ...(sigungu ? { sigungu } : {}),
-        },
-      })
-      .then((res) => {
-        setResults(res.data.data ?? []);
-      })
-      .catch((e) => {
-        console.error("검색 실패:", e);
-        setResults([]);
-      });
+    setSelectedDistrict(null);
+
+    try {
+      if (parts.length >= 2) {
+        const { data } = await apiClient.get("/api/v1/districts", {
+          params: { sido: parts[0], sigungu: parts.slice(1).join(" ") },
+        });
+        setResults(data?.data ?? []);
+        return;
+      }
+
+      // 한 단어
+      const q = parts[0];
+      const [bySido, bySigungu] = await Promise.all([
+        apiClient.get("/api/v1/districts", { params: { sido: q } }),
+        apiClient.get("/api/v1/districts", { params: { sigungu: q } }),
+      ]);
+
+      const merged: District[] = [
+        ...(bySido.data?.data ?? []),
+        ...(bySigungu.data?.data ?? []),
+      ];
+
+      // 중복 제거
+      const unique = Object.values(
+        merged.reduce(
+          (acc, d) => ((acc[d.districtId] = d), acc),
+          {} as Record<string, District>
+        )
+      );
+
+      setResults(unique);
+    } catch (e) {
+      console.error("검색 실패:", e);
+      setResults([]);
+    }
   };
 
   // 리스트에서 선택
@@ -128,7 +150,14 @@ const LocationSearch = () => {
   };
   const handleChange = (v: string) => {
     setKeyword(v);
-    setIsSearchMode(v.trim().length > 0);
+
+    if (v.trim().length === 0) {
+      setIsSearchMode(false);
+      setResults([]);
+      setSelectedDistrict(null);
+    } else {
+      setIsSearchMode(true);
+    }
   };
 
   return (
@@ -149,7 +178,14 @@ const LocationSearch = () => {
           }}
         />
         {keyword && (
-          <button onClick={() => setKeyword("")}>
+          <button
+            onClick={() => {
+              setKeyword("");
+              setResults([]);
+              setSelectedDistrict(null);
+              setIsSearchMode(false);
+            }}
+          >
             <img src={XIcon} alt="취소" />
           </button>
         )}

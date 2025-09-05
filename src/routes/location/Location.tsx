@@ -466,7 +466,7 @@ export default function LocationPage() {
         console.error("자치구 삭제 실패:", e);
       }
     },
-    [fetchDistricts]
+    [fetchDistricts, pushToast]
   );
 
   const [deleteTargetId, setDeleteTargetId] = useState<string | number | null>(
