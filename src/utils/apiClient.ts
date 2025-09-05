@@ -5,7 +5,6 @@ const apiClient = axios.create({
   withCredentials: true,
 });
 
-// 세션 깨우기용 (토큰 불러오기)
 export async function wakeSession() {
   try {
     await apiClient.get("/api/v1/users/my/districts", {
