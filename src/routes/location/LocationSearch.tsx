@@ -8,6 +8,7 @@ import ScopeIcon from "@/assets/scope.svg";
 import LocationSearchItem from "@components/location/LocationSearchItem";
 import { useKakaoLoader } from "react-kakao-maps-sdk";
 import apiClient from "@utils/apiClient";
+import MainButton from "@components/MainButton";
 
 type District = {
   districtId: string;
@@ -30,7 +31,14 @@ type GeoJSON = { type: "FeatureCollection"; features: GeoJSONFeature[] };
 const LocationSearch = () => {
   const navigate = useNavigate();
 
+  const [isSearchMode, setIsSearchMode] = useState(false);
   const [keyword, setKeyword] = useState("");
+
+  // 선택된 자치구
+  const [selectedDistrict, setSelectedDistrict] = useState<District | null>(
+    null
+  );
+
   const [results, setResults] = useState<District[]>([]); // api 응답
 
   const [loading, error] = useKakaoLoader({
@@ -66,11 +74,6 @@ const LocationSearch = () => {
     return new Map(sigunguList.map((s) => [s.code, s]));
   }, [sigunguList]);
 
-  // const filteredList = useMemo(() => {
-  //   if (!keyword) return [];
-  //   return sigunguList.filter((sgg) => sgg.name.includes(keyword));
-  // }, [keyword, sigunguList]);
-
   const handleSearch = () => {
     const [sido, sigungu] = keyword.trim().split(/\s+/, 2);
     if (!sido) return;
@@ -91,23 +94,38 @@ const LocationSearch = () => {
       });
   };
 
-  const handlePick = (d: District) => {
-    const title = [d.sido, d.sigugn, d.eupmyeondong].filter(Boolean).join(" ");
-    const sig5 = (d.districtId ?? "").slice(0, 5); // 앞 5자리
+  const handlePick = async (d: District) => {
+    // const title = [d.sido, d.sigugn, d.eupmyeondong].filter(Boolean).join(" ");
+    // const sig5 = (d.districtId ?? "").slice(0, 5); // 앞 5자리
+    // // SIG_CD와 동일한 코드 찾기
+    // const sgg = sigunguMap.get(sig5);
+    // navigate("/location", {
+    //   state: {
+    //     source: "location_search",
+    //     setup: true,
+    //     selected: title,
+    //     sigCode: sig5,
+    //     sigName: sgg?.name ?? null,
+    //     districtId: d.districtId,
+    //   },
+    // });
+    try {
+      await apiClient.post(`/api/v1/users/districts/${d.districtId}`);
 
-    // SIG_CD와 동일한 코드 찾기
-    const sgg = sigunguMap.get(sig5);
+      navigate("/location", { replace: true, state: null });
+    } catch (e) {
+      console.error("자치구 등록 실패:", e);
+    }
+  };
 
-    navigate("/location", {
-      state: {
-        source: "location_search",
-        setup: true,
-        selected: title,
-        sigCode: sig5,
-        sigName: sgg?.name ?? null,
-        districtId: d.districtId,
-      },
-    });
+  // 키보드 설정
+  const handleFocus = () => setIsSearchMode(true);
+  const handleBlur = () => {
+    if (keyword.trim().length === 0) setIsSearchMode(false);
+  };
+  const handleChange = (v: string) => {
+    setKeyword(v);
+    setIsSearchMode(v.trim().length > 0);
   };
 
   return (
@@ -120,7 +138,9 @@ const LocationSearch = () => {
           type="text"
           placeholder="내 동네를 검색하세요"
           value={keyword}
-          onChange={(e) => setKeyword(e.target.value)}
+          onFocus={handleFocus}
+          onBlur={handleBlur}
+          onChange={(e) => handleChange(e.target.value)}
           onKeyDown={(e) => {
             if (e.key === "Enter") handleSearch();
           }}
@@ -132,10 +152,12 @@ const LocationSearch = () => {
         )}
       </L.SearchBox>
 
-      <L.Now onClick={handleSearch}>
-        <img src={ScopeIcon} alt="현재 위치" />
-        <p>현재 위치로 찾기</p>
-      </L.Now>
+      {!isSearchMode && (
+        <L.Now onClick={handleSearch}>
+          <img src={ScopeIcon} alt="현재 위치" />
+          <p>현재 위치로 찾기</p>
+        </L.Now>
+      )}
 
       <L.SearchList>
         {results.map((d) => {
@@ -146,11 +168,24 @@ const LocationSearch = () => {
             <LocationSearchItem
               key={d.districtId}
               title={label}
-              onClick={() => handlePick(d)}
+              isSelected={selectedDistrict?.districtId === d.districtId}
+              onClick={() => setSelectedDistrict(d)}
             />
           );
         })}
       </L.SearchList>
+
+      <L.Button>
+        <MainButton
+          title="등록"
+          disabled={!selectedDistrict}
+          onClick={() => {
+            if (selectedDistrict) {
+              handlePick(selectedDistrict);
+            }
+          }}
+        />
+      </L.Button>
     </L.Page>
   );
 };
