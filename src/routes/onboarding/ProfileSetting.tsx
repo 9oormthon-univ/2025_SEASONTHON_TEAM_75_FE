@@ -5,6 +5,7 @@ import AddIcon from "@assets/add.svg";
 import { useEffect, useRef, useState, type ChangeEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import apiClient, { wakeSession } from "@utils/apiClient";
+import MainButton from "@components/MainButton";
 
 const MAX_LEN = 20;
 
@@ -85,11 +86,12 @@ const ProfileSetting = () => {
           <p>2~20자의 한글, 영문, 숫자를 사용할 수 있어요</p>
         </P.Nickname>
 
-        <P.Button
-          disabled={submitting || nickname.trim().length === 0}
-          onClick={handleComplete}
-        >
-          {submitting ? "저장 중..." : "완료"}
+        <P.Button>
+          <MainButton
+            disabled={submitting || nickname.trim().length === 0}
+            onClick={handleComplete}
+            title="완료"
+          />
         </P.Button>
       </P.Container>
     </P.Page>
