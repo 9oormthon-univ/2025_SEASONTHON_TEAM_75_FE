@@ -1,10 +1,19 @@
 import styled from "styled-components";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import apiClient from "@utils/apiClient";
+import { type ApiScanResult } from "@stores/scanResultStore";
+
+interface SimilarItem {
+  trashItemId: number;
+  itemName: string;
+  typeName: string;
+}
 
 interface TypeModalProps {
+  trashId: number;
   onClose: () => void;
-  onSelect: (type: string) => void;
+  onSelect: (newTrashData: ApiScanResult) => void;
 }
 
 export const ModalOverlay = styled.div`
@@ -119,23 +128,44 @@ export const CloseButton = styled.button`
   align-items: center;
 `;
 
-const TypeModal: React.FC<TypeModalProps> = ({ onClose, onSelect }) => {
-  const [selectedType, setSelectedType] = useState<string | null>(null);
+const TypeModal: React.FC<TypeModalProps> = ({
+  trashId,
+  onClose,
+  onSelect,
+}) => {
+  const [items, setItems] = useState<SimilarItem[]>([]);
+  const [selectedItemId, setSelectedItemId] = useState<number | null>(null);
   const navigate = useNavigate();
-  const types = [
-    "유색 페트병",
-    "비닐 라벨",
-    "병뚜껑",
-    "커튼",
-    "사람손",
-    "투명 페트병",
-  ];
 
-  const handleSelect = () => {
-    if (selectedType) {
-      onSelect(selectedType);
-    } else {
+  useEffect(() => {
+    const fetchSimilarItems = async () => {
+      try {
+        const response = await apiClient.get<{ data: SimilarItem[] }>(
+          `/api/v1/trash/${trashId}/items`
+        );
+        setItems(response.data.data);
+      } catch (error) {
+        console.error("비슷한 품목을 불러오는 데 실패했습니다:", error);
+      }
+    };
+
+    fetchSimilarItems();
+  }, [trashId]);
+
+  const handleSelect = async () => {
+    if (selectedItemId === null) {
       alert("품목을 선택해주세요.");
+      return;
+    }
+
+    try {
+      const response = await apiClient.patch<{ data: ApiScanResult }>(
+        `/api/v1/trash/${trashId}/items/${selectedItemId}`
+      );
+      onSelect(response.data.data);
+    } catch (error) {
+      console.error("품목 변경에 실패했습니다:", error);
+      alert("품목 변경에 실패했습니다.");
     }
   };
 
@@ -148,13 +178,13 @@ const TypeModal: React.FC<TypeModalProps> = ({ onClose, onSelect }) => {
       <ModalContainer onClick={(e) => e.stopPropagation()}>
         <Title>비슷한 품목을 선택해주세요</Title>
         <TypeList>
-          {types.map((type) => (
+          {items.map((item) => (
             <Type
-              key={type}
-              isSelected={selectedType === type}
-              onClick={() => setSelectedType(type)}
+              key={item.trashItemId}
+              isSelected={selectedItemId === item.trashItemId}
+              onClick={() => setSelectedItemId(item.trashItemId)}
             >
-              {type}
+              {item.itemName}
             </Type>
           ))}
         </TypeList>
