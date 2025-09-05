@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import LogoutModal from "@components/setting/LogoutModal";
 import WithdrawModal from "@components/setting/WithdrawModal";
 import apiClient from "@utils/apiClient";
+import { useNavigate } from "react-router-dom";
 
 // 타입
 type User = {
@@ -44,6 +45,8 @@ type DistrictResponse = {
 };
 
 const Setting = () => {
+  const navigate = useNavigate();
+
   const [isLogoutOpen, setIsLogoutOpen] = useState(false);
   const [isWithdrawOpen, setIsWithdrawOpen] = useState(false);
 
@@ -118,7 +121,7 @@ const Setting = () => {
         <ToggleListItem type="saved" />
       </S.ToggleGroup>
 
-      <S.Feedback>
+      <S.Feedback onClick={() => navigate("/setting/feedback")}>
         <S.Left>
           <img src={FeedbackIcon} alt="피드백하기" />
           <p>피드백하기</p>
