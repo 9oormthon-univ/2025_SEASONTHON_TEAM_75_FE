@@ -6,6 +6,7 @@ import GalleryImg from "@assets/gallery.svg";
 import ChangeCameraImg from "@assets/cam_change.svg";
 import ShutterImg from "@assets/cam_shutter.svg";
 import heic2any from "heic2any";
+import apiClient from "@utils/apiClient";
 
 const Scan: React.FC = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -63,18 +64,32 @@ const Scan: React.FC = () => {
     };
   }, [cameraFacingMode]);
 
-  // 임시 로직
-  const processImageAndNavigate = (imageDataUrl: string) => {
+  const processImageAndNavigate = async (
+    imageFile: File,
+    imageDataUrl: string
+  ) => {
+    navigate("/scan/loading");
+
+    const formData = new FormData();
+    formData.append("imageFile", imageFile);
+
     try {
-      console.log("이미지 처리 완료, ScanResult 페이지로 이동합니다.");
-      navigate("/scan/result/1", {
+      const response = await apiClient.post("/api/v1/trash", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      console.log("API 응답 성공:", response.data.data.imageUrl);
+      navigate(`/scan/result/${response.data.data.id}`, {
         state: {
+          apiResult: response.data.data,
           capturedImage: imageDataUrl,
         },
       });
     } catch (error) {
-      console.error("처리 중 오류 발생:", error);
-      alert("이미지를 처리하는 중 오류가 발생했습니다.");
+      console.error("API 요청 실패:", error);
+      navigate("/scan/fail");
     }
   };
 
@@ -142,7 +157,14 @@ const Scan: React.FC = () => {
     }
 
     const dataUrl = croppedCanvas.toDataURL("image/png");
-    processImageAndNavigate(dataUrl);
+    croppedCanvas.toBlob((blob) => {
+      if (blob) {
+        const imageFile = new File([blob], "capture.png", {
+          type: "image/png",
+        });
+        processImageAndNavigate(imageFile, dataUrl);
+      }
+    }, "image/png");
   };
 
   const toggleCameraFacingMode = () => {
@@ -165,6 +187,7 @@ const Scan: React.FC = () => {
 
     try {
       const isHeic = file.name.toLowerCase().endsWith(".heic");
+      let imageFile = file;
 
       if (isHeic) {
         console.log("HEIC 파일을 감지하여 JPEG로 변환합니다.");
@@ -173,7 +196,7 @@ const Scan: React.FC = () => {
           toType: "image/jpeg",
           quality: 0.8,
         });
-        file = new File([convertedBlob as Blob], "converted.jpeg", {
+        imageFile = new File([convertedBlob as Blob], "converted.jpeg", {
           type: "image/jpeg",
         });
       }
@@ -181,13 +204,13 @@ const Scan: React.FC = () => {
       const reader = new FileReader();
       reader.onloadend = () => {
         const imageDataUrl = reader.result as string;
-        processImageAndNavigate(imageDataUrl);
+        processImageAndNavigate(imageFile, imageDataUrl);
       };
       reader.onerror = () => {
         console.error("파일 리더 오류");
         alert("파일을 읽는 데 실패했습니다.");
       };
-      reader.readAsDataURL(file);
+      reader.readAsDataURL(imageFile);
     } catch (e) {
       console.error("갤러리 이미지 처리 오류:", e);
       alert("이미지 파일을 처리하는 데 실패했습니다.");
