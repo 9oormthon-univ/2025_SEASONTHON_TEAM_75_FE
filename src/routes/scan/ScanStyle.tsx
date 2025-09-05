@@ -3,7 +3,7 @@ import styled from "styled-components";
 export const Container = styled.div`
   position: relative;
   width: 100%;
-  height: 100vh;
+  height: 100dvh;
   display: flex;
   flex-direction: column;
   background-color: white;
@@ -35,7 +35,7 @@ export const Overlay = styled.div`
     left: 50%;
     transform: translate(-50%, -50%);
     max-width: 450px;
-    width: 86%;
+    width: 70%;
     aspect-ratio: 340 / 545;
     box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.3);
 
@@ -53,7 +53,7 @@ export const ScanBox = styled.div`
   z-index: 3;
   pointer-events: none;
   max-width: 450px;
-  width: 86%;
+  width: 70%;
   aspect-ratio: 340 / 545;
 
   &::before {
@@ -101,12 +101,12 @@ export const CloseButton = styled.img`
 
 export const ButtonContainer = styled.div`
   position: absolute;
-  bottom: 2rem;
+  bottom: 1rem;
   left: 50%;
   transform: translateX(-50%);
   width: 100%;
   max-width: 450px;
-  padding: 2rem 1.9rem;
+  padding: 2rem 1.9rem 1rem 1.9rem;
   box-sizing: border-box;
   display: flex;
   justify-content: space-between;

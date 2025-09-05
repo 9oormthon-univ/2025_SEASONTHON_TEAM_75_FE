@@ -38,6 +38,7 @@ const NavContainer = styled.nav`
 `;
 
 const NavItem = styled(NavLink)<NavItemProps>`
+  all: unset;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -52,7 +53,8 @@ const NavItem = styled(NavLink)<NavItemProps>`
   padding-bottom: 20px;
 
   &:active,
-  &:visited {
+  &:visited,
+  &:hover {
     color: ${({ theme, $isActive }) =>
       $isActive ? theme.colors.navAct : theme.colors.nav};
   }
