@@ -1,8 +1,8 @@
 import styled from "styled-components";
+import DeleteIcon from "@assets/trashcan.svg";
 
 interface ModalProps {
-  title: string;
-  confirmText: string;
+  district: string;
   isOpen: boolean;
   onCancel: () => void;
   onConfirm: () => void;
@@ -24,25 +24,31 @@ const Background = styled.div`
 const Container = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 32px;
+  align-items: center;
+  gap: 18px;
 
   border-radius: 20px;
   background: #fff;
   box-shadow: 0 0 16px 0 rgba(0, 0, 0, 0.25);
 
-  padding: 38px 25px 22px 25px;
+  padding: 28px 19px 20px 19px;
+
+  img {
+    width: 60px;
+    height: 60px;
+  }
 `;
 
 const Title = styled.p`
   font-size: 20px;
-  font-weight: 600;
+  font-weight: 700;
   line-height: 150%;
   text-align: center;
   white-space: pre-wrap;
-  text-align: left;
+  text-align: center;
   color: ${({ theme }) => theme.colors.text1};
 
-  margin: 0;
+  margin: 0 0 9px 0;
 `;
 
 const ButtonGroup = styled.div`
@@ -55,12 +61,12 @@ const CancelButton = styled.button`
   cursor: pointer;
   padding: 12.5px 44px;
 
-  color: #6b6b6b;
+  color: ${({ theme }) => theme.colors.text2};
   font-size: 16px;
   font-weight: 500;
 
-  border-radius: 10.5px;
-  background: #f0f0f0;
+  border-radius: 12px;
+  background: ${({ theme }) => theme.colors.text5};
 
   &:focus {
     outline: none;
@@ -72,34 +78,38 @@ const ConfirmButton = styled.button`
   cursor: pointer;
   padding: 12.5px 44px;
 
-  color: #ffffff;
+  color: white;
   font-size: 16px;
   font-weight: 600;
 
-  border-radius: 10.5px;
-  background: ${({ theme }) => theme.colors.button};
+  border-radius: 12px;
+  background: ${({ theme }) => theme.colors.main};
 
   &:focus {
     outline: none;
   }
 `;
 
-function LocationModal(props: ModalProps) {
-  if (!props.isOpen) return null;
+function LocationDeleteModal({
+  district,
+  isOpen,
+  onCancel,
+  onConfirm,
+}: ModalProps) {
+  if (!isOpen) return null;
 
   return (
-    <Background onClick={props.onCancel}>
+    <Background onClick={onCancel}>
       <Container onClick={(e) => e.stopPropagation()}>
-        <Title>{props.title}</Title>
+        <img src={DeleteIcon} alt="삭제" />
+        <Title>{`'${district}'을\n삭제할까요?`}</Title>
         <ButtonGroup>
-          <CancelButton onClick={props.onCancel}>취소</CancelButton>
-          <ConfirmButton onClick={props.onConfirm}>
-            {props.confirmText}
-          </ConfirmButton>
+          <CancelButton onClick={onCancel}>취소</CancelButton>
+          <ConfirmButton onClick={onConfirm}>삭제</ConfirmButton>
         </ButtonGroup>
       </Container>
     </Background>
   );
 }
 
-export default LocationModal;
+export default LocationDeleteModal;

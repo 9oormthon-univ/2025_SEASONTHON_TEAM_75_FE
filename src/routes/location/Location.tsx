@@ -3,7 +3,7 @@ import { Map, MapMarker, Polygon, useKakaoLoader } from "react-kakao-maps-sdk";
 import { useCallback, useEffect, useMemo, useReducer, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import Header from "@components/Header";
-import LocationModal from "@components/location/LocationModal";
+import LocationDeleteModal from "@components/location/LocationDeleteModal";
 import NextIcon from "@/assets/next.svg";
 import InfoIcon from "@assets/info.svg";
 import PlusIcon from "@assets/plus.svg";
@@ -572,9 +572,8 @@ export default function LocationPage() {
       )}
 
       {/* 삭제 확인 모달 */}
-      <LocationModal
-        title={`'${deleteTarget?.title ?? "이 동네"}'\n삭제할까요?`}
-        confirmText="삭제"
+      <LocationDeleteModal
+        district={`${deleteTarget?.title}`}
         isOpen={!!deleteTargetId}
         onCancel={cancelRemove}
         onConfirm={confirmRemove}
