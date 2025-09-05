@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useReducer, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import Header from "@components/Header";
 import LocationModal from "@components/location/LocationModal";
+import NextIcon from "@/assets/next.svg";
 import InfoIcon from "@assets/info.svg";
 import PlusIcon from "@assets/plus.svg";
 import WarnIcon from "@assets/warning.svg";
@@ -532,8 +533,8 @@ export default function LocationPage() {
         title={"내 동네 설정"}
         onBack={() => console.log("뒤로가기")}
         rightButton={
-          <button onClick={() => setShowInfo((v) => !v)}>
-            <img src={InfoIcon} alt="정보" />
+          <button onClick={() => navigate("/home")}>
+            <img src={NextIcon} alt="다음" />
           </button>
         }
       />
@@ -578,6 +579,10 @@ export default function LocationPage() {
         onCancel={cancelRemove}
         onConfirm={confirmRemove}
       />
+
+      <L.InfoButton onClick={() => setShowInfo((v) => !v)}>
+        <img src={InfoIcon} alt="정보" />
+      </L.InfoButton>
 
       {showInfo && (
         <L.Info>
