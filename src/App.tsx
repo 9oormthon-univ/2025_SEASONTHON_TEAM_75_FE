@@ -19,7 +19,7 @@ import Setting from "@routes/setting/Setting";
 import NotFound from "@routes/NotFound";
 import theme from "@styles/theme";
 import ProfileComplete from "@routes/onboarding/ProfileComplete";
-import Feedback from "@routes/setting/FeedBack";
+import Feedback from "@routes/setting/Feedback";
 
 function App() {
   return (
