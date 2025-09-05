@@ -1,5 +1,4 @@
-import VinylIcon from "@assets/vinyl.svg";
-import PetIcon from "@assets/pet.svg";
+import { getTrashType } from "@utils/trashType";
 import RecyclingIcon from "@assets/recycling.svg";
 import styled from "styled-components";
 
@@ -61,26 +60,17 @@ interface PartCardProps {
 }
 
 const PartCard = ({ type, name }: PartCardProps) => {
-  const getMainIconForType = () => {
-    switch (type) {
-      case "PET(투명페트병)":
-        return PetIcon;
-      case "비닐류":
-        return VinylIcon;
-      default:
-        return PetIcon;
-    }
-  };
+  const trashType = getTrashType(type);
 
   return (
     <Container>
       <LeftSection>
-        <TrashImage src={getMainIconForType()} alt={type} />
+        <TrashImage src={trashType.icon} alt={trashType.nameKo} />
         <InfoWrapper>
           <Name>{name}</Name>
           <Type>
             <Icon src={RecyclingIcon} alt="재활용 아이콘" />
-            {type}
+            {trashType.nameKo}
           </Type>
         </InfoWrapper>
       </LeftSection>
