@@ -324,9 +324,16 @@ export default function LocationPage() {
   useEffect(() => {
     if (isFromSearch && !isSetupMode && selectedTitleFromQuery) {
       pushToast(`내 동네를 '${selectedTitleFromQuery}'으로 설정했어요`);
-      navigate(".", { replace: true, state: null });
+      navigate(".", { replace: true, state: { from } });
     }
-  }, [isFromSearch, isSetupMode, selectedTitleFromQuery, pushToast, navigate]);
+  }, [
+    isFromSearch,
+    isSetupMode,
+    selectedTitleFromQuery,
+    pushToast,
+    navigate,
+    from,
+  ]);
 
   // 내 동네 목록
   const initialItems = useMemo<MyLocationItem[]>(() => [], []);
@@ -545,8 +552,8 @@ export default function LocationPage() {
   );
 
   const handleAddLocation = useCallback(
-    () => navigate("/location/search"),
-    [navigate]
+    () => navigate("/location/search", { state: { from } }),
+    [navigate, from]
   );
   const handleRegister = useCallback(async () => {
     const districtId = districtIdFromQuery;
@@ -560,22 +567,25 @@ export default function LocationPage() {
 
       await fetchDistricts();
 
-      pushToast(`내 동네를 '${selectedTitle}으로 설정했어요`);
+      pushToast(`내 동네를 '${selectedTitle}'으로 설정했어요`);
 
       setIsSetupMode(false);
       setSelectedTitle(undefined);
 
-      if (isFromSearch) navigate(".", { replace: true, state: null });
+      if (isFromSearch) {
+        navigate(".", { replace: true, state: { from } });
+      }
     } catch (e) {
       console.error("자치구 업데이트 실패:", e);
     }
   }, [
-    isFromSearch,
-    navigate,
-    selectedTitle,
     districtIdFromQuery,
+    selectedTitle,
     fetchDistricts,
     pushToast,
+    isFromSearch,
+    navigate,
+    from,
   ]);
 
   if (loading) {

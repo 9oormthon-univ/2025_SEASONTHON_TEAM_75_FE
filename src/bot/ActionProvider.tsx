@@ -46,6 +46,20 @@ type TrashItemsResponse = {
   data: TrashItem[];
 };
 
+// 유저
+type UserResponse = {
+  httpCode: number;
+  httpStatus: string;
+  message: string;
+  data: {
+    userId: number;
+    nickName: string;
+    profileImageUrl: string | null;
+    createAt: string;
+    updatedAt: string;
+  };
+};
+
 // 공용 타입
 type BotMessage = ReturnType<typeof _createChatBotMessage>;
 type UserMessage = ReturnType<typeof _makeClientMessage>;
@@ -127,6 +141,21 @@ const ActionProvider: React.FC<ActionProviderProps> = ({
   setSelectedMode,
   onExpose,
 }) => {
+  // 사용자 이름
+  const [userName, setUserName] = React.useState<string>("");
+
+  React.useEffect(() => {
+    (async () => {
+      try {
+        const { data } = await apiClient.get<UserResponse>("/api/v1/users/me");
+        setUserName(data?.data?.nickName?.trim() ?? "");
+      } catch (e) {
+        console.error("사용자 조회 실패: ", e);
+      }
+    })();
+  }, []);
+
+  // 메시지
   const clientMsg = (
     text: string,
     options: Record<string, unknown> = {}
@@ -141,8 +170,8 @@ const ActionProvider: React.FC<ActionProviderProps> = ({
 
       const introText =
         mode === "word"
-          ? "멋진 선택이야, 000요원! \n이제 목표 쓰레기를 알려 줘."
-          : "멋진 선택이야, 000요원! \n먼저 작전 구역을 선택해 줘.";
+          ? `멋진 선택이야, ${userName}요원! \n이제 목표 쓰레기를 알려 줘.`
+          : `멋진 선택이야, ${userName}요원! \n먼저 작전 구역을 선택해 줘.`;
 
       const next = pushBot(introText);
 

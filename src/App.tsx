@@ -19,6 +19,7 @@ import Setting from "@routes/setting/Setting";
 import NotFound from "@routes/NotFound";
 import theme from "@styles/theme";
 import ProfileComplete from "@routes/onboarding/ProfileComplete";
+import Feedback from "@routes/setting/Feedback";
 
 function App() {
   return (
@@ -147,14 +148,24 @@ function App() {
                 }
               />
             </Route>
-            <Route
-              path="/setting"
-              element={
-                <Layout showNavbar={true}>
-                  <Setting />
-                </Layout>
-              }
-            />
+            <Route path="/setting">
+              <Route
+                index
+                element={
+                  <Layout showNavbar={true}>
+                    <Setting />
+                  </Layout>
+                }
+              />
+              <Route
+                path="feedback"
+                element={
+                  <Layout showNavbar={false}>
+                    <Feedback />
+                  </Layout>
+                }
+              />
+            </Route>
             <Route
               path="*"
               element={

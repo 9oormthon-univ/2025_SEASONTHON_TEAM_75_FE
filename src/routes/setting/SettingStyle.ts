@@ -20,6 +20,7 @@ export const Profile = styled.div`
   img {
     width: 60px;
     height: 60px;
+    border-radius: 30px;
   }
 `;
 
@@ -99,4 +100,10 @@ export const AuthItem = styled.button`
   width: 100%;
   text-align: start;
   padding: 16px;
+
+  color: ${({ theme }) => theme.colors.text1};
+  font-family: Pretendard;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0.16px;
 `;

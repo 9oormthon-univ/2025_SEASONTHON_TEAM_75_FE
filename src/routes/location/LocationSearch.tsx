@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import * as L from "./LocationSearchStyle";
 import Header from "@components/Header";
 import SearchIcon from "@/assets/search.svg";
@@ -30,6 +30,10 @@ type GeoJSON = { type: "FeatureCollection"; features: GeoJSONFeature[] };
 
 const LocationSearch = () => {
   const navigate = useNavigate();
+  const { state: navState } = useLocation() as {
+    state?: { from?: "home" | "profile_complete" };
+  };
+  const from = navState?.from;
 
   const [isSearchMode, setIsSearchMode] = useState(false);
   const [keyword, setKeyword] = useState("");
@@ -131,6 +135,7 @@ const LocationSearch = () => {
           source: "location_search",
           setup: false,
           selected: label,
+          from,
         },
       });
     } catch (e) {
