@@ -11,7 +11,11 @@ type Item = {
 type Props = {
   payload?: Item[]; // 카테고리 배열
   actions: {
-    selectTrashCategory: (category: string) => void;
+    selectTrashCategory: (category: {
+      id: number;
+      name: string;
+      code?: string;
+    }) => void;
   };
 };
 
@@ -26,7 +30,11 @@ const TrashWidgetGroup: React.FC<Props> = ({ payload = [], actions }) => {
 
   const handleCategoryClick = (item: Item) => {
     setSelectedId(item.id);
-    actions.selectTrashCategory(item.name);
+    actions.selectTrashCategory({
+      id: item.id,
+      name: item.name,
+      code: item.code,
+    });
   };
 
   return (

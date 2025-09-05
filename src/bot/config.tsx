@@ -5,6 +5,7 @@ import ChatBox from "@components/chat/ChatBox";
 import SearchWidgetGroup from "@components/chat/SearchWidgetGroup";
 import TrashWidgetGroup from "@components/chat/TrashWidgetGroup";
 import Chatbot from "react-chatbot-kit";
+import TrashItemWidgetGroup from "@components/chat/TrashItemWidgetGroup";
 
 type SearchMode = "word" | "category";
 
@@ -17,9 +18,18 @@ export type SearchWidgetProps = {
 
 export type TrashWidgetProps = {
   actions: {
-    selectTrashCategory: (category: string) => void;
+    selectTrashCategory: (category: {
+      id: number;
+      name: string;
+      code?: string;
+    }) => void;
   };
   payload?: Array<{ id: number; code: string; name: string }>;
+};
+
+export type TrashItemWidgetProps = {
+  actions: { selectTrashItem: (item: { id: number; name: string }) => void };
+  payload?: Array<{ id: number; name: string }>;
 };
 
 type WidgetConfig<T> = {
@@ -31,7 +41,8 @@ type WidgetConfig<T> = {
 
 type WidgetEntry =
   | WidgetConfig<SearchWidgetProps>
-  | WidgetConfig<TrashWidgetProps>;
+  | WidgetConfig<TrashWidgetProps>
+  | WidgetConfig<TrashItemWidgetProps>;
 
 type MinimalChatbotConfig = {
   botName?: string;
@@ -82,6 +93,14 @@ const rawConfig: MinimalChatbotConfig = {
     {
       widgetName: "trashTypeWidgets",
       widgetFunc: (props: TrashWidgetProps) => <TrashWidgetGroup {...props} />,
+      props: {},
+      mapStateToProps: [],
+    },
+    {
+      widgetName: "trashItemWidgets",
+      widgetFunc: (props: TrashItemWidgetProps) => (
+        <TrashItemWidgetGroup {...props} />
+      ),
       props: {},
       mapStateToProps: [],
     },
