@@ -1,23 +1,5 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import styled, { keyframes } from "styled-components";
-import Logo from "@assets/splash_logo.svg";
-
-const fadeIn = keyframes`
-  from { opacity: 0; transform: scale(0.98); }
-  to   { opacity: 1; transform: scale(1); }
-`;
-
-const Container = styled.div`
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  background: ${({ theme }) => theme.colors.main};
-  animation: ${fadeIn} 400ms ease-out;
-`;
 
 const Splash = () => {
   const navigate = useNavigate();
@@ -31,9 +13,20 @@ const Splash = () => {
   }, [navigate]);
 
   return (
-    <Container>
-      <img src={Logo} alt="로고" />
-    </Container>
+    <div
+      style={{
+        width: "100%",
+        height: "100vh",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        backgroundColor: "black",
+        color: "white",
+        fontSize: "24px",
+      }}
+    >
+      스플래시 테스트 화면입니다.
+    </div>
   );
 };
 
