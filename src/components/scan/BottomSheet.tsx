@@ -3,6 +3,7 @@ import { Drawer } from "vaul";
 import styled from "styled-components";
 
 export const ScrollableContainer = styled.div`
+  width: 100%;
   background-color: white;
   border-top-left-radius: 20px;
   border-top-right-radius: 20px;
@@ -14,6 +15,11 @@ export const ScrollableContainer = styled.div`
   }
   scrollbar-width: none;
   -ms-overflow-style: none;
+
+  @media screen and (min-width: 1025px) {
+    width: 393px;
+    margin: 0 auto;
+  }
 `;
 
 interface CustomBottomSheetProps {
@@ -49,6 +55,7 @@ const BottomSheet: React.FC<CustomBottomSheetProps> = ({
             borderTopLeftRadius: "20px",
             borderTopRightRadius: "20px",
             height: "90vh",
+            width: "100%",
           }}
         >
           <ScrollableContainer>
