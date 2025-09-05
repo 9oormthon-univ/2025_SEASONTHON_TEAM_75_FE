@@ -115,6 +115,7 @@ type LocationState = {
   selected?: string;
   sigCode?: string;
   districtId?: string;
+  from?: "home" | "profile_complete";
 } | null;
 
 export type MyLocationItem = {
@@ -268,6 +269,17 @@ function ListPanel({
 // 메인
 export default function LocationPage() {
   const navigate = useNavigate();
+  const { state: navState } = useLocation() as { state: LocationState };
+  const from = navState?.from;
+  // 들어온 경로에 따라 헤더 수정
+  const isBackButton = from === "home";
+  const rightButton =
+    from === "profile_complete" ? (
+      <button onClick={() => navigate("/home")}>
+        <img src={NextIcon} alt="다음" />
+      </button>
+    ) : undefined;
+
   const {
     isFromSearch,
     setup: setupFromQuery,
@@ -569,7 +581,7 @@ export default function LocationPage() {
   if (loading) {
     return (
       <L.Page>
-        <Header title={"내 동네 설정"} />
+        <Header title={"내 동네 설정"} isBackButton={true} />
         <div style={{ padding: "20px" }}>지도 로딩중...</div>
       </L.Page>
     );
@@ -578,13 +590,9 @@ export default function LocationPage() {
   return (
     <L.Page>
       <Header
-        title={"내 동네 설정"}
-        onBack={() => console.log("뒤로가기")}
-        rightButton={
-          <button onClick={() => navigate("/home")}>
-            <img src={NextIcon} alt="다음" />
-          </button>
-        }
+        title="내 동네 설정"
+        isBackButton={isBackButton}
+        rightButton={rightButton}
       />
 
       <Map

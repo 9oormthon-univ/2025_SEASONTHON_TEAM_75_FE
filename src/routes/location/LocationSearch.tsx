@@ -162,7 +162,7 @@ const LocationSearch = () => {
 
   return (
     <L.Page>
-      <Header title="내 동네 설정" onBack={() => navigate(-1)} />
+      <Header title="내 동네 설정" isBackButton={true} />
 
       <L.SearchBox>
         <img src={SearchIcon} alt="검색" />

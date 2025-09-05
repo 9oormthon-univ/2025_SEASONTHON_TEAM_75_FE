@@ -52,7 +52,7 @@ const ProfileSetting = () => {
 
   return (
     <P.Page>
-      <Header title="프로필 설정" />
+      <Header title="프로필 설정" isBackButton={true} />
       <P.Container>
         <P.Profile>
           <img src={previewUrl ?? Profile} alt="프로필" />

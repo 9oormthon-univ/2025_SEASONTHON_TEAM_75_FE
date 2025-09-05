@@ -40,7 +40,7 @@ const History = () => {
 
   return (
     <H.Container>
-      <Header title={"최근기록"} onBack={() => console.log("뒤로가기")} />
+      <Header title={"최근기록"} isBorder={true} />
       <H.SubHeader>
         <H.HistoryCount>총 {historyCount}개</H.HistoryCount>
         <H.EditBtn onClick={handleEditClick} disabled={historyCount === 0}>
