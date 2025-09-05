@@ -3,22 +3,35 @@ import { createChatBotMessage } from "react-chatbot-kit";
 import Header from "@components/Header";
 import ChatBox from "@components/chat/ChatBox";
 import SearchWidgetGroup from "@components/chat/SearchWidgetGroup";
+import TrashWidgetGroup from "@components/chat/TrashWidgetGroup";
+import Chatbot from "react-chatbot-kit";
 
 type SearchMode = "word" | "category";
 
-type WidgetProps = {
+export type SearchWidgetProps = {
   actions: {
     selectSearchMode: (mode: SearchMode, title: string) => void;
     setSelectedMode: (mode: SearchMode | null) => void;
   };
 };
 
-type WidgetConfig = {
-  widgetName: string;
-  widgetFunc: (props: WidgetProps) => React.ReactElement;
-  props: Record<string, unknown>;
-  mapStateToProps: string[];
+export type TrashWidgetProps = {
+  actions: {
+    selectTrashCategory: (category: string) => void;
+  };
+  payload?: Array<{ id: number; code: string; name: string }>;
 };
+
+type WidgetConfig<T> = {
+  widgetName: string;
+  widgetFunc: (props: T) => React.ReactElement;
+  props?: Partial<T>;
+  mapStateToProps?: string[];
+};
+
+type WidgetEntry =
+  | WidgetConfig<SearchWidgetProps>
+  | WidgetConfig<TrashWidgetProps>;
 
 type MinimalChatbotConfig = {
   botName?: string;
@@ -34,10 +47,10 @@ type MinimalChatbotConfig = {
       props: React.ComponentProps<typeof ChatBox>
     ) => React.ReactElement;
   };
-  widgets?: WidgetConfig[];
+  widgets?: WidgetEntry[];
 };
 
-const config: MinimalChatbotConfig = {
+const rawConfig: MinimalChatbotConfig = {
   botName: "에코사령관",
   initialMessages: [
     createChatBotMessage(
@@ -60,11 +73,41 @@ const config: MinimalChatbotConfig = {
   widgets: [
     {
       widgetName: "searchWidgets",
-      widgetFunc: (props: WidgetProps) => <SearchWidgetGroup {...props} />,
+      widgetFunc: (props: SearchWidgetProps) => (
+        <SearchWidgetGroup {...props} />
+      ),
+      props: {},
+      mapStateToProps: [],
+    },
+    {
+      widgetName: "trashTypeWidgets",
+      widgetFunc: (props: TrashWidgetProps) => <TrashWidgetGroup {...props} />,
       props: {},
       mapStateToProps: [],
     },
   ],
 };
 
+// Chat.tsx에서 타입 오류 나는 거 막는 용도...
+type ChatbotProps = React.ComponentProps<typeof Chatbot>;
+type LibConfig = ChatbotProps["config"];
+type LibWidget = NonNullable<LibConfig["widgets"]>[number];
+
+function adaptConfig(cfg: MinimalChatbotConfig): LibConfig {
+  const widgets: LibWidget[] = (cfg.widgets ?? []).map<LibWidget>((w) => ({
+    widgetName: w.widgetName,
+    widgetFunc: w.widgetFunc as (props: unknown) => React.ReactElement,
+    props: (w.props ?? {}) as Record<string, unknown>,
+    mapStateToProps: w.mapStateToProps ?? [],
+  }));
+
+  return {
+    botName: cfg.botName,
+    initialMessages: cfg.initialMessages,
+    customComponents: cfg.customComponents,
+    widgets,
+  };
+}
+
+const config = adaptConfig(rawConfig);
 export default config;

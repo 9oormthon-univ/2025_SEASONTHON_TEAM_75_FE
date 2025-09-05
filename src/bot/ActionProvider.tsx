@@ -18,6 +18,19 @@ type SearchResponse = {
   };
 };
 
+type TrashType = {
+  trashTypeId: number;
+  typeCode: string;
+  typeName: string;
+};
+
+type TrashTypesResponse = {
+  httpCode: number;
+  httpStatus: string;
+  message: string;
+  data: TrashType[];
+};
+
 // 공용 타입
 type BotMessage = ReturnType<typeof _createChatBotMessage>;
 type UserMessage = ReturnType<typeof _makeClientMessage>;
@@ -47,6 +60,10 @@ export type Actions = {
 
   // 단어 검색 API
   searchKeyword: (raw: string) => Promise<void>;
+
+  // 상위 카테고리 API
+  fetchTrashTypes: (introText?: string) => Promise<void>;
+  selectTrashCategory: (category: string) => void;
 };
 
 export type ActionProviderProps = {
@@ -101,13 +118,12 @@ const ActionProvider: React.FC<ActionProviderProps> = ({
     selectSearchMode: (mode, title) => {
       const userMsg = clientMsg(title);
 
-      const next: BotMessage =
+      const introText =
         mode === "word"
-          ? pushBot("멋진 선택이야, 000요원! \n이제 목표 쓰레기를 알려 줘.", {})
-          : pushBot(
-              "멋진 선택이야, 000요원! \n먼저 작전 구역을 선택해 줘.",
-              {}
-            );
+          ? "멋진 선택이야, 000요원! \n이제 목표 쓰레기를 알려 줘."
+          : "멋진 선택이야, 000요원! \n먼저 작전 구역을 선택해 줘.";
+
+      const next = pushBot(introText);
 
       setState((prev) => {
         const msgs = [...prev.messages];
@@ -150,6 +166,11 @@ const ActionProvider: React.FC<ActionProviderProps> = ({
       });
 
       setSelectedMode(mode);
+
+      // 카테고리 모드면 카테고리 API 호출
+      if (mode === "category") {
+        void actions.fetchTrashTypes(introText);
+      }
     },
 
     setSelectedMode: (mode) => {
@@ -288,6 +309,131 @@ const ActionProvider: React.FC<ActionProviderProps> = ({
           return { ...prev, messages: [...msgs, err] };
         });
       }
+    },
+
+    // 상위 카테고리 API
+    fetchTrashTypes: async (introText?: string) => {
+      // 로딩
+      const loading = pushBot("•••");
+      setState((prev) => ({ ...prev, messages: [...prev.messages, loading] }));
+
+      try {
+        const { data } = await apiClient.get<TrashTypesResponse>(
+          "/api/v1/questions/trash-types"
+        );
+
+        const items = Array.isArray(data?.data) ? data.data : [];
+
+        if (items.length === 0) {
+          const fail = pushBot(
+            "카테고리 정보를 불러오지 못했어. 잠시 후 다시 시도해줘!"
+          );
+          const msgs = (prev: ChatState) => prev.messages.slice(0, -1);
+          setState((prev) => ({ ...prev, messages: [...msgs(prev), fail] }));
+          return;
+        }
+
+        const payload = items.map((t) => ({
+          id: t.trashTypeId,
+          code: t.typeCode,
+          name: t.typeName,
+        }));
+
+        setState((prev) => {
+          const msgs = [...prev.messages];
+          msgs.pop(); // 마지막 '•••' 제거
+
+          // 뒤에서부터 "인트로 텍스트"인 버블을 찾는다
+          const revIdx = [...msgs]
+            .reverse()
+            .findIndex((m) => getMsgText(m) === introText);
+          if (revIdx !== -1) {
+            const realIdx = msgs.length - 1 - revIdx;
+
+            // 🟢 같은 텍스트를 유지하면서 위젯/payload만 붙여 '치환'
+            msgs[realIdx] = createChatBotMessage(
+              introText ?? "카테고리를 선택해 줘!",
+              {
+                widget: "trashTypeWidgets", // config에 등록한 위젯 이름과 동일
+                payload,
+              }
+            );
+          } else {
+            // 혹시 못 찾으면 새 버블 하나로 대체
+            msgs.push(
+              createChatBotMessage("먼저 작전 구역을 선택해 줘!", {
+                widget: "trashTypeWidgets",
+                payload,
+              })
+            );
+          }
+          return { ...prev, messages: msgs };
+        });
+      } catch (e) {
+        console.error(e);
+        const err = pushBot("서버와 통신에 실패했어. 잠시 후 다시 시도해줘!");
+        setState((prev) => {
+          const msgs = prev.messages.slice(0, -1);
+          return { ...prev, messages: [...msgs, err] };
+        });
+      }
+    },
+
+    // 상위 카테고리 선택 후
+    selectTrashCategory: (category) => {
+      const userMsg = clientMsg(category);
+
+      const guide = pushBot(
+        `확인 완료! ${category} 구역에 진입했어. 이제 목표물을 조준해 줘!`
+      );
+
+      setState((prev) => {
+        // 마지막에 붙은 위젯(trashTypeWidgets) 제거/치환
+        const msgs = [...prev.messages];
+
+        // 뒤에서부터 위젯 버블 찾기
+        const revIdx = [...msgs]
+          .reverse()
+          .findIndex(
+            (m) =>
+              m?.widget === "trashTypeWidgets" ||
+              (isPossiblyWidgetMessage(m) &&
+                (m as PossiblyWidgetMessage).widget === "trashTypeWidgets")
+          );
+
+        if (revIdx !== -1) {
+          const realIdx = msgs.length - 1 - revIdx;
+          const original = msgs[realIdx];
+
+          // 같은 텍스트 유지하면서 widget/payload만 제거
+          if (isPossiblyWidgetMessage(original)) {
+            const clone: Record<string, unknown> = { ...original };
+            delete clone.widget;
+            delete clone.payload;
+            if (
+              "props" in clone &&
+              typeof clone.props === "object" &&
+              clone.props
+            ) {
+              const cp = { ...(clone.props as Record<string, unknown>) };
+              delete cp.widget;
+              delete cp.payload;
+              clone.props = cp;
+            }
+            msgs[realIdx] = clone as ChatMessage;
+          }
+        }
+
+        // 입력창을 활성화하려고 모드를 word로 전환
+        return {
+          ...prev,
+          messages: [...msgs, userMsg, guide],
+          selectedMode: "word",
+        };
+      });
+
+      // 외부로도 반영 (Chat.tsx placeholder 제어용)
+      setSelectedMode("word");
     },
   };
 
