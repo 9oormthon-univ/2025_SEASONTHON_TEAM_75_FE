@@ -254,10 +254,12 @@ function ListPanel({
             onRemove={onRemove}
           />
         ))}
-        <L.AddButton onClick={onAdd}>
-          <img src={PlusIcon} alt="추가" />
-          <p>동네 추가하기</p>
-        </L.AddButton>
+        {items.length < 2 && (
+          <L.AddButton onClick={onAdd}>
+            <img src={PlusIcon} alt="추가" />
+            <p>동네 추가하기</p>
+          </L.AddButton>
+        )}
       </L.ButtonGroup>
     </L.Bottom>
   );
