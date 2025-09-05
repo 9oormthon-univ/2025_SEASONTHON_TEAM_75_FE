@@ -295,7 +295,8 @@ const ActionProvider: React.FC<ActionProviderProps> = ({
             const msgs = prev.messages.slice(0, -1); // '...' 제거
             return { ...prev, messages: [...msgs, fail] };
           });
-          return;
+
+          setSelectedMode(null);
         }
 
         const m0 = pushBot(
@@ -322,6 +323,8 @@ const ActionProvider: React.FC<ActionProviderProps> = ({
           const msgs = prev.messages.slice(0, -1);
           return { ...prev, messages: [...msgs, m0, m1, m2] };
         });
+
+        setSelectedMode(null);
       } catch (e) {
         console.error(e);
         const err = pushBot("서버와 통신에 실패했어. 잠시 후 다시 시도해줘!");
@@ -329,6 +332,8 @@ const ActionProvider: React.FC<ActionProviderProps> = ({
           const msgs = prev.messages.slice(0, -1);
           return { ...prev, messages: [...msgs, err] };
         });
+
+        setSelectedMode(null);
       }
     },
 
@@ -440,11 +445,11 @@ const ActionProvider: React.FC<ActionProviderProps> = ({
         return {
           ...prev,
           messages: [...msgs, userMsg, anchor],
-          selectedMode: "word",
+          selectedMode: "category",
         };
       });
 
-      setSelectedMode("word");
+      setSelectedMode("category");
 
       void actions.fetchTrashItemsByTypeId(id);
     },
@@ -532,10 +537,8 @@ const ActionProvider: React.FC<ActionProviderProps> = ({
           }
         }
 
-        return { ...prev, messages: [...msgs, userMsg], selectedMode: "word" };
+        return { ...prev, messages: [...msgs, userMsg] };
       });
-
-      setSelectedMode("word");
       // 아이템 이름 검색
       void actions.searchKeyword(name);
     },

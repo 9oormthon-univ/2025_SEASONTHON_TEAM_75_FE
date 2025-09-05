@@ -109,14 +109,6 @@ const Chat: React.FC = () => {
       }
     };
 
-    recognition.onresult = (event: SpeechRecognitionEvent) => {
-      const result = event.results[event.results.length - 1];
-      const text = result?.[0]?.transcript ?? "";
-      lastTranscriptRef.current = text;
-      actionsRef.current?.updateSTT(text);
-      if (result?.isFinal) finalize();
-    };
-
     recognition.onerror = () => finalize();
     recognition.onend = () => finalize();
 
