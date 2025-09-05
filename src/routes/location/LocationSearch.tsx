@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import * as L from "./LocationSearchStyle";
 import Header from "@components/Header";
@@ -47,6 +47,10 @@ const LocationSearch = () => {
   });
 
   const [sigunguList, setSigunguList] = useState<Sigungu[]>([]);
+  useEffect(() => {
+    // sigunguList 미사용 (임시)
+    if (sigunguList.length) void sigunguList[0];
+  }, [sigunguList]);
 
   useEffect(() => {
     if (error) {
@@ -70,10 +74,6 @@ const LocationSearch = () => {
       .catch((e) => console.error("sig.json 로드 실패:", e));
   }, []);
 
-  const sigunguMap = useMemo(() => {
-    return new Map(sigunguList.map((s) => [s.code, s]));
-  }, [sigunguList]);
-
   const handleSearch = () => {
     const [sido, sigungu] = keyword.trim().split(/\s+/, 2);
     if (!sido) return;
@@ -94,21 +94,8 @@ const LocationSearch = () => {
       });
   };
 
+  // 리스트에서 선택
   const handlePick = async (d: District) => {
-    // const title = [d.sido, d.sigugn, d.eupmyeondong].filter(Boolean).join(" ");
-    // const sig5 = (d.districtId ?? "").slice(0, 5); // 앞 5자리
-    // // SIG_CD와 동일한 코드 찾기
-    // const sgg = sigunguMap.get(sig5);
-    // navigate("/location", {
-    //   state: {
-    //     source: "location_search",
-    //     setup: true,
-    //     selected: title,
-    //     sigCode: sig5,
-    //     sigName: sgg?.name ?? null,
-    //     districtId: d.districtId,
-    //   },
-    // });
     try {
       await apiClient.post(`/api/v1/users/districts/${d.districtId}`);
 
@@ -116,6 +103,11 @@ const LocationSearch = () => {
     } catch (e) {
       console.error("자치구 등록 실패:", e);
     }
+  };
+
+  // 현재 위치로 찾기
+  const handleCurrentPick = async () => {
+    console.log("현재 위치로 찾기");
   };
 
   // 키보드 설정
@@ -153,7 +145,7 @@ const LocationSearch = () => {
       </L.SearchBox>
 
       {!isSearchMode && (
-        <L.Now onClick={handleSearch}>
+        <L.Now onClick={handleCurrentPick}>
           <img src={ScopeIcon} alt="현재 위치" />
           <p>현재 위치로 찾기</p>
         </L.Now>
