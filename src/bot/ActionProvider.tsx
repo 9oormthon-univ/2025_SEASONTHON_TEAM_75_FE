@@ -3,6 +3,20 @@ import {
   createChatBotMessage as _createChatBotMessage,
   createClientMessage as _makeClientMessage,
 } from "react-chatbot-kit";
+import apiClient from "@utils/apiClient";
+
+// 응답 타입
+type SearchResponse = {
+  httpCode: number;
+  httpStatus: string;
+  message: string;
+  data: {
+    trashDescriptionId: number;
+    guideSteps: string[];
+    cautionNote: string;
+    typeName: string;
+  };
+};
 
 // 공용 타입
 type BotMessage = ReturnType<typeof _createChatBotMessage>;
@@ -30,6 +44,9 @@ export type Actions = {
   beginSTT: () => void;
   updateSTT: (text: string) => void;
   endSTT: (finalText?: string) => void;
+
+  // 단어 검색 API
+  searchKeyword: (raw: string) => Promise<void>;
 };
 
 export type ActionProviderProps = {
@@ -77,17 +94,17 @@ const ActionProvider: React.FC<ActionProviderProps> = ({
     options: Record<string, unknown> = {}
   ): UserMessage => (createClientMessage ?? _makeClientMessage)(text, options);
 
+  const pushBot = (text: string, options: Record<string, unknown> = {}) =>
+    createChatBotMessage(text, options);
+
   const actions: Actions = {
     selectSearchMode: (mode, title) => {
       const userMsg = clientMsg(title);
 
       const next: BotMessage =
         mode === "word"
-          ? createChatBotMessage(
-              "멋진 선택이야, 000요원! \n이제 목표 쓰레기를 알려 줘.",
-              {}
-            )
-          : createChatBotMessage(
+          ? pushBot("멋진 선택이야, 000요원! \n이제 목표 쓰레기를 알려 줘.", {})
+          : pushBot(
               "멋진 선택이야, 000요원! \n먼저 작전 구역을 선택해 줘.",
               {}
             );
@@ -167,25 +184,110 @@ const ActionProvider: React.FC<ActionProviderProps> = ({
     },
 
     endSTT: (finalText?: string) => {
+      let finalized = (finalText ?? "").trim();
+
       setState((prev) => {
         const msgs = [...prev.messages];
         const idx = msgs.findIndex((m) => getMsgId(m) === STT_MESSAGE_ID);
-        if (idx === -1) return prev;
-
+        if (idx === -1) {
+          return prev;
+        }
         const last = msgs[idx];
-        const text = (finalText ?? getMsgText(last) ?? "").trim();
+        // 파라미터 없음 -> 말풍선에 남은 텍스트 사용
+        if (!finalized) {
+          finalized = (getMsgText(last) ?? "").trim();
+        }
 
-        const finalized: ChatMessage = {
+        const finalizedMsg: ChatMessage = {
           ...(last as object),
-          message: text,
+          message: finalized,
         } as ChatMessage;
+        const withId = finalizedMsg as unknown as MessageWithId;
+        delete withId.id; // STT ID 제거
 
-        const withId = finalized as unknown as MessageWithId;
-        delete withId.id;
-
-        msgs[idx] = finalized;
+        msgs[idx] = finalizedMsg;
         return { ...prev, messages: msgs };
       });
+
+      if (finalized) {
+        void actions.searchKeyword(finalized);
+      }
+    },
+
+    // 단어검색 API 호출
+    searchKeyword: async (raw: string) => {
+      const keyword = raw.trim();
+      if (!keyword) return;
+
+      // 로딩
+      const loading = pushBot("•••");
+      setState((prev) => ({ ...prev, messages: [...prev.messages, loading] }));
+
+      try {
+        const { data } = await apiClient.get<SearchResponse>(
+          "/api/v1/questions/search",
+          {
+            params: { keyword },
+          }
+        );
+
+        if (!data?.data) {
+          const fail = pushBot(
+            "흠… 지금 보고된 정보는 내가 분석할 수 없는 대상이야.\n미안하지만 다시 한 번만 더 정확히 알려줄 수 있어?"
+          );
+          setState((prev) => {
+            const msgs = prev.messages.slice(0, -1);
+            return { ...prev, messages: [...msgs, fail] };
+          });
+          return;
+        }
+
+        const { guideSteps, cautionNote } = data.data;
+
+        // 빈 배열인 경우
+        if (!Array.isArray(guideSteps) || guideSteps.length === 0) {
+          const fail = pushBot(
+            `흠… 지금 보고된 정보는 내가 분석할 수 없는 대상이야.\n미안하지만 다시 한 번만 더 정확히 알려줄 수 있어?`
+          );
+          setState((prev) => {
+            const msgs = prev.messages.slice(0, -1); // '...' 제거
+            return { ...prev, messages: [...msgs, fail] };
+          });
+          return;
+        }
+
+        const m0 = pushBot(
+          `이번 임무의 코드네임은 '${keyword} 분리수거 작전'이야.\n지금부터 단계별 절차를 안내할게!`
+        );
+
+        // 가이드 스텝
+        const guideText =
+          Array.isArray(guideSteps) && guideSteps.length
+            ? guideSteps.map((s, i) => `STEP ${i + 1}. ${s}`).join("\n")
+            : "가이드가 아직 준비되지 않았어요.";
+
+        const m1 = pushBot(guideText);
+
+        // 주의사항
+        const m2 = pushBot(
+          cautionNote?.trim()
+            ? `⚠️ 주의사항\n${cautionNote}`
+            : "주의사항이 없어요.",
+          { widget: "searchWidgets" }
+        );
+
+        setState((prev) => {
+          const msgs = prev.messages.slice(0, -1);
+          return { ...prev, messages: [...msgs, m0, m1, m2] };
+        });
+      } catch (e) {
+        console.error(e);
+        const err = pushBot("서버와 통신에 실패했어. 잠시 후 다시 시도해줘!");
+        setState((prev) => {
+          const msgs = prev.messages.slice(0, -1);
+          return { ...prev, messages: [...msgs, err] };
+        });
+      }
     },
   };
 

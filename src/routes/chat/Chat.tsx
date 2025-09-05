@@ -63,6 +63,9 @@ const Chat: React.FC = () => {
   const [isListening, setIsListening] = useState(false);
   const [selectedMode, setSelectedMode] = useState<SearchMode | null>(null);
 
+  const lastTranscriptRef = useRef("");
+  const sttEndedRef = useRef(false);
+
   const actionsRef = useRef<Actions | null>(null);
 
   const startListening = () => {
@@ -77,6 +80,17 @@ const Chat: React.FC = () => {
     recognition.lang = "ko-KR";
     recognition.continuous = false; // 말 끝나면 종료
     recognition.interimResults = true; // 중간 결과 실시간
+
+    lastTranscriptRef.current = "";
+    sttEndedRef.current = false;
+
+    const finalize = () => {
+      if (sttEndedRef.current) return;
+      sttEndedRef.current = true;
+      const finalText = (lastTranscriptRef.current || "").trim();
+      actionsRef.current?.endSTT(finalText);
+      setIsListening(false);
+    };
 
     // STT 시작
     actionsRef.current?.beginSTT();
@@ -95,16 +109,16 @@ const Chat: React.FC = () => {
       }
     };
 
-    recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
-      console.error("STT Error:", event.error, event.message);
-      actionsRef.current?.endSTT();
-      setIsListening(false);
+    recognition.onresult = (event: SpeechRecognitionEvent) => {
+      const result = event.results[event.results.length - 1];
+      const text = result?.[0]?.transcript ?? "";
+      lastTranscriptRef.current = text;
+      actionsRef.current?.updateSTT(text);
+      if (result?.isFinal) finalize();
     };
 
-    recognition.onend = () => {
-      actionsRef.current?.endSTT();
-      setIsListening(false);
-    };
+    recognition.onerror = () => finalize();
+    recognition.onend = () => finalize();
 
     recognition.start();
   };
