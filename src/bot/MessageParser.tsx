@@ -13,7 +13,10 @@ type MessageParserProps = {
 
 const MessageParser: React.FC<MessageParserProps> = ({ children, actions }) => {
   const parse = (message: string) => {
-    console.log(message.trim());
+    const text = message.trim();
+    if (!text) return;
+
+    void actions.searchKeyword(text);
   };
 
   return (
