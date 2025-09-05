@@ -83,10 +83,7 @@ export type Actions = {
     name: string;
     code?: string;
   }) => void;
-  fetchTrashItemsByTypeId: (
-    trashTypeId: number,
-    anchorText?: string
-  ) => Promise<void>;
+  fetchTrashItemsByTypeId: (trashTypeId: number) => Promise<void>;
   selectTrashItem: (item: { id: number; name: string }) => void;
 };
 
@@ -419,7 +416,6 @@ const ActionProvider: React.FC<ActionProviderProps> = ({
               (m as unknown as { widget?: unknown })?.widget ===
                 "trashTypeWidgets"
           );
-
         if (revIdx !== -1) {
           const realIdx = msgs.length - 1 - revIdx;
           const original = msgs[realIdx];
@@ -450,14 +446,11 @@ const ActionProvider: React.FC<ActionProviderProps> = ({
 
       setSelectedMode("word");
 
-      void actions.fetchTrashItemsByTypeId(
-        id,
-        `확인 완료! ${name} 구역에 진입했어. 이제 목표물을 조준해 줘!`
-      );
+      void actions.fetchTrashItemsByTypeId(id);
     },
 
     // 하위 카테고리 조회
-    fetchTrashItemsByTypeId: async (trashTypeId, anchorText) => {
+    fetchTrashItemsByTypeId: async (trashTypeId) => {
       // 로딩
       const loading = pushBot("•••");
       setState((prev) => ({ ...prev, messages: [...prev.messages, loading] }));
@@ -476,27 +469,17 @@ const ActionProvider: React.FC<ActionProviderProps> = ({
         setState((prev) => {
           const msgs = prev.messages.slice(0, -1);
 
+          // 직전 말풍선
+          const lastIdx = msgs.length - 1;
+          const lastMsg = msgs[lastIdx];
+
           // 텍스트 유지, 위젯 추가
-          const revIdx = [...msgs]
-            .reverse()
-            .findIndex((m) => getMsgText(m) === (anchorText ?? ""));
-          if (revIdx !== -1) {
-            const realIdx = msgs.length - 1 - revIdx;
-            msgs[realIdx] = createChatBotMessage(
-              anchorText ?? "목표물을 조준해 줘!",
-              {
-                widget: "trashItemWidgets",
-                payload,
-              }
-            );
-          } else {
-            msgs.push(
-              createChatBotMessage("목표물을 조준해 줘!", {
-                widget: "trashItemWidgets",
-                payload,
-              })
-            );
-          }
+          const anchorText = getMsgText(lastMsg) ?? "목표물을 조준해 줘!";
+          msgs[lastIdx] = createChatBotMessage(anchorText, {
+            widget: "trashItemWidgets",
+            payload,
+          });
+
           return { ...prev, messages: msgs };
         });
       } catch (e) {
@@ -505,7 +488,7 @@ const ActionProvider: React.FC<ActionProviderProps> = ({
           "하위 카테고리를 불러오지 못했어. 잠시 후 다시 시도해줘!"
         );
         setState((prev) => {
-          const msgs = prev.messages.slice(0, -1);
+          const msgs = prev.messages.slice(0, -1); // 로딩 제거
           return { ...prev, messages: [...msgs, err] };
         });
       }
