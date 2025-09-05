@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import DeleteIcon from "@assets/trashcan.svg";
+import DeleteIcon from "@assets/trashCan.svg";
 
 interface ModalProps {
   district: string;
