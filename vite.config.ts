@@ -20,6 +20,7 @@ export default defineConfig({
       input: "/index.html",
     },
   },
+  base: "/",
   server: {
     port: 3000,
   },
