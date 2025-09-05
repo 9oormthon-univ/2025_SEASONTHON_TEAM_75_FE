@@ -28,14 +28,7 @@ function App() {
         <GlobalStyle />
         <Router>
           <Routes>
-            <Route
-              path="/"
-              element={
-                <Layout showNavbar={false}>
-                  <Splash />
-                </Layout>
-              }
-            />
+            <Route path="/" element={<Splash />} />
             <Route
               path="/login"
               element={
