@@ -65,4 +65,9 @@ export const SearchList = styled.div`
   flex: 1;
   overflow-y: auto;
   margin-top: 4px;
+  scrollbar-width: none;
+`;
+
+export const Button = styled.div`
+  margin: 20px 16px 80px 16px;
 `;

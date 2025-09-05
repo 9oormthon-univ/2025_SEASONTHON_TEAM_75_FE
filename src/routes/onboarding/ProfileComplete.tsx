@@ -15,7 +15,9 @@ const ProfileComplete = () => {
       <P.ButtonGroup>
         <MainButton
           title="동네 설정하기"
-          onClick={() => navigate("/location")}
+          onClick={() =>
+            navigate("/location", { state: { from: "profile_complete" } })
+          }
         />
       </P.ButtonGroup>
     </P.Page>

@@ -75,7 +75,7 @@ const rawConfig: MinimalChatbotConfig = {
     ),
   ],
   customComponents: {
-    header: () => <Header title="챗봇" />,
+    header: () => <Header title="챗봇" isBorder={true} isBackButton={true} />,
     botAvatar: () => <div />,
     botChatMessage: (props) => <ChatBox {...props} bot />,
     userAvatar: () => <div />,

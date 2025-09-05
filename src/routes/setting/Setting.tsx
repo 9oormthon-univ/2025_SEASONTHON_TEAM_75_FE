@@ -26,7 +26,7 @@ const Setting = () => {
 
   return (
     <S.Page>
-      <Header title="설정" />
+      <Header title="설정" isBorder={true} />
 
       <S.Profile>
         <img src={ProfileImg} alt="프로필 이미지" />

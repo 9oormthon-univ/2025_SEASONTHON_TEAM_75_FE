@@ -1,20 +1,23 @@
 import styled from "styled-components";
 import BackIcon from "@/assets/back.svg";
+import { useNavigate } from "react-router-dom";
 
 interface HeaderProps {
   title: string;
-  onBack?: () => void;
   rightButton?: React.ReactNode;
+  isBackButton?: boolean;
+  isBorder?: boolean;
 }
 
-const Container = styled.div`
+const Container = styled.div<{ $isBorder?: boolean }>`
   display: flex;
   align-items: center;
   justify-content: space-between;
   height: 64px;
   padding: 0 16px;
-  background-color: #ffffff;
-  // border-bottom: 1px solid #d8d9d8;
+  background-color: white;
+  border-bottom: 1px solid
+    ${({ $isBorder }) => ($isBorder ? "#d8d9d8" : "white")};
 `;
 
 const BackButton = styled.button`
@@ -57,20 +60,22 @@ const Spacer = styled.div`
   width: 65px;
 `;
 
-function Header(props: HeaderProps) {
+function Header({ title, rightButton, isBackButton, isBorder }: HeaderProps) {
+  const navigate = useNavigate();
+
   return (
-    <Container>
-      <BackButton onClick={props.onBack}>
-        <img src={BackIcon} alt="홈" />
-      </BackButton>
-
-      <Title>{props.title}</Title>
-
-      {props.rightButton ? (
-        <RightButton>{props.rightButton}</RightButton>
+    <Container $isBorder={isBorder}>
+      {isBackButton ? (
+        <BackButton onClick={() => navigate(-1)}>
+          <img src={BackIcon} alt="홈" />
+        </BackButton>
       ) : (
         <Spacer />
       )}
+
+      <Title>{title}</Title>
+
+      {rightButton ? <RightButton>{rightButton}</RightButton> : <Spacer />}
     </Container>
   );
 }

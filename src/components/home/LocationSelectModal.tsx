@@ -100,7 +100,7 @@ const LocationSelectModal = ({
   };
 
   const handleNavigate = () => {
-    navigate("/location");
+    navigate("/location", { state: { from: "home" } });
     onClose();
   };
 

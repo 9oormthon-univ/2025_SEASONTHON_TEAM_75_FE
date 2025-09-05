@@ -104,25 +104,7 @@ export const Input = styled.div`
 
 export const Button = styled.button`
   position: absolute;
-  left: 16px;
-  right: 16px;
   bottom: 55px;
 
-  width: auto;
-  max-width: 480px;
-  margin: 0 auto;
-  height: 59px;
-
-  color: #fff;
-  font-family: Pretendard;
-  font-size: 20px;
-  font-weight: 700;
-  letter-spacing: -0.165px;
-
-  border-radius: 12px;
-  background-color: ${({ theme }) => theme.colors.button};
-
-  &:disabled {
-    background-color: ${({ theme }) => theme.colors.sub1};
-  }
+  width: 100%;
 `;
