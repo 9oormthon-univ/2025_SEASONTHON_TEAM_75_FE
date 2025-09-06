@@ -14,6 +14,7 @@ import LocationDeleteModal from "@components/location/LocationDeleteModal";
 import InfoIcon from "@assets/info.svg";
 import PlusIcon from "@assets/plus.svg";
 import WarnIcon from "@assets/warning.svg";
+import MarkIconUrl from "@assets/map_marker.svg?url";
 import LocationList from "@components/location/LocationList";
 import MainButton from "@components/MainButton";
 import apiClient from "@utils/apiClient";
@@ -588,10 +589,10 @@ export default function LocationPage() {
 
   if (loading) {
     return (
-      <L.Page>
-        <Header title={"내 동네 설정"} isBackButton={true} />
-        <div style={{ padding: "20px" }}>지도 로딩중...</div>
-      </L.Page>
+      <L.Loading>
+        <Header title={"내 동네 설정"} />
+        <div>지도 로딩중...</div>
+      </L.Loading>
     );
   }
 
@@ -609,7 +610,13 @@ export default function LocationPage() {
         style={{ width: "100%", height: isSetupMode ? "70%" : "50%" }}
         onCreate={setMap}
       >
-        <MapMarker position={myLocation} />
+        <MapMarker
+          position={myLocation}
+          image={{
+            src: MarkIconUrl,
+            size: { width: 23, height: 23 },
+          }}
+        />
         {sigPaths.length > 0 && (
           <Polygon
             path={sigPaths}
