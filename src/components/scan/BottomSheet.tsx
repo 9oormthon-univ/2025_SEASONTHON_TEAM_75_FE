@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Drawer } from "vaul";
 import styled from "styled-components";
 
@@ -22,11 +22,51 @@ export const ScrollableContainer = styled.div`
   }
 `;
 
+const SheetSpinnerOverlay = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(255, 255, 255, 0.75);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10;
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+`;
+
+const Spinner = styled.div`
+  width: 28px;
+  height: 28px;
+  border: 3px solid ${({ theme }) => theme.colors.text4 || "#e0e0e0"};
+  border-top-color: ${({ theme }) => theme.colors.main || "#000000"};
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+`;
+
+const DragHandle = styled.div`
+  margin: 1rem auto;
+  width: 36px;
+  height: 4px;
+  flex-shrink: 0;
+  border-radius: 9999px;
+  background-color: #d8d9db;
+`;
+
 interface CustomBottomSheetProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   children: React.ReactNode;
   snapPoints?: (number | string)[];
+  isLoading?: boolean;
 }
 
 const BottomSheet: React.FC<CustomBottomSheetProps> = ({
@@ -34,6 +74,7 @@ const BottomSheet: React.FC<CustomBottomSheetProps> = ({
   onOpenChange,
   children,
   snapPoints = [0.4, 0.8],
+  isLoading = false,
 }) => {
   return (
     <Drawer.Root
@@ -45,7 +86,6 @@ const BottomSheet: React.FC<CustomBottomSheetProps> = ({
       <Drawer.Portal>
         <Drawer.Content
           style={{
-            position: "fixed",
             bottom: 0,
             left: 0,
             right: 0,
@@ -56,23 +96,22 @@ const BottomSheet: React.FC<CustomBottomSheetProps> = ({
             borderTopRightRadius: "20px",
             height: "90vh",
             width: "100%",
+            position: "fixed",
           }}
         >
+          <DragHandle />
           <ScrollableContainer>
-            <div
-              style={{
-                margin: "1.3rem auto 0 auto",
-                width: "36px",
-                height: "4px",
-                flexShrink: 0,
-                borderRadius: "9999px",
-                backgroundColor: "#D8D9DB",
-              }}
-            />
             <div style={{ width: "100%", margin: "0 auto 170px auto" }}>
               {children}
             </div>
           </ScrollableContainer>
+
+          {/* 로딩 시 콘텐츠 위에 오버레이를 띄웁니다. */}
+          {isLoading && (
+            <SheetSpinnerOverlay>
+              <Spinner />
+            </SheetSpinnerOverlay>
+          )}
         </Drawer.Content>
       </Drawer.Portal>
     </Drawer.Root>
