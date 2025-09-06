@@ -1,9 +1,17 @@
 import * as L from "./LocationStyle";
 import { Map, MapMarker, Polygon, useKakaoLoader } from "react-kakao-maps-sdk";
-import { useCallback, useEffect, useMemo, useReducer, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useReducer,
+  useRef,
+  useState,
+} from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import Header from "@components/Header";
-import LocationModal from "@components/location/LocationModal";
+import LocationDeleteModal from "@components/location/LocationDeleteModal";
+import NextIcon from "@/assets/next.svg";
 import InfoIcon from "@assets/info.svg";
 import PlusIcon from "@assets/plus.svg";
 import WarnIcon from "@assets/warning.svg";
@@ -107,6 +115,7 @@ type LocationState = {
   selected?: string;
   sigCode?: string;
   districtId?: string;
+  from?: "home" | "profile_complete";
 } | null;
 
 export type MyLocationItem = {
@@ -246,10 +255,12 @@ function ListPanel({
             onRemove={onRemove}
           />
         ))}
-        <L.AddButton onClick={onAdd}>
-          <img src={PlusIcon} alt="추가" />
-          <p>동네 추가하기</p>
-        </L.AddButton>
+        {items.length < 2 && (
+          <L.AddButton onClick={onAdd}>
+            <img src={PlusIcon} alt="추가" />
+            <p>동네 추가하기</p>
+          </L.AddButton>
+        )}
       </L.ButtonGroup>
     </L.Bottom>
   );
@@ -258,6 +269,17 @@ function ListPanel({
 // 메인
 export default function LocationPage() {
   const navigate = useNavigate();
+  const { state: navState } = useLocation() as { state: LocationState };
+  const from = navState?.from;
+  // 들어온 경로에 따라 헤더 수정
+  const isBackButton = from === "home";
+  const rightButton =
+    from === "profile_complete" ? (
+      <button onClick={() => navigate("/home")}>
+        <img src={NextIcon} alt="다음" />
+      </button>
+    ) : undefined;
+
   const {
     isFromSearch,
     setup: setupFromQuery,
@@ -275,6 +297,43 @@ export default function LocationPage() {
   const [defaultUserDistrictId, setDefaultUserDistrictId] = useState<
     string | number | null
   >(null); // 디폴트 자치구
+
+  // 토스트 메시지
+  const [toastTitle, setToastTitle] = useState<string | null>(null);
+  const toastTimerRef = useRef<number | null>(null);
+
+  const pushToast = useCallback((title: string) => {
+    setToastTitle(`${title}`);
+    if (toastTimerRef.current) {
+      window.clearTimeout(toastTimerRef.current);
+    }
+    toastTimerRef.current = window.setTimeout(() => {
+      setToastTitle(null);
+      toastTimerRef.current = null;
+    }, 2000);
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (toastTimerRef.current) {
+        window.clearTimeout(toastTimerRef.current);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    if (isFromSearch && !isSetupMode && selectedTitleFromQuery) {
+      pushToast(`내 동네를 '${selectedTitleFromQuery}'으로 설정했어요`);
+      navigate(".", { replace: true, state: { from } });
+    }
+  }, [
+    isFromSearch,
+    isSetupMode,
+    selectedTitleFromQuery,
+    pushToast,
+    navigate,
+    from,
+  ]);
 
   // 내 동네 목록
   const initialItems = useMemo<MyLocationItem[]>(() => [], []);
@@ -399,18 +458,12 @@ export default function LocationPage() {
         null;
       setDefaultUserDistrictId(def); // 디폴트 설정
 
-      // 디폴트가 맨 위
-      const defaultId = data.data.find(
-        (x: UserDistrict) => x.isDefault
-      )?.userDistrictId;
-      const ordered = [...items].sort((a, b) => {
-        const aIsDef = a.id === defaultId ? 0 : 1;
-        const bIsDef = b.id === defaultId ? 0 : 1;
-        return aIsDef - bIsDef;
-      });
-
       // 리스트 교체
-      dispatch({ type: "replace", items: ordered });
+      dispatch({ type: "replace", items: items });
+
+      if (def != null) {
+        dispatch({ type: "select", id: def });
+      }
     } catch (e) {
       console.error("내 자치구 불러오기 실패:", e);
     }
@@ -422,15 +475,19 @@ export default function LocationPage() {
 
   // 삭제 확인
   const handleDelete = useCallback(
-    async (userDistrictId: number | string) => {
+    async (userDistrictId: number | string, title?: string) => {
       try {
         await apiClient.delete(`/api/v1/users/districts/${userDistrictId}`);
         await fetchDistricts();
+
+        if (title) {
+          pushToast(`내 동네 '${title}'을 삭제했어요`);
+        }
       } catch (e) {
         console.error("자치구 삭제 실패:", e);
       }
     },
-    [fetchDistricts]
+    [fetchDistricts, pushToast]
   );
 
   const [deleteTargetId, setDeleteTargetId] = useState<string | number | null>(
@@ -443,10 +500,11 @@ export default function LocationPage() {
 
   const confirmRemove = useCallback(() => {
     if (deleteTargetId != null) {
-      handleDelete(deleteTargetId);
+      const title = state.items.find((i) => i.id === deleteTargetId)?.title;
+      handleDelete(deleteTargetId, title);
     }
     setDeleteTargetId(null);
-  }, [deleteTargetId, handleDelete]);
+  }, [deleteTargetId, handleDelete, state.items]);
 
   const cancelRemove = useCallback(() => {
     setDeleteTargetId(null);
@@ -467,26 +525,35 @@ export default function LocationPage() {
         if (state.selectedId !== id) dispatch({ type: "select", id });
         return;
       }
+
+      const nextTitle = state.items.find((it) => it.id === id)?.title;
+
       dispatch({ type: "select", id });
 
       try {
-        await apiClient.patch(
-          `/api/v1/users/districts/${id}`,
-          {},
-          { withCredentials: true }
-        );
-        // 서버 갱신
-        await fetchDistricts();
+        await apiClient.patch(`/api/v1/users/districts/${id}`, {});
+
+        if (nextTitle) {
+          pushToast(`내 동네를 '${nextTitle}'으로 설정했어요`);
+        }
+
+        setDefaultUserDistrictId(id);
       } catch (e) {
         console.error("기본 자치구 변경 실패:", e);
       }
     },
-    [isSetupMode, defaultUserDistrictId, state.selectedId, fetchDistricts]
+    [
+      isSetupMode,
+      defaultUserDistrictId,
+      state.items,
+      state.selectedId,
+      pushToast,
+    ]
   );
 
   const handleAddLocation = useCallback(
-    () => navigate("/location/search"),
-    [navigate]
+    () => navigate("/location/search", { state: { from } }),
+    [navigate, from]
   );
   const handleRegister = useCallback(async () => {
     const districtId = districtIdFromQuery;
@@ -500,27 +567,31 @@ export default function LocationPage() {
 
       await fetchDistricts();
 
-      // 자치구 설정 알림
+      pushToast(`내 동네를 '${selectedTitle}'으로 설정했어요`);
 
       setIsSetupMode(false);
       setSelectedTitle(undefined);
 
-      if (isFromSearch) navigate(".", { replace: true, state: null });
+      if (isFromSearch) {
+        navigate(".", { replace: true, state: { from } });
+      }
     } catch (e) {
       console.error("자치구 업데이트 실패:", e);
     }
   }, [
+    districtIdFromQuery,
+    selectedTitle,
+    fetchDistricts,
+    pushToast,
     isFromSearch,
     navigate,
-    selectedTitle,
-    districtIdFromQuery,
-    fetchDistricts,
+    from,
   ]);
 
   if (loading) {
     return (
       <L.Page>
-        <Header title={"내 동네 설정"} />
+        <Header title={"내 동네 설정"} isBackButton={true} />
         <div style={{ padding: "20px" }}>지도 로딩중...</div>
       </L.Page>
     );
@@ -529,13 +600,9 @@ export default function LocationPage() {
   return (
     <L.Page>
       <Header
-        title={"내 동네 설정"}
-        onBack={() => console.log("뒤로가기")}
-        rightButton={
-          <button onClick={() => setShowInfo((v) => !v)}>
-            <img src={InfoIcon} alt="정보" />
-          </button>
-        }
+        title="내 동네 설정"
+        isBackButton={isBackButton}
+        rightButton={rightButton}
       />
 
       <Map
@@ -558,6 +625,8 @@ export default function LocationPage() {
         )}
       </Map>
 
+      {toastTitle && <L.Toast>{toastTitle}</L.Toast>}
+
       {isSetupMode ? (
         <SetupPanel selectedTitle={selectedTitle} onRegister={handleRegister} />
       ) : (
@@ -571,13 +640,16 @@ export default function LocationPage() {
       )}
 
       {/* 삭제 확인 모달 */}
-      <LocationModal
-        title={`'${deleteTarget?.title ?? "이 동네"}'\n삭제할까요?`}
-        confirmText="삭제"
+      <LocationDeleteModal
+        district={`${deleteTarget?.title}`}
         isOpen={!!deleteTargetId}
         onCancel={cancelRemove}
         onConfirm={confirmRemove}
       />
+
+      <L.InfoButton onClick={() => setShowInfo((v) => !v)}>
+        <img src={InfoIcon} alt="정보" />
+      </L.InfoButton>
 
       {showInfo && (
         <L.Info>
