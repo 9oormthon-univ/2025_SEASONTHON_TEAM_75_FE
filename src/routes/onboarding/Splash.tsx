@@ -9,6 +9,7 @@ const fadeIn = keyframes`
 `;
 
 const Container = styled.div`
+  position: relative;
   width: 100%;
   height: 100%;
   display: flex;
@@ -19,13 +20,23 @@ const Container = styled.div`
   animation: ${fadeIn} 400ms ease-out;
 `;
 
+const Title = styled.div`
+  position: absolute;
+  bottom: 83px;
+  color: white;
+  text-align: center;
+  font-family: NanumSquareRound;
+  font-size: 20px;
+  font-weight: 800;
+`;
+
 const Splash = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
     const timer = setTimeout(() => {
       navigate("/login", { replace: true });
-    }, 1800);
+    }, 2500);
 
     return () => clearTimeout(timer);
   }, [navigate]);
@@ -33,6 +44,7 @@ const Splash = () => {
   return (
     <Container>
       <img src={Logo} alt="로고" />
+      <Title>분리특공대</Title>
     </Container>
   );
 };
