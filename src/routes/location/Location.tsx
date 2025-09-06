@@ -11,7 +11,6 @@ import {
 import { useLocation, useNavigate } from "react-router-dom";
 import Header from "@components/Header";
 import LocationDeleteModal from "@components/location/LocationDeleteModal";
-import NextIcon from "@/assets/next.svg";
 import InfoIcon from "@assets/info.svg";
 import PlusIcon from "@assets/plus.svg";
 import WarnIcon from "@assets/warning.svg";
@@ -273,12 +272,11 @@ export default function LocationPage() {
   const from = navState?.from;
   // 들어온 경로에 따라 헤더 수정
   const isBackButton = from === "home";
-  const rightButton =
-    from === "profile_complete" ? (
-      <button onClick={() => navigate("/home")}>
-        <img src={NextIcon} alt="다음" />
-      </button>
-    ) : undefined;
+  const rightButton = (
+    <button onClick={() => setShowInfo((v) => !v)}>
+      <img src={InfoIcon} alt="정보" />
+    </button>
+  );
 
   const {
     isFromSearch,
@@ -646,10 +644,6 @@ export default function LocationPage() {
         onCancel={cancelRemove}
         onConfirm={confirmRemove}
       />
-
-      <L.InfoButton onClick={() => setShowInfo((v) => !v)}>
-        <img src={InfoIcon} alt="정보" />
-      </L.InfoButton>
 
       {showInfo && (
         <L.Info>

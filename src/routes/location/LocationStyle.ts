@@ -87,21 +87,13 @@ export const AddButton = styled.button`
   }
 `;
 
-export const InfoButton = styled.button`
-  position: absolute;
-  top: 75px;
-  right: 10px;
-  padding: 0;
-  z-index: 10;
-`;
-
 export const Info = styled.div`
   display: flex;
   flex-direction: column;
   gap: 6px;
   position: absolute;
-  top: 110px;
-  right: 10px;
+  top: 54px;
+  right: 16px;
 
   width: 126px;
   padding: 24px 18px;
