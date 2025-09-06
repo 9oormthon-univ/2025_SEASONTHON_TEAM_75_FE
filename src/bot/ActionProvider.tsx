@@ -302,41 +302,45 @@ const ActionProvider: React.FC<ActionProviderProps> = ({
           }
         );
 
+        // 응답 없음 처리
         if (!data?.data) {
           const fail = pushBot(
             "흠… 지금 보고된 정보는 내가 분석할 수 없는 대상이야.\n미안하지만 다시 한 번만 더 정확히 알려줄 수 있어?"
           );
           setState((prev) => {
-            const msgs = prev.messages.slice(0, -1);
+            const msgs = prev.messages.slice(0, -1); // 로딩 제거
             return { ...prev, messages: [...msgs, fail] };
           });
           return;
         }
 
-        const { guideSteps, cautionNote } = data.data;
+        const { guideSteps, cautionNote, trashDescriptionId } = data.data;
 
-        // 빈 배열인 경우
-        if (!Array.isArray(guideSteps) || guideSteps.length === 0) {
+        // 가이드 스텝 없음, 미분류(-1)
+        if (
+          !Array.isArray(guideSteps) ||
+          guideSteps.length === 0 ||
+          trashDescriptionId === -1
+        ) {
           const fail = pushBot(
-            `흠… 지금 보고된 정보는 내가 분석할 수 없는 대상이야.\n미안하지만 다시 한 번만 더 정확히 알려줄 수 있어?`
+            "흠… 지금 보고된 정보는 내가 분석할 수 없는 대상이야.\n미안하지만 다시 한 번만 더 정확히 알려줄 수 있어?"
           );
           setState((prev) => {
-            const msgs = prev.messages.slice(0, -1); // '...' 제거
+            const msgs = prev.messages.slice(0, -1); // 로딩 제거
             return { ...prev, messages: [...msgs, fail] };
           });
-
-          setSelectedMode(null);
+          return;
         }
 
+        // 정상 플로우
         const m0 = pushBot(
           `이번 임무의 코드네임은 '${keyword} 분리수거 작전'이야.\n지금부터 단계별 절차를 안내할게!`
         );
 
         // 가이드 스텝
-        const guideText =
-          Array.isArray(guideSteps) && guideSteps.length
-            ? guideSteps.map((s, i) => `STEP ${i + 1}. ${s}`).join("\n")
-            : "가이드가 아직 준비되지 않았어요.";
+        const guideText = guideSteps
+          .map((s, i) => `STEP ${i + 1}. ${s}`)
+          .join("\n");
 
         const m1 = pushBot(guideText);
 
