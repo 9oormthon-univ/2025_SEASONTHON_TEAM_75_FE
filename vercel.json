@@ -1,14 +1,7 @@
 {
-  "redirects": [
-    {
-      "source": "/",
-      "destination": "/login",
-      "permanent": false
-    }
-  ],
   "rewrites": [
     {
-      "source": "/(.*)",
+      "source": "/((?!api/|.*\\..*).*)",
       "destination": "/index.html"
     }
   ]
