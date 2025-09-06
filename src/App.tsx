@@ -29,7 +29,7 @@ function App() {
         <Router>
           <Routes>
             <Route
-              path="/"
+              path="/login"
               element={
                 <Layout showNavbar={false}>
                   <Splash />
@@ -37,7 +37,7 @@ function App() {
               }
             />
             <Route
-              path="/login"
+              path="/"
               element={
                 <Layout showNavbar={false}>
                   <Login />
