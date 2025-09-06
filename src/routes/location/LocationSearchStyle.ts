@@ -69,5 +69,5 @@ export const SearchList = styled.div`
 `;
 
 export const Button = styled.div`
-  margin: 20px 16px 80px 16px;
+  margin: 20px 16px 55px 16px;
 `;

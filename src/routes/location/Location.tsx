@@ -660,6 +660,15 @@ export default function LocationPage() {
           </p>
         </L.Info>
       )}
+
+      {!isSetupMode && (
+        <L.Complete>
+          <MainButton
+            title="동네 설정 완료"
+            disabled={state.items.length === 0}
+          />
+        </L.Complete>
+      )}
     </L.Page>
   );
 }

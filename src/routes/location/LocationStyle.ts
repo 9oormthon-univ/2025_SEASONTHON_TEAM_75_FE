@@ -56,7 +56,7 @@ export const Warn = styled.div`
   font-size: 14px;
   font-weight: 500;
 
-  margin: 20px 0 16px 0;
+  margin: 20px 0 21px 0;
 `;
 
 export const ButtonGroup = styled.div`
@@ -146,4 +146,12 @@ export const Toast = styled.div`
   font-size: 14px;
   font-weight: 500;
   letter-spacing: -0.165px;
+`;
+
+export const Complete = styled.div`
+  position: absolute;
+  bottom: 55px;
+  left: 16px;
+  right: 16px;
+  z-index: 50;
 `;
