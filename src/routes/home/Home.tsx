@@ -14,36 +14,15 @@ import CalIcon from "@assets/main_cal.svg";
 import LocationSelectModal from "@components/home/LocationSelectModal";
 import apiClient from "@utils/apiClient";
 import { useNavigate } from "react-router-dom";
-import { trashCardData, modalContentMap } from "@utils/revisionTrash";
-import type { TrashCardData } from "@utils/revisionTrash";
 import RankingImg from "@assets/rankingImg.svg";
-
-const formatRelativeTime = (dateString: string): string => {
-  if (!dateString) return "";
-
-  const now = new Date();
-  const lastUpdatedDate = new Date(`${dateString}+09:00`);
-  const diffInMs = now.getTime() - lastUpdatedDate.getTime();
-
-  const diffInMinutes = Math.floor(diffInMs / (1000 * 60));
-
-  if (diffInMinutes < 0) {
-    return `${dateString.substring(0, 10).replace(/-/g, ".")} 기준`;
-  }
-  if (diffInMinutes < 1) {
-    return "방금 전 업데이트";
-  }
-  if (diffInMinutes < 60) {
-    return `${diffInMinutes}분 전 업데이트`;
-  }
-  if (diffInMinutes < 120) {
-    return "1시간 전 업데이트";
-  }
-  if (diffInMinutes < 180) {
-    return "2시간 전 업데이트";
-  }
-  return `${dateString.substring(0, 10).replace(/-/g, ".")} 기준`;
-};
+import { TRASH_TYPES } from "@utils/trashType";
+import EtcIcon from "@assets/etc.svg";
+import LogoIcon from "@assets/home_logo.svg";
+import {
+  MainSectionSkeleton,
+  RankingItemSkeleton,
+  TrashCardSkeleton,
+} from "@components/home/Skeleton";
 
 interface Location {
   districtId: string;
@@ -96,26 +75,72 @@ interface RankingItemData {
   searchCount: number;
 }
 
+interface ApiRevisionItem {
+  revisionId: number;
+  subTitle: string;
+  trashTypeName: string;
+  revisionDate: string;
+}
+
+interface ApiRevisionDetail {
+  revisionId: number;
+  subTitle: string;
+  title: string;
+  content: string;
+  revisionDate: string;
+  trashTypeName: string;
+}
+
+const getIconForTrashType = (trashTypeName: string): string => {
+  const foundType = Object.values(TRASH_TYPES).find(
+    (type) => type.nameKo === trashTypeName
+  );
+  return foundType ? foundType.icon : EtcIcon;
+};
+
+const formatRelativeTime = (dateString: string): string => {
+  if (!dateString) return "";
+
+  const now = new Date();
+  const lastUpdatedDate = new Date(`${dateString}+09:00`);
+  const diffInMs = now.getTime() - lastUpdatedDate.getTime();
+
+  const diffInMinutes = Math.floor(diffInMs / (1000 * 60));
+
+  if (diffInMinutes < 0) {
+    return `${dateString.substring(0, 10).replace(/-/g, ".")} 기준`;
+  }
+  if (diffInMinutes < 1) {
+    return "방금 전 업데이트";
+  }
+  if (diffInMinutes < 60) {
+    return `${diffInMinutes}분 전 업데이트`;
+  }
+  if (diffInMinutes < 120) {
+    return "1시간 전 업데이트";
+  }
+  if (diffInMinutes < 180) {
+    return "2시간 전 업데이트";
+  }
+  return `${dateString.substring(0, 10).replace(/-/g, ".")} 기준`;
+};
+
 const Home = () => {
   const [myDistricts, setMyDistricts] = useState<UserDistrict[]>([]);
   const [defaultLocation, setDefaultLocation] = useState<Location | null>(null);
   const [isModalOpen, setModalOpen] = useState(false);
   const navigate = useNavigate();
   const [scheduleInfo, setScheduleInfo] = useState<ScheduleInfo | null>(null);
-  const [selectedCard, setSelectedCard] = useState<TrashCardData | null>(null);
   const [rankingList, setRankingList] = useState<RankingItemData[]>([]);
   const [rankingLastUpdated, setRankingLastUpdated] = useState<string>("");
   const formattedDate = scheduleInfo?.date
     ? scheduleInfo.date.substring(5).replace("-", ".")
     : "";
-
-  const handleOpenModal = (card: TrashCardData) => {
-    setSelectedCard(card);
-  };
-
-  const handleCloseModal = () => {
-    setSelectedCard(null);
-  };
+  const [revisionList, setRevisionList] = useState<ApiRevisionItem[]>([]);
+  const [selectedRevision, setSelectedRevision] =
+    useState<ApiRevisionDetail | null>(null);
+  const [isRevisionModalOpen, setRevisionModalOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   const fetchMyDistricts = async () => {
     try {
@@ -183,21 +208,15 @@ const Home = () => {
     }
   };
 
-  useEffect(() => {
-    fetchMyDistricts();
-    fetchRankings();
-  }, []);
-
-  useEffect(() => {
-    if (defaultLocation) {
-      fetchTrashSchedule();
-    } else {
-      setScheduleInfo(null);
+  const fetchRevisions = async () => {
+    try {
+      const response = await apiClient.get<{ data: ApiRevisionItem[] }>(
+        "/api/v1/revisions"
+      );
+      setRevisionList(response.data.data);
+    } catch (error) {
+      console.error("최신 개정 쓰레기 목록 조회에 실패했습니다.", error);
     }
-  }, [defaultLocation]);
-
-  const handleDefaultChange = () => {
-    fetchMyDistricts();
   };
 
   const handleLocationClick = () => {
@@ -207,6 +226,54 @@ const Home = () => {
       setModalOpen(true);
     }
   };
+
+  const handleDefaultChange = () => {
+    fetchMyDistricts();
+  };
+
+  const handleOpenRevisionModal = async (revisionId: number) => {
+    setRevisionModalOpen(true);
+    try {
+      const response = await apiClient.get<{ data: ApiRevisionDetail }>(
+        `/api/v1/revisions/${revisionId}`
+      );
+      setSelectedRevision(response.data.data);
+    } catch (error) {
+      console.error("개정 상세 정보 조회 실패:", error);
+      handleCloseRevisionModal();
+    }
+  };
+
+  const handleCloseRevisionModal = () => {
+    setRevisionModalOpen(false);
+    setSelectedRevision(null);
+  };
+
+  useEffect(() => {
+    const fetchInitialData = async () => {
+      try {
+        await Promise.all([
+          fetchMyDistricts(),
+          fetchRankings(),
+          fetchRevisions(),
+        ]);
+      } catch (error) {
+        console.error("초기 데이터 로딩에 실패했습니다.", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchInitialData();
+  }, []);
+
+  useEffect(() => {
+    if (defaultLocation) {
+      fetchTrashSchedule();
+    } else {
+      setScheduleInfo(null);
+    }
+  }, [defaultLocation]);
 
   const renderMainContent = () => {
     const { categories, location } = scheduleInfo!;
@@ -317,6 +384,7 @@ const Home = () => {
   return (
     <H.HomeContainer>
       <H.HomeHeader>
+        <H.Logo src={LogoIcon} alt="로고"></H.Logo>
         <H.LocationBox
           onClick={handleLocationClick}
           style={{ cursor: "pointer" }}
@@ -328,54 +396,64 @@ const Home = () => {
           <H.LocationDropdown src={dropdownIcon} alt="드롭다운 아이콘" />
         </H.LocationBox>
       </H.HomeHeader>
-      <H.MainSection>
-        <H.Today>{formattedDate}</H.Today>
-        {mainTitle}
-        <H.MainIcon>
-          <img src={mainIcon} alt="메인 아이콘" />
-        </H.MainIcon>
-      </H.MainSection>
+      {isLoading ? (
+        <MainSectionSkeleton />
+      ) : (
+        <H.MainSection>
+          <H.Today>{formattedDate}</H.Today>
+          {mainTitle}
+          <H.MainIcon>
+            <img src={mainIcon} alt="메인 아이콘" />
+          </H.MainIcon>
+        </H.MainSection>
+      )}
       <H.BgBox>
         <SectionHeader
           title="실시간 쓰레기 인기랭킹"
           subtitle={formattedLastUpdated}
         ></SectionHeader>
         <H.RankingWrapper>
-          {rankingList.map((item) => (
-            <RankingItem
-              key={item.rank}
-              rank={item.rank}
-              imageUrl={item.imageUrl}
-              name={item.name}
-              searchCount={item.searchCount}
-              trendDirection={item.trendDirection}
-            />
-          ))}
+          {isLoading
+            ? Array.from({ length: 5 }).map((_, index) => (
+                <RankingItemSkeleton key={index} />
+              ))
+            : rankingList.map((item) => (
+                <RankingItem
+                  key={item.rank}
+                  rank={item.rank}
+                  imageUrl={item.imageUrl}
+                  name={item.name}
+                  searchCount={item.searchCount}
+                  trendDirection={item.trendDirection}
+                />
+              ))}
         </H.RankingWrapper>
         <SectionHeader
           title="최신 개정 쓰레기"
           subtitle="최신 개정 반영중"
         ></SectionHeader>
         <H.TrashCardList>
-          {trashCardData.map((card) => (
-            <TrashCard
-              key={card.id}
-              imageUrl={card.imageUrl}
-              type={card.type}
-              description={card.description}
-              date={card.date}
-              onClick={() => handleOpenModal(card)}
-            />
-          ))}
+          {isLoading
+            ? Array.from({ length: 3 }).map((_, index) => (
+                <TrashCardSkeleton key={index} />
+              ))
+            : revisionList.map((card) => (
+                <TrashCard
+                  key={card.revisionId}
+                  imageUrl={getIconForTrashType(card.trashTypeName)}
+                  type={card.trashTypeName}
+                  description={card.subTitle}
+                  date={new Date(card.revisionDate)}
+                  onClick={() => handleOpenRevisionModal(card.revisionId)}
+                />
+              ))}
         </H.TrashCardList>
       </H.BgBox>
       <TrashCardModal
-        isOpen={!!selectedCard}
-        onClose={handleCloseModal}
-        title={selectedCard ? modalContentMap[selectedCard.type]?.title : ""}
-        content={
-          selectedCard ? modalContentMap[selectedCard.type]?.content : ""
-        }
+        isOpen={isRevisionModalOpen}
+        onClose={handleCloseRevisionModal}
+        title={selectedRevision?.title || ""}
+        content={selectedRevision?.content || ""}
       />
       <LocationSelectModal
         isOpen={isModalOpen}

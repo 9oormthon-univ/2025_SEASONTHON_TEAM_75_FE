@@ -14,7 +14,7 @@ export const HomeContainer = styled.div`
 
 export const HomeHeader = styled.div`
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
   align-items: center;
   flex-direction: row;
   width: 100%;
@@ -44,6 +44,13 @@ export const LocationName = styled.div`
 export const LocationDropdown = styled.img`
   width: 10px;
   height: 6px;
+`;
+
+export const Logo = styled.img`
+  width: 25px;
+  height: 25px;
+  margin-left: 5px;
+  margin-top: 5px;
 `;
 
 export const MainSection = styled.div`
