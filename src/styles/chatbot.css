@@ -25,6 +25,7 @@
 .react-chatbot-kit-chat-message-container {
   flex: 1 1 auto !important;
   overflow-y: auto;
+  scrollbar-width: none;
 }
 
 .react-chatbot-kit-chat-input {
