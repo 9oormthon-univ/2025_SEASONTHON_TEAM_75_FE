@@ -1,6 +1,5 @@
 import Header from "@components/Header";
 import * as S from "./SettingStyle";
-import ProfileImg from "@assets/profile.svg";
 import ToggleListItem from "@components/setting/ToggleListItem";
 import FeedbackIcon from "@assets/setting_feedback.svg";
 import ArrowIcon from "@assets/history_arrow.svg";
@@ -52,7 +51,7 @@ const Setting = () => {
 
   // 프로필
   const [me, setMe] = useState<User | null>(null);
-  const [imgSrc, setImgSrc] = useState<string>(ProfileImg);
+  const [imgSrc, setImgSrc] = useState<string | null>(null);
 
   // 자치구
   const [defaultDistrict, setDefaultDistrict] = useState<string>("");
@@ -63,7 +62,7 @@ const Setting = () => {
         const { data } = await apiClient.get<UserResponse>("/api/v1/users/me");
 
         setMe(data.data);
-        setImgSrc(data.data.profileImageUrl || ProfileImg);
+        setImgSrc(data.data.profileImageUrl || null);
       } catch (e) {
         console.error("프로필 조회 실패:", e);
       }
@@ -121,14 +120,10 @@ const Setting = () => {
 
       <S.Container>
         <S.Profile>
-          <img
-            src={imgSrc}
-            alt="프로필 이미지"
-            onError={() => setImgSrc(ProfileImg)}
-          />
+          {imgSrc && <img src={imgSrc} alt="프로필 이미지" />}
           <S.Info>
-            <h3>{me?.nickName || "닉네임"}</h3>
-            <p>{defaultDistrict || "기본 자치구"}</p>
+            <h3>{me?.nickName || ""}</h3>
+            <p>{defaultDistrict || ""}</p>
           </S.Info>
         </S.Profile>
 

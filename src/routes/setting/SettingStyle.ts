@@ -18,9 +18,10 @@ export const Container = styled.div`
 export const Profile = styled.div`
   display: flex;
   gap: 20px;
-  padding: 22px 16px;
+  padding: 0 16px;
   margin: 16px;
   align-items: center;
+  height: 103px;
 
   border-radius: 12px;
   background: var(--white, #fff);
