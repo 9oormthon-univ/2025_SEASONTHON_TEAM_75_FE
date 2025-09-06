@@ -88,15 +88,31 @@ const Setting = () => {
   }, []);
 
   // 로그아웃
-  const handleLogout = () => {
-    console.log("로그아웃");
-    setIsLogoutOpen(false);
+  const handleLogout = async () => {
+    try {
+      await apiClient.post("/api/v1/auth/kakao/logout");
+      alert("로그아웃 되었습니다.");
+      navigate("/");
+    } catch (e) {
+      console.error("로그아웃 실패:", e);
+      alert("로그아웃에 실패했습니다. 다시 시도해주세요.");
+    } finally {
+      setIsLogoutOpen(false);
+    }
   };
 
   // 탈퇴
-  const handleWithdraw = () => {
-    console.log("회원탈퇴");
-    setIsWithdrawOpen(false);
+  const handleWithdraw = async () => {
+    try {
+      await apiClient.delete("/api/v1/users/me");
+      alert("탈퇴 되었습니다.");
+      navigate("/");
+    } catch (e) {
+      console.error("탈퇴 실패:", e);
+      alert("탈퇴에 실패했습니다. 다시 시도해주세요.");
+    } finally {
+      setIsLogoutOpen(false);
+    }
   };
 
   return (
