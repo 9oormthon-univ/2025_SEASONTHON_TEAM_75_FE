@@ -28,6 +28,121 @@ type GeoJSONFeature = {
 };
 type GeoJSON = { type: "FeatureCollection"; features: GeoJSONFeature[] };
 
+// Kakao 지오코더 관련
+type RegionCodeResultLike = {
+  region_type: "B" | "H";
+  code: string;
+  address_name: string;
+};
+type JibunLike = {
+  region_1depth_name: string;
+  region_2depth_name: string;
+  region_3depth_name: string;
+  main_address_no: string;
+  sub_address_no?: string | null;
+};
+type AddressResultLike = {
+  address?: JibunLike | null;
+};
+
+// Kakao 지오코더 최소 인터페이스
+type GeocoderLike = {
+  coord2RegionCode: (
+    lng: number,
+    lat: number,
+    cb: (result: RegionCodeResultLike[], status: string) => void
+  ) => void;
+  coord2Address: (
+    lng: number,
+    lat: number,
+    cb: (result: AddressResultLike[], status: string) => void
+  ) => void;
+};
+
+// 지오코더
+function getGeocoder(): GeocoderLike | null {
+  const w = window as unknown as {
+    kakao?: { maps?: { services?: { Geocoder: new () => GeocoderLike } } };
+  };
+  if (!w.kakao?.maps?.services) return null;
+  return new w.kakao.maps.services.Geocoder();
+}
+
+// 현재 위치
+function getCurrentPosition(): Promise<GeolocationPosition> {
+  return new Promise((resolve, reject) => {
+    if (!navigator.geolocation)
+      return reject(new Error("Geolocation를 지원하지 않습니다."));
+    navigator.geolocation.getCurrentPosition(resolve, reject, {
+      enableHighAccuracy: true,
+      timeout: 10_000,
+      maximumAge: 0,
+    });
+  });
+}
+
+// 주소 정보
+type ReverseRegion = {
+  bcode?: string; // 법정동 코드
+  hcode?: string; // 행정동 코드
+  addressName?: string; // 전체 주소
+  sido?: string;
+  sigungu?: string;
+  eupmyeondong?: string;
+  jibunAddress?: string; // 지번 전체 주소
+  roadAddress?: string; // 도로명 전체 주소
+};
+
+async function reverseFromCoord(
+  lat: number,
+  lng: number
+): Promise<ReverseRegion> {
+  const geocoder = getGeocoder();
+  if (!geocoder) throw new Error("카카오 지오코더가 아직 로드되지 않았습니다.");
+
+  // 법정/행정 코드
+  const region = await new Promise<RegionCodeResultLike[]>((res, rej) => {
+    geocoder.coord2RegionCode(lng, lat, (result, status) => {
+      if (status === "OK") res(result);
+      else rej(new Error("coord2RegionCode 실패: " + status));
+    });
+  });
+
+  const legal = region.find((r) => r.region_type === "B"); // 법정동
+
+  // 지번/도로명 주소
+  const addr = await new Promise<AddressResultLike[]>((res, rej) => {
+    geocoder.coord2Address(lng, lat, (result, status) => {
+      if (status === "OK") res(result);
+      else rej(new Error("coord2Address 실패: " + status));
+    });
+  });
+
+  const jibun = addr.find((a) => a.address)?.address ?? undefined;
+
+  // 시/구/동
+  const parts = (legal?.address_name ?? "").split(" ").filter(Boolean);
+  const sido = parts[0];
+  // 2단계 비어있는 경우
+  const sigungu = parts.length >= 3 ? parts[1] : parts[1] ?? undefined;
+  const eupmyeondong = parts.length >= 3 ? parts[2] : parts[2] ?? undefined;
+
+  return {
+    bcode: legal?.code,
+    addressName: legal?.address_name,
+    sido,
+    sigungu,
+    eupmyeondong,
+    jibunAddress: jibun
+      ? `${jibun.region_1depth_name} ${jibun.region_2depth_name} ${
+          jibun.region_3depth_name
+        } ${jibun.main_address_no}${
+          jibun.sub_address_no ? "-" + jibun.sub_address_no : ""
+        }`
+      : undefined,
+  };
+}
+
 const LocationSearch = () => {
   const navigate = useNavigate();
   const { state: navState } = useLocation() as {
@@ -145,7 +260,39 @@ const LocationSearch = () => {
 
   // 현재 위치로 찾기
   const handleCurrentPick = async () => {
-    console.log("현재 위치로 찾기");
+    try {
+      // 현재 좌표
+      const pos = await getCurrentPosition();
+      const { latitude, longitude } = pos.coords;
+
+      //
+      const info = await reverseFromCoord(latitude, longitude);
+
+      if (!info.bcode) {
+        console.error("법정동 코드(bcode)를 찾지 못했습니다.", info);
+        return;
+      }
+
+      // 법정코드로 바로 등록
+      await apiClient.post(`/api/v1/users/districts/${info.bcode}`);
+
+      // UI 이동
+      const label =
+        info.addressName ??
+        [info.sido, info.sigungu, info.eupmyeondong].filter(Boolean).join(" ");
+
+      navigate("/location", {
+        replace: true,
+        state: {
+          source: "location_search",
+          setup: false,
+          selected: label,
+          from,
+        },
+      });
+    } catch (e) {
+      console.error("현재 위치 등록 실패:", e);
+    }
   };
 
   // 키보드 설정
