@@ -1,5 +1,14 @@
 import styled from "styled-components";
 
+export const Loading = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  position: relative;
+`;
+
 export const Page = styled.div`
   display: flex;
   flex-direction: column;
@@ -56,7 +65,7 @@ export const Warn = styled.div`
   font-size: 14px;
   font-weight: 500;
 
-  margin: 20px 0 16px 0;
+  margin: 20px 0 21px 0;
 `;
 
 export const ButtonGroup = styled.div`
@@ -87,21 +96,13 @@ export const AddButton = styled.button`
   }
 `;
 
-export const InfoButton = styled.button`
-  position: absolute;
-  top: 75px;
-  right: 10px;
-  padding: 0;
-  z-index: 10;
-`;
-
 export const Info = styled.div`
   display: flex;
   flex-direction: column;
   gap: 6px;
   position: absolute;
-  top: 110px;
-  right: 10px;
+  top: 54px;
+  right: 16px;
 
   width: 126px;
   padding: 24px 18px;
@@ -146,4 +147,12 @@ export const Toast = styled.div`
   font-size: 14px;
   font-weight: 500;
   letter-spacing: -0.165px;
+`;
+
+export const Complete = styled.div`
+  position: absolute;
+  bottom: 55px;
+  left: 16px;
+  right: 16px;
+  z-index: 50;
 `;

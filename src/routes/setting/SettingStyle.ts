@@ -4,15 +4,24 @@ export const Page = styled.div`
   background-color: ${({ theme }) => theme.colors.box};
   display: flex;
   flex-direction: column;
-  height: 100%;
+  height: 100dvh;
+  overflow: hidden;
+`;
+
+export const Container = styled.div`
+  flex: 1;
+  overflow-y: auto;
+  padding-bottom: 110px;
+  scrollbar-width: none;
 `;
 
 export const Profile = styled.div`
   display: flex;
   gap: 20px;
-  padding: 22px 16px;
+  padding: 0 16px;
   margin: 16px;
   align-items: center;
+  height: 103px;
 
   border-radius: 12px;
   background: var(--white, #fff);

@@ -11,10 +11,10 @@ import {
 import { useLocation, useNavigate } from "react-router-dom";
 import Header from "@components/Header";
 import LocationDeleteModal from "@components/location/LocationDeleteModal";
-import NextIcon from "@/assets/next.svg";
 import InfoIcon from "@assets/info.svg";
 import PlusIcon from "@assets/plus.svg";
 import WarnIcon from "@assets/warning.svg";
+import MarkIconUrl from "@assets/map_marker.svg?url";
 import LocationList from "@components/location/LocationList";
 import MainButton from "@components/MainButton";
 import apiClient from "@utils/apiClient";
@@ -273,12 +273,11 @@ export default function LocationPage() {
   const from = navState?.from;
   // 들어온 경로에 따라 헤더 수정
   const isBackButton = from === "home";
-  const rightButton =
-    from === "profile_complete" ? (
-      <button onClick={() => navigate("/home")}>
-        <img src={NextIcon} alt="다음" />
-      </button>
-    ) : undefined;
+  const rightButton = (
+    <button onClick={() => setShowInfo((v) => !v)}>
+      <img src={InfoIcon} alt="정보" />
+    </button>
+  );
 
   const {
     isFromSearch,
@@ -590,10 +589,10 @@ export default function LocationPage() {
 
   if (loading) {
     return (
-      <L.Page>
-        <Header title={"내 동네 설정"} isBackButton={true} />
-        <div style={{ padding: "20px" }}>지도 로딩중...</div>
-      </L.Page>
+      <L.Loading>
+        <Header title={"내 동네 설정"} />
+        <div>지도 로딩중...</div>
+      </L.Loading>
     );
   }
 
@@ -611,7 +610,13 @@ export default function LocationPage() {
         style={{ width: "100%", height: isSetupMode ? "70%" : "50%" }}
         onCreate={setMap}
       >
-        <MapMarker position={myLocation} />
+        <MapMarker
+          position={myLocation}
+          image={{
+            src: MarkIconUrl,
+            size: { width: 23, height: 23 },
+          }}
+        />
         {sigPaths.length > 0 && (
           <Polygon
             path={sigPaths}
@@ -647,10 +652,6 @@ export default function LocationPage() {
         onConfirm={confirmRemove}
       />
 
-      <L.InfoButton onClick={() => setShowInfo((v) => !v)}>
-        <img src={InfoIcon} alt="정보" />
-      </L.InfoButton>
-
       {showInfo && (
         <L.Info>
           <h1>지역을 설정하는 이유가 무엇인가요?</h1>
@@ -659,6 +660,16 @@ export default function LocationPage() {
             정확한 분리수거 가이드를 제공해드릴게요!
           </p>
         </L.Info>
+      )}
+
+      {!isSetupMode && from !== "home" && (
+        <L.Complete>
+          <MainButton
+            title="동네 설정 완료"
+            onClick={() => navigate("/home")}
+            disabled={state.items.length === 0}
+          />
+        </L.Complete>
       )}
     </L.Page>
   );
