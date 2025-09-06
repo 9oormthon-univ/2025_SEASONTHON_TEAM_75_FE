@@ -22,12 +22,8 @@ export const Text1 = styled.div`
   white-space: pre-line;
   text-align: center;
   margin: 2rem 0 1rem 0;
-`;
-
-export const Text2 = styled.div`
-  color: ${({ theme }) => theme.colors.text2};
-  font-family: "Pretendard";
-  font-weight: 600;
-  font-size: 16px;
-  margin-bottom: 5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 4rem;
 `;
