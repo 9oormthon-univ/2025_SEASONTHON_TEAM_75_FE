@@ -4,27 +4,63 @@ import Profile from "@assets/profile.svg";
 import AddIcon from "@assets/add.svg";
 import { useEffect, useRef, useState, type ChangeEvent } from "react";
 import { useNavigate } from "react-router-dom";
-import apiClient, { wakeSession } from "@utils/apiClient";
+import apiClient from "@utils/apiClient";
 import MainButton from "@components/MainButton";
+
+type User = {
+  userId: number;
+  nickName: string;
+  profileImageUrl: string | null;
+  createAt: string;
+  updatedAt: string;
+};
+
+type UserResponse = {
+  httpCode: number;
+  httpStatus: string;
+  message: string;
+  data: User;
+};
 
 const MAX_LEN = 20;
 
 const ProfileSetting = () => {
+  const navigate = useNavigate();
+
   const [nickname, setNickname] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const navigate = useNavigate();
+
+  const [imgSrc, setImgSrc] = useState<string | null>(null);
 
   useEffect(() => {
-    void wakeSession();
+    (async () => {
+      try {
+        const { data } = await apiClient.get<UserResponse>("/api/v1/users/me");
+        const me = data.data;
+        setNickname(me.nickName ?? "");
+        setImgSrc(me.profileImageUrl || null);
+      } catch (e) {
+        console.error("프로필 조회 실패:", e);
+      }
+    })();
   }, []);
+
+  useEffect(() => {
+    return () => {
+      if (previewUrl) URL.revokeObjectURL(previewUrl);
+    };
+  }, [previewUrl]);
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files?.[0] ?? null;
     setFile(f);
-    setPreviewUrl(f ? URL.createObjectURL(f) : null);
+    setPreviewUrl((prev) => {
+      if (prev) URL.revokeObjectURL(prev);
+      return f ? URL.createObjectURL(f) : null;
+    });
   };
 
   const handlePickImage = () => fileInputRef.current?.click();
@@ -40,7 +76,6 @@ const ProfileSetting = () => {
       );
       if (file) form.append("image", file, file.name);
 
-      await wakeSession();
       await apiClient.patch("/api/v1/users", form);
       navigate("/profile/complete");
     } catch (err: unknown) {
@@ -50,12 +85,15 @@ const ProfileSetting = () => {
     }
   };
 
+  // 이미지 우선순위
+  const displaySrc = previewUrl ?? imgSrc ?? Profile;
+
   return (
     <P.Page>
       <Header title="프로필 설정" isBackButton={true} />
       <P.Container>
         <P.Profile>
-          <img src={previewUrl ?? Profile} alt="프로필" />
+          <img src={displaySrc} alt="프로필" />
           <button type="button" onClick={handlePickImage}>
             <img src={AddIcon} alt="프로필 수정" />
           </button>
@@ -90,7 +128,7 @@ const ProfileSetting = () => {
           <MainButton
             disabled={submitting || nickname.trim().length === 0}
             onClick={handleComplete}
-            title="완료"
+            title={submitting ? "저장 중..." : "완료"}
           />
         </P.Button>
       </P.Container>
