@@ -273,9 +273,6 @@ const LocationSearch = () => {
         return;
       }
 
-      // 법정코드로 바로 등록
-      await apiClient.post(`/api/v1/users/districts/${info.bcode}`);
-
       // UI 이동
       const label =
         info.addressName ??
@@ -285,8 +282,10 @@ const LocationSearch = () => {
         replace: true,
         state: {
           source: "location_search",
-          setup: false,
+          setup: true,
           selected: label,
+          districtId: info.bcode,
+          sigCode: info.bcode.slice(0, 5),
           from,
         },
       });
