@@ -57,6 +57,7 @@ export const NoHistoryBox = styled.div`
 `;
 
 export const CardWrapper = styled.div`
+  overflow-x: hidden;
   width: 100%;
   display: flex;
   flex-direction: column;
