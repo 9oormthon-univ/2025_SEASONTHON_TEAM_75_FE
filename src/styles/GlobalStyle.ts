@@ -4,9 +4,10 @@ import theme from "./theme";
 
 const GlobalStyle = createGlobalStyle`
 	@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+  @import url('https://cdn.rawgit.com/innks/NanumSquareRound/master/nanumsquareround.min.css');
   
   html, body {
-    font-family: 'Pretendard';
+    font-family: 'Pretendard', 'NanumSquareRound';
     background-color: #fff;
     margin: 0;
     padding: 0;
