@@ -129,7 +129,7 @@ const ScanResult: React.FC = () => {
   return (
     <R.Container>
       <R.Header>
-        <R.BackBtn onClick={() => navigate(-1)}>
+        <R.BackBtn onClick={() => navigate("/home")}>
           <img src={BackIcon} alt="뒤로 가기" />
         </R.BackBtn>
       </R.Header>

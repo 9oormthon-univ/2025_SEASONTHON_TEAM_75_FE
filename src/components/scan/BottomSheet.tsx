@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { Drawer } from "vaul";
 import styled from "styled-components";
 
