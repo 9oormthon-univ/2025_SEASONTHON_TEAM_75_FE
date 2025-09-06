@@ -5,11 +5,11 @@
   <br/>
 
   <h1>
-    ♻️ [2025 kakao X goorm 시즌톤] 75팀 분리특공대 FE ♻️
+    ♻️ [2025 kakao X goorm 시즌톤] 75팀 분리특공대 ♻️
   </h1>
   <strong>IT 연합 동아리 구름톤 유니브</strong>
+  <p>2025_SEASONTHON_TEAM_75_FE</p>
   
-  <br/>
   <br/>
   
   <p>
@@ -48,11 +48,10 @@
   
 | 프로필 사진                                                                                             | 계정 정보                                             | 담당 역할                                  |
 | :-----------------------------------------------------------------------------------------------------: | :----------------------------------------------------: | ------------------------------------------ |
-| <img src="https://avatars.githubusercontent.com/u/126665882?v=4" width="100" alt="윤지 프로필 사진"/> | **[@Yunji-Yun](https://github.com/Yunji-Yun)** | 홈, 최근 기록, 쓰레기 스캔 및 등록         |
-| <img src="https://avatars.githubusercontent.com/u/133081015?v=4" width="100" alt="예진 프로필 사진"/> | **[@alwn8918](https://github.com/alwn8918)** | 온보딩, 자치구 등록, 챗봇 가이드, 설정     |
+| <img src="https://avatars.githubusercontent.com/u/126665882?v=4" width="100" alt="윤지 프로필 사진"/> | **[@Yunji-Yun](https://github.com/Yunji-Yun)** | 쓰레기 랭킹, 쓰레기 스캔 및 등록         |
+| <img src="https://avatars.githubusercontent.com/u/133081015?v=4" width="100" alt="예진 프로필 사진"/> | **[@alwn8918](https://github.com/alwn8918)** | 자치구 등록, 챗봇 가이드     |
 
 </div>
-
 
 <br/>
 
