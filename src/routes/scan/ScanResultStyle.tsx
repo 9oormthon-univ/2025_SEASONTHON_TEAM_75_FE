@@ -6,6 +6,12 @@ export const Container = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  overflow: hidden;
 `;
 
 export const Header = styled.div`
@@ -72,25 +78,49 @@ export const TrashDes = styled.div`
   font-size: 16px;
 `;
 
-export const AIBox = styled.div`
-  background-color: ${({ theme }) => theme.colors.box};
-  border-radius: 12px;
-  padding: 15px;
-  box-sizing: border-box;
+export const TypeChangeBox = styled.div`
   width: 100%;
   margin-top: 1rem;
 `;
 
-export const AITitle = styled.div`
-  color: ${({ theme }) => theme.colors.text3};
-  font-weight: 700;
-  font-size: 12px;
-`;
-
-export const AIContent = styled.div`
+export const TypeChangeTitle = styled.div`
   color: ${({ theme }) => theme.colors.text2};
   font-weight: 500;
   font-size: 14px;
+  margin-bottom: 10px;
+`;
+
+export const TypeChangeContent = styled.div`
+  font-family: "Pretendard";
+  font-size: 14px;
+  color: ${({ theme }) => theme.colors.text2};
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  gap: 10px 5px;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+`;
+
+export const Type = styled.div<{ isSelected: boolean }>`
+  border-radius: 20px;
+  width: fit-content;
+  flex-shrink: 0;
+  padding: 2px 10px;
+  box-sizing: border-box;
+  background-color: ${({ isSelected, theme }) =>
+    isSelected ? theme.colors.sub1 : "#ffffff"};
+  color: ${({ isSelected, theme }) =>
+    isSelected ? theme.colors.main : theme.colors.text2};
+  border: 1px solid
+    ${({ isSelected, theme }) =>
+      isSelected ? theme.colors.main : theme.colors.text4};
+  font-weight: ${({ isSelected }) => (isSelected ? 600 : 500)};
 `;
 
 export const MidContainer = styled.div`
@@ -100,7 +130,7 @@ export const MidContainer = styled.div`
   flex-direction: column;
   align-items: flex-start;
   font-family: "Pretendard";
-  padding: 1.3rem;
+  padding: 0 1.3rem 1.3rem 1.3rem;
   box-sizing: border-box;
 `;
 
@@ -116,6 +146,7 @@ export const LocationBox = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
+  margin-top: 1rem;
 
   span {
     background-color: ${({ theme }) => theme.colors.sub2};

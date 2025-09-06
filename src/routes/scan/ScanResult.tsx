@@ -5,11 +5,17 @@ import React, { useEffect, useState } from "react";
 import BottomSheet from "@components/scan/BottomSheet";
 import PartCard from "@components/scan/PartCard";
 import NoticeIcon from "@/assets/notice.svg";
-import TypeModal from "@components/scan/TypeModal";
 import {
   useScanResultStore,
   type ApiScanResult,
 } from "@stores/scanResultStore";
+import apiClient from "@utils/apiClient";
+
+interface SimilarItem {
+  trashItemId: number;
+  itemName: string;
+  typeName: string;
+}
 
 const ScanResult: React.FC = () => {
   const location = useLocation();
@@ -29,17 +35,11 @@ const ScanResult: React.FC = () => {
 
   const [open, setOpen] = useState(true);
   const snapPoints = [0.5, 0.9];
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const handleOpenModal = () => setIsModalOpen(true);
-
-  const handleCloseModal = () => setIsModalOpen(false);
-
-  const handleSelectType = (newTrashData: ApiScanResult) => {
-    console.log("선택된 타입으로 데이터 업데이트:", newTrashData.itemName);
-    updateCurrentResult(newTrashData);
-    handleCloseModal();
-  };
+  const [similarItems, setSimilarItems] = useState<SimilarItem[]>([]);
+  const [selectedSimilarItemId, setSelectedSimilarItemId] = useState<
+    number | null
+  >(null);
+  const [isUpdating, setIsUpdating] = useState(false);
 
   const handleNavigateToScan = () => {
     navigate("/scan");
@@ -74,6 +74,47 @@ const ScanResult: React.FC = () => {
     clearCurrentResult,
   ]);
 
+  useEffect(() => {
+    const fetchSimilarItems = async () => {
+      if (currentResult) {
+        setSelectedSimilarItemId(null);
+        try {
+          const response = await apiClient.get<{ data: SimilarItem[] }>(
+            `/api/v1/trash/${currentResult.id}/items`
+          );
+          setSimilarItems(response.data.data);
+        } catch (error) {
+          console.error("비슷한 품목을 불러오는 데 실패했습니다:", error);
+        }
+      }
+    };
+
+    fetchSimilarItems();
+  }, [currentResult]);
+
+  const handleItemSelect = async (selectedItemId: number) => {
+    if (!currentResult) {
+      return;
+    }
+    setSelectedSimilarItemId(selectedItemId);
+    setIsUpdating(true);
+    try {
+      const response = await apiClient.patch<{ data: ApiScanResult }>(
+        `/api/v1/trash/${currentResult.id}/items/${selectedItemId}`
+      );
+      updateCurrentResult(response.data.data);
+      console.log(
+        "선택된 타입으로 데이터 업데이트:",
+        response.data.data.itemName
+      );
+    } catch (error) {
+      console.error("품목 변경에 실패했습니다:", error);
+      alert("품목 변경에 실패했습니다.");
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
   if (!currentResult) {
     return null;
   }
@@ -87,24 +128,21 @@ const ScanResult: React.FC = () => {
 
   return (
     <R.Container>
-      {isModalOpen && (
-        <TypeModal
-          trashId={currentResult.id}
-          onClose={handleCloseModal}
-          onSelect={handleSelectType}
-        />
-      )}
       <R.Header>
         <R.BackBtn onClick={() => navigate(-1)}>
           <img src={BackIcon} alt="뒤로 가기" />
         </R.BackBtn>
-        <R.RightBtn onClick={handleOpenModal}>이 품목이 아닌가요?</R.RightBtn>
       </R.Header>
       <R.ScanImg
         src={capturedImage || currentResult.imageUrl}
         alt="스캔 이미지"
       />
-      <BottomSheet open={open} onOpenChange={setOpen} snapPoints={snapPoints}>
+      <BottomSheet
+        open={open}
+        onOpenChange={setOpen}
+        snapPoints={snapPoints}
+        isLoading={isUpdating}
+      >
         <R.TopContainer>
           <R.TrashName>
             {currentResult.itemName || currentResult.name}
@@ -114,26 +152,22 @@ const ScanResult: React.FC = () => {
               ? `재활용 쓰레기 : ${currentResult.typeName}`
               : currentResult.typeName}
           </R.TrashDes>
-          <R.AIBox>
-            <R.AITitle>AI 요약</R.AITitle>
-            <R.AIContent>{currentResult.summary}</R.AIContent>
-          </R.AIBox>
+          <R.TypeChangeBox>
+            <R.TypeChangeTitle>이 품목이 아닌가요?</R.TypeChangeTitle>
+            <R.TypeChangeContent>
+              {similarItems.map((item) => (
+                <R.Type
+                  key={item.trashItemId}
+                  isSelected={selectedSimilarItemId === item.trashItemId}
+                  onClick={() => handleItemSelect(item.trashItemId)}
+                >
+                  {item.itemName}
+                </R.Type>
+              ))}
+            </R.TypeChangeContent>
+          </R.TypeChangeBox>
         </R.TopContainer>
         <R.MidContainer>
-          {currentResult.location &&
-            currentResult.days &&
-            currentResult.days.length > 0 && (
-              <R.LocationBox>
-                {currentResult.location.sigungu}는{" "}
-                <span>
-                  {currentResult.days
-                    .map((day) => day.replace("요일", ""))
-                    .join(",")}
-                  요일
-                </span>
-                에 버려요.
-              </R.LocationBox>
-            )}
           {currentResult.parts && currentResult.parts.length > 0 && (
             <R.MidSection>
               <R.Title>부품 카드</R.Title>
@@ -158,6 +192,20 @@ const ScanResult: React.FC = () => {
               )}
             </R.GuideBox>
           </R.MidSection>
+          {currentResult.location &&
+            currentResult.days &&
+            currentResult.days.length > 0 && (
+              <R.LocationBox>
+                {currentResult.location.sigungu}는{" "}
+                <span>
+                  {currentResult.days
+                    .map((day) => day.replace("요일", ""))
+                    .join(",")}
+                  요일
+                </span>
+                에 버려요.
+              </R.LocationBox>
+            )}
         </R.MidContainer>
         <R.ButtonWrapper>
           <R.ScanBtn onClick={handleNavigateToScan}>
