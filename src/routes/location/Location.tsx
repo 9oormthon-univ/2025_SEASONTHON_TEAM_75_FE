@@ -655,10 +655,11 @@ export default function LocationPage() {
         </L.Info>
       )}
 
-      {!isSetupMode && (
+      {!isSetupMode && from !== "home" && (
         <L.Complete>
           <MainButton
             title="동네 설정 완료"
+            onClick={() => navigate("/home")}
             disabled={state.items.length === 0}
           />
         </L.Complete>
