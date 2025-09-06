@@ -49,6 +49,7 @@ export const SelectAllBtn = styled.button<SelectAllBtnProps>`
 `;
 
 export const CardWrapper = styled.div`
+  overflow-x: hidden;
   width: 100%;
   display: flex;
   flex-direction: column;
