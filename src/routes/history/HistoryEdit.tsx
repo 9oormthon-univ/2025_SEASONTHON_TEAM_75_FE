@@ -53,7 +53,7 @@ const HistoryEdit = () => {
 
   return (
     <H.Container>
-      <Header title={"최근기록"} isBorder={true} />
+      <Header title={"최근기록"} isBorder={true} isBackButton={true} />
       <H.SubHeader>
         <H.HistoryCount>총 {historyCount}개</H.HistoryCount>
         <H.SelectAllBtn onClick={handleSelectAll} isActive={isAllSelected}>
