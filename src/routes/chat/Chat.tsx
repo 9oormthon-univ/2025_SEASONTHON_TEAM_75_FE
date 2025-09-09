@@ -3,12 +3,12 @@ import Chatbot from "react-chatbot-kit";
 import "react-chatbot-kit/build/main.css";
 import "../../styles/chatbot.css";
 import * as C from "./ChatStyle";
-import config from "../../bot/config";
-import MessageParser from "../../bot/MessageParser";
+import config from "../../utils/bot/config";
+import MessageParser from "../../utils/bot/MessageParser";
 import ActionProvider, {
   type ActionProviderProps,
   type Actions,
-} from "../../bot/ActionProvider";
+} from "../../utils/bot/ActionProvider";
 import ChatMicButton from "@components/chat/ChatMicButton";
 
 type SearchMode = "word" | "category";
