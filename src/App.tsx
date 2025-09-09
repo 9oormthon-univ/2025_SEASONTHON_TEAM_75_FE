@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "styled-components";
+import { Analytics } from "@vercel/analytics/react";
 import GlobalStyle from "@styles/GlobalStyle";
 import Layout from "@styles/Layout";
 import Home from "@routes/home/Home";
@@ -177,6 +178,7 @@ function App() {
           </Routes>
         </Router>
       </ThemeProvider>
+      <Analytics />
     </>
   );
 }
