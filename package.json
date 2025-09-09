@@ -12,6 +12,7 @@
   "dependencies": {
     "@types/react-router-dom": "^5.3.3",
     "@types/styled-components": "^5.1.34",
+    "@vercel/analytics": "^1.5.0",
     "axios": "^1.11.0",
     "heic2any": "^0.0.4",
     "react": "^19.1.1",
