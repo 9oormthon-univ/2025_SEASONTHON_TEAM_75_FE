@@ -27,6 +27,7 @@ export const LocationBox = styled.div`
   gap: 5px;
   align-items: center;
   flex-direction: row;
+  cursor: pointer;
 `;
 
 export const LocationIcon = styled.img`

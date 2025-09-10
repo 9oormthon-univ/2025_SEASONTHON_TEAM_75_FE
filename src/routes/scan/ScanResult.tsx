@@ -10,6 +10,7 @@ import {
   type ApiScanResult,
 } from "@stores/scanResultStore";
 import apiClient from "@utils/apiClient";
+import { RemoveScroll } from "react-remove-scroll";
 
 interface SimilarItem {
   trashItemId: number;
@@ -137,85 +138,87 @@ const ScanResult: React.FC = () => {
         src={capturedImage || currentResult.imageUrl}
         alt="스캔 이미지"
       />
-      <BottomSheet
-        open={open}
-        onOpenChange={setOpen}
-        snapPoints={snapPoints}
-        isLoading={isUpdating}
-      >
-        <R.TopContainer>
-          <R.TrashName>
-            {currentResult.itemName || currentResult.name}
-          </R.TrashName>
-          <R.TrashDes>
-            {prefix === "R"
-              ? `재활용 쓰레기 : ${currentResult.typeName}`
-              : currentResult.typeName}
-          </R.TrashDes>
-          <R.TypeChangeBox>
-            <R.TypeChangeTitle>이 품목이 아닌가요?</R.TypeChangeTitle>
-            <R.TypeChangeContent>
-              {similarItems.map((item) => (
-                <R.Type
-                  key={item.trashItemId}
-                  isSelected={selectedSimilarItemId === item.trashItemId}
-                  onClick={() => handleItemSelect(item.trashItemId)}
-                >
-                  {item.itemName}
-                </R.Type>
-              ))}
-            </R.TypeChangeContent>
-          </R.TypeChangeBox>
-        </R.TopContainer>
-        <R.MidContainer>
-          {currentResult.parts && currentResult.parts.length > 0 && (
-            <R.MidSection>
-              <R.Title>부품 카드</R.Title>
-              {currentResult.parts.map((part) => (
-                <PartCard
-                  key={part.name}
-                  name={part.name}
-                  type={part.typeCode}
-                />
-              ))}
-            </R.MidSection>
-          )}
-          <R.MidSection>
-            <R.Title>분리배출 가이드</R.Title>
-            <R.GuideBox>
-              {guideElements}
-              {currentResult.cautionNote && (
-                <R.Notice>
-                  <R.NoticeIcon src={NoticeIcon} alt="주의" />
-                  {currentResult.cautionNote}
-                </R.Notice>
-              )}
-            </R.GuideBox>
-          </R.MidSection>
-          {currentResult.location &&
-            currentResult.days &&
-            currentResult.days.length > 0 && (
-              <R.LocationBox>
-                {currentResult.location.sigungu}는{" "}
-                <span>
-                  {currentResult.days
-                    .map((day) => day.replace("요일", ""))
-                    .join(",")}
-                  요일
-                </span>
-                에 버려요.
-              </R.LocationBox>
+      <RemoveScroll enabled={open}>
+        <BottomSheet
+          open={open}
+          onOpenChange={setOpen}
+          snapPoints={snapPoints}
+          isLoading={isUpdating}
+        >
+          <R.TopContainer>
+            <R.TrashName>
+              {currentResult.itemName || currentResult.name}
+            </R.TrashName>
+            <R.TrashDes>
+              {prefix === "R"
+                ? `재활용 쓰레기 : ${currentResult.typeName}`
+                : currentResult.typeName}
+            </R.TrashDes>
+            <R.TypeChangeBox>
+              <R.TypeChangeTitle>이 품목이 아닌가요?</R.TypeChangeTitle>
+              <R.TypeChangeContent>
+                {similarItems.map((item) => (
+                  <R.Type
+                    key={item.trashItemId}
+                    isSelected={selectedSimilarItemId === item.trashItemId}
+                    onClick={() => handleItemSelect(item.trashItemId)}
+                  >
+                    {item.itemName}
+                  </R.Type>
+                ))}
+              </R.TypeChangeContent>
+            </R.TypeChangeBox>
+          </R.TopContainer>
+          <R.MidContainer>
+            {currentResult.parts && currentResult.parts.length > 0 && (
+              <R.MidSection>
+                <R.Title>부품 카드</R.Title>
+                {currentResult.parts.map((part) => (
+                  <PartCard
+                    key={part.name}
+                    name={part.name}
+                    type={part.typeCode}
+                  />
+                ))}
+              </R.MidSection>
             )}
-        </R.MidContainer>
-        <R.ButtonWrapper>
-          <R.ScanBtn onClick={handleNavigateToScan}>
-            다른 쓰레기 분리수거하기
-          </R.ScanBtn>
-          <R.ChatBtn onClick={handleNavigateToChat}>
-            챗봇에게 물어보기
-          </R.ChatBtn>
-        </R.ButtonWrapper>
-      </BottomSheet>
+            <R.MidSection>
+              <R.Title>분리배출 가이드</R.Title>
+              <R.GuideBox>
+                {guideElements}
+                {currentResult.cautionNote && (
+                  <R.Notice>
+                    <R.NoticeIcon src={NoticeIcon} alt="주의" />
+                    {currentResult.cautionNote}
+                  </R.Notice>
+                )}
+              </R.GuideBox>
+            </R.MidSection>
+            {currentResult.location &&
+              currentResult.days &&
+              currentResult.days.length > 0 && (
+                <R.LocationBox>
+                  {currentResult.location.sigungu}는{" "}
+                  <span>
+                    {currentResult.days
+                      .map((day) => day.replace("요일", ""))
+                      .join(",")}
+                    요일
+                  </span>
+                  에 버려요.
+                </R.LocationBox>
+              )}
+          </R.MidContainer>
+          <R.ButtonWrapper>
+            <R.ScanBtn onClick={handleNavigateToScan}>
+              다른 쓰레기 분리수거하기
+            </R.ScanBtn>
+            <R.ChatBtn onClick={handleNavigateToChat}>
+              챗봇에게 물어보기
+            </R.ChatBtn>
+          </R.ButtonWrapper>
+        </BottomSheet>
+      </RemoveScroll>
     </R.Container>
   );
 };
