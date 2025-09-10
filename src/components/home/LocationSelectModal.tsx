@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
-import apiClient from "@utils/apiClient";
+import { useDistricts, useDistrictActions } from "@stores/userDistrictStore";
 
 export const ModalOverlay = styled.div`
   position: fixed;
@@ -50,53 +50,23 @@ export const GoToLocation = styled(Option)`
   }
 `;
 
-interface Location {
-  districtId: string;
-  sido: string;
-  sigugn: string;
-  eupmyeondong: string;
-}
-
-interface UserDistrict {
-  response: Location;
-  userDistrictId: number;
-  isDefault: boolean;
-}
-
 interface LocationSelectModalProps {
   isOpen: boolean;
   onClose: () => void;
-  districts: UserDistrict[];
-  onDefaultChange: () => void;
 }
 
-const LocationSelectModal = ({
-  isOpen,
-  onClose,
-  districts,
-  onDefaultChange,
-}: LocationSelectModalProps) => {
+const LocationSelectModal = ({ isOpen, onClose }: LocationSelectModalProps) => {
   const navigate = useNavigate();
+  const districts = useDistricts();
+  const { changeDefault } = useDistrictActions();
 
   if (!isOpen) {
     return null;
   }
 
-  const handleOptionClick = async (district: UserDistrict) => {
-    if (district.isDefault) {
-      onClose();
-      return;
-    }
-    try {
-      await apiClient.patch(
-        `/api/v1/users/districts/${district.userDistrictId}`
-      );
-      onDefaultChange();
-      onClose();
-    } catch (error) {
-      console.error("기본 자치구 변경에 실패했습니다.", error);
-      alert("기본 동네 변경에 실패했습니다. 다시 시도해주세요.");
-    }
+  const handleSetDefault = async (id: number) => {
+    await changeDefault(id);
+    onClose();
   };
 
   const handleNavigate = () => {
@@ -113,7 +83,7 @@ const LocationSelectModal = ({
             <Option
               key={district.userDistrictId}
               isSelected={district.isDefault}
-              onClick={() => handleOptionClick(district)}
+              onClick={() => handleSetDefault(district.userDistrictId)}
             >
               {locString}
             </Option>

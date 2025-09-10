@@ -23,19 +23,7 @@ import {
   RankingItemSkeleton,
   TrashCardSkeleton,
 } from "@components/home/Skeleton";
-
-interface Location {
-  districtId: string;
-  sido: string;
-  sigugn: string;
-  eupmyeondong: string;
-}
-
-interface UserDistrict {
-  response: Location;
-  userDistrictId: number;
-  isDefault: boolean;
-}
+import { useDistricts, useDefaultDistrict } from "@stores/userDistrictStore";
 
 interface TrashSchedule {
   categoryName: string;
@@ -126,8 +114,8 @@ const formatRelativeTime = (dateString: string): string => {
 };
 
 const Home = () => {
-  const [myDistricts, setMyDistricts] = useState<UserDistrict[]>([]);
-  const [defaultLocation, setDefaultLocation] = useState<Location | null>(null);
+  const myDistricts = useDistricts();
+  const defaultLocation = useDefaultDistrict();
   const [isModalOpen, setModalOpen] = useState(false);
   const navigate = useNavigate();
   const [scheduleInfo, setScheduleInfo] = useState<ScheduleInfo | null>(null);
@@ -141,22 +129,6 @@ const Home = () => {
     useState<ApiRevisionDetail | null>(null);
   const [isRevisionModalOpen, setRevisionModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-
-  const fetchMyDistricts = async () => {
-    try {
-      const response = await apiClient.get<{ data: UserDistrict[] }>(
-        "/api/v1/users/my/districts"
-      );
-      const districts = response.data.data;
-      const currentDefault =
-        districts.find((d) => d.isDefault)?.response || null;
-
-      setMyDistricts(districts);
-      setDefaultLocation(currentDefault);
-    } catch (error) {
-      console.error("자치구 목록 조회에 실패했습니다.", error);
-    }
-  };
 
   const fetchTrashSchedule = async () => {
     try {
@@ -227,10 +199,6 @@ const Home = () => {
     }
   };
 
-  const handleDefaultChange = () => {
-    fetchMyDistricts();
-  };
-
   const handleOpenRevisionModal = async (revisionId: number) => {
     setRevisionModalOpen(true);
     try {
@@ -251,12 +219,9 @@ const Home = () => {
 
   useEffect(() => {
     const fetchInitialData = async () => {
+      setIsLoading(true);
       try {
-        await Promise.all([
-          fetchMyDistricts(),
-          fetchRankings(),
-          fetchRevisions(),
-        ]);
+        await Promise.all([fetchRankings(), fetchRevisions()]);
       } catch (error) {
         console.error("초기 데이터 로딩에 실패했습니다.", error);
       } finally {
@@ -385,10 +350,7 @@ const Home = () => {
     <H.HomeContainer>
       <H.HomeHeader>
         <H.Logo src={LogoIcon} alt="로고"></H.Logo>
-        <H.LocationBox
-          onClick={handleLocationClick}
-          style={{ cursor: "pointer" }}
-        >
+        <H.LocationBox onClick={handleLocationClick}>
           <H.LocationIcon src={locationIcon} alt="위치 아이콘" />
           <H.LocationName>
             {defaultLocation ? defaultLocation.sigugn : "동네 설정"}
@@ -458,8 +420,6 @@ const Home = () => {
       <LocationSelectModal
         isOpen={isModalOpen}
         onClose={() => setModalOpen(false)}
-        districts={myDistricts}
-        onDefaultChange={handleDefaultChange}
       />
     </H.HomeContainer>
   );
