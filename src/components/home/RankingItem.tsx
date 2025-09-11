@@ -2,6 +2,7 @@ import styled from "styled-components";
 import RankingUp from "@assets/rankingUp.svg";
 import RankingDown from "@assets/rankingDown.svg";
 import RankingSame from "@assets/rankingSame.svg";
+import type { RankingItemData } from "@types";
 
 export const ItemContainer = styled.div`
   width: 221px;
@@ -98,23 +99,13 @@ export const SearchCount = styled.div`
   font-size: 11px;
 `;
 
-type TrendDirection = "UP" | "DOWN" | "SAME";
-
-interface RankingItemProps {
-  rank: number;
-  imageUrl: string;
-  name: string;
-  trendDirection: TrendDirection;
-  searchCount: number;
-}
-
 const RankingItem = ({
   rank,
   imageUrl,
   name,
   trendDirection,
   searchCount,
-}: RankingItemProps) => {
+}: RankingItemData) => {
   const renderTrendBox = () => {
     switch (trendDirection) {
       case "UP":

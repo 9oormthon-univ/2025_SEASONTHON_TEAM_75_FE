@@ -9,11 +9,26 @@ export const Container = styled.div`
   justify-content: center;
   background: white;
   position: relative;
+`;
+
+export const ButtonContainer = styled.div`
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  bottom: 66px;
 
   button {
-    position: absolute;
-    bottom: 58px;
+    color: ${({ theme }) => theme.colors.text2};
+    font-family: Pretendard;
+    font-size: 16px;
+    font-weight: 500;
+    letter-spacing: 0.16px;
+    text-decoration-line: underline;
+    text-underline-offset: 3px;
+
     padding: 0;
+    margin: 0;
   }
 `;
 

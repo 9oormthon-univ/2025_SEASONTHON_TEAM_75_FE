@@ -13,6 +13,8 @@
       "@assets/*": ["src/assets/*"],
       "@utils/*": ["src/utils/*"],
       "@stores/*": ["src/stores/*"],
+      "@types": ["types"],
+      "@types/*": ["src/types/*"],
       "@/*": ["src/*"]
     }
   }
