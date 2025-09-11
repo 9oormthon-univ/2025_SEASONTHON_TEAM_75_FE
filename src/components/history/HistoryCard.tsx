@@ -4,6 +4,7 @@ import Arrow from "@assets/history_arrow.svg";
 import NonSelectIcon from "@assets/history_nosel.svg";
 import SelectIcon from "@assets/history_sel.svg";
 import { getTrashType } from "@utils/trashType";
+import type { HistoryItem } from "@types";
 
 export const Container = styled.div`
   display: flex;
@@ -66,22 +67,19 @@ export const RightSection = styled.div`
 `;
 
 interface HistoryCardProps {
-  id: number;
-  type: string;
-  name: string;
+  item: HistoryItem;
   mode: "view" | "edit";
   isSelected?: boolean;
   onClick: (id: number) => void;
 }
 
 const HistorytCard = ({
-  id,
-  type,
-  name,
+  item,
   mode,
   isSelected,
   onClick,
 }: HistoryCardProps) => {
+  const { id, type, name } = item;
   const trashType = getTrashType(type);
 
   const renderRightIcon = () => {

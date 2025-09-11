@@ -1,28 +1,9 @@
 import { create } from "zustand";
-
-export interface ApiHistoryItem {
-  id: number;
-  imageUrl: string;
-  name: string;
-  summary: string;
-  itemName: string | null;
-  typeCode: string;
-  typeName: string;
-  guideSteps: string[];
-  cautionNote: string | null;
-  parts: any[];
-  createdAt: string;
-}
-
-export interface HistoryItem {
-  id: number;
-  type: string;
-  name: string;
-}
+import type { ApiTrashDetail, HistoryItem } from "@types";
 
 interface HistoryState {
   historyItems: HistoryItem[];
-  setHistoryItems: (items: ApiHistoryItem[]) => void;
+  setHistoryItems: (items: ApiTrashDetail[]) => void;
   deleteHistoryItems: (idsToDelete: number[]) => void;
 }
 

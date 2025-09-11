@@ -5,8 +5,9 @@ import Header from "@components/Header";
 import NoHistoryIcon from "@assets/history_zero.svg";
 import HistoryCard from "@components/history/HistoryCard";
 import apiClient from "@utils/apiClient";
-import { useHistoryStore, type ApiHistoryItem } from "@stores/historyStore";
+import { useHistoryStore } from "@stores/historyStore";
 import { HistoryPageSkeleton } from "@components/history/Skeleton";
+import type { ApiTrashDetail } from "@types";
 
 const History = () => {
   const navigate = useNavigate();
@@ -16,7 +17,7 @@ const History = () => {
   useEffect(() => {
     const fetchHistoryData = async () => {
       try {
-        const response = await apiClient.get<{ data: ApiHistoryItem[] }>(
+        const response = await apiClient.get<{ data: ApiTrashDetail[] }>(
           "/api/v1/trash/my"
         );
         setHistoryItems(response.data.data);
@@ -28,7 +29,7 @@ const History = () => {
     };
 
     fetchHistoryData();
-  }, [setHistoryItems]);
+  }, []);
 
   const historyCount = historyItems.length;
 
@@ -65,9 +66,7 @@ const History = () => {
               {historyItems.map((item) => (
                 <HistoryCard
                   key={item.id}
-                  id={item.id}
-                  name={item.name}
-                  type={item.type}
+                  item={item}
                   mode="view"
                   onClick={handleCardClick}
                 />

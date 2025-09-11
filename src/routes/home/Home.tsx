@@ -4,13 +4,8 @@ import locationIcon from "@assets/location.svg";
 import dropdownIcon from "@assets/dropdown.svg";
 import RankingItem from "@components/home/RankingItem";
 import TrashCard from "@components/home/TrashCard";
-import { useState, useEffect, Fragment } from "react";
+import { useState, useEffect } from "react";
 import TrashCardModal from "@components/home/TrashCardModal";
-import DefaultIcon from "@assets/main_default.svg";
-import EarthIcon from "@assets/main_earth.svg";
-import FoodIcon from "@assets/main_food.svg";
-import PetIcon from "@assets/main_pet.svg";
-import CalIcon from "@assets/main_cal.svg";
 import LocationSelectModal from "@components/home/LocationSelectModal";
 import apiClient from "@utils/apiClient";
 import { useNavigate } from "react-router-dom";
@@ -32,6 +27,7 @@ import type {
   ApiRevisionItem,
   ApiRevisionDetail,
 } from "@types";
+import ScheduleCard from "@components/home/ScheduleCard";
 
 const getIconForTrashType = (trashTypeName: string): string => {
   const foundType = Object.values(TRASH_TYPES).find(
@@ -75,9 +71,6 @@ const Home = () => {
   const [scheduleInfo, setScheduleInfo] = useState<ScheduleInfo | null>(null);
   const [rankingList, setRankingList] = useState<RankingItemData[]>([]);
   const [rankingLastUpdated, setRankingLastUpdated] = useState<string>("");
-  const formattedDate = scheduleInfo?.date
-    ? scheduleInfo.date.substring(5).replace("-", ".")
-    : "";
   const [revisionList, setRevisionList] = useState<ApiRevisionItem[]>([]);
   const [selectedRevision, setSelectedRevision] =
     useState<ApiRevisionDetail | null>(null);
@@ -113,12 +106,12 @@ const Home = () => {
 
   const fetchRankings = async () => {
     try {
-      const response = await apiClient.get<RankingApiResponse>(
+      const response = await apiClient.get<{ data: RankingApiResponse }>(
         "/api/v1/rank/current"
       );
 
-      const rawData = response.data.rankings;
-      const lastUpdatedDate = response.data.lastUpdated;
+      const rawData = response.data.data.rankings;
+      const lastUpdatedDate = response.data.data.lastUpdated;
 
       const processedData = rawData.map((item) => ({
         rank: item.rankOrder,
@@ -195,110 +188,6 @@ const Home = () => {
     }
   }, [defaultLocation]);
 
-  const renderMainContent = () => {
-    const { categories, location } = scheduleInfo!;
-    const GENERAL_WASTE = "일반/음식물쓰레기";
-    const PET_WASTE = "투명페트병/비닐";
-    const OTHER_RECYCLABLES = "그외 재활용품";
-
-    const sortOrder = [GENERAL_WASTE, PET_WASTE, OTHER_RECYCLABLES];
-
-    const sortedCategories = [...categories].sort((a, b) => {
-      const indexA = sortOrder.indexOf(a);
-      const indexB = sortOrder.indexOf(b);
-      return indexA - indexB;
-    });
-
-    if (categories.length === 0) {
-      return {
-        icon: EarthIcon,
-        title: (
-          <H.Titles>
-            <H.TitleTop>
-              <H.Highlight1>오늘은</H.Highlight1>
-            </H.TitleTop>
-            <H.TitleBottom>
-              <H.Highlight2>분리수거 없는 날</H.Highlight2>
-            </H.TitleBottom>
-            <H.SubTitle>오늘은 버리지 말고 차곡차곡 모아둬요!</H.SubTitle>
-          </H.Titles>
-        ),
-      };
-    }
-
-    const isAllTrashDay =
-      categories.includes(GENERAL_WASTE) &&
-      categories.includes(PET_WASTE) &&
-      categories.includes(OTHER_RECYCLABLES);
-
-    if (isAllTrashDay) {
-      return {
-        icon: DefaultIcon,
-        title: (
-          <H.Titles>
-            <H.TitleTop>
-              오늘은 <H.Highlight1>{location}</H.Highlight1>
-            </H.TitleTop>
-            <H.TitleBottom>
-              <H.Highlight2>모든 쓰레기</H.Highlight2> 버리는 날
-            </H.TitleBottom>
-            <H.SubTitle>오늘도 한 봉지 깔끔하게 비워볼까요?</H.SubTitle>
-          </H.Titles>
-        ),
-      };
-    }
-
-    let icon = DefaultIcon;
-    if (categories.includes(GENERAL_WASTE)) {
-      icon = FoodIcon;
-    } else if (categories.includes(PET_WASTE)) {
-      icon = PetIcon;
-    }
-
-    const title = (
-      <H.Titles>
-        <H.TitleTop>
-          오늘은 <H.Highlight1>{location}</H.Highlight1>
-        </H.TitleTop>
-        <H.TitleBottom>
-          <H.Highlight2>
-            {sortedCategories.map((cat, index) => (
-              <Fragment key={index}>
-                {cat}
-                {index < categories.length - 1 && <>,</>}
-                {index < categories.length - 1 && <br />}
-              </Fragment>
-            ))}
-          </H.Highlight2>{" "}
-          버리는 날
-        </H.TitleBottom>
-        <H.SubTitle>오늘도 한 봉지 깔끔하게 비워볼까요?</H.SubTitle>
-      </H.Titles>
-    );
-
-    return { icon, title };
-  };
-
-  const getContent = () => {
-    if (!defaultLocation || !scheduleInfo) {
-      return {
-        icon: CalIcon,
-        title: (
-          <H.Titles>
-            <H.TitleTop>현재 설정된</H.TitleTop>
-            <H.TitleBottom>
-              <H.Highlight1>동네가 없어요</H.Highlight1>
-            </H.TitleBottom>
-            <H.SubTitle>동네를 설정하면 분리수거 날짜를 알려드려요!</H.SubTitle>
-          </H.Titles>
-        ),
-      };
-    }
-    return renderMainContent();
-  };
-
-  const { icon: mainIcon, title: mainTitle } = getContent();
-
   const formattedLastUpdated = formatRelativeTime(rankingLastUpdated);
 
   return (
@@ -316,13 +205,7 @@ const Home = () => {
       {isLoading ? (
         <MainSectionSkeleton />
       ) : (
-        <H.MainSection>
-          <H.Today>{formattedDate}</H.Today>
-          {mainTitle}
-          <H.MainIcon>
-            <img src={mainIcon} alt="메인 아이콘" />
-          </H.MainIcon>
-        </H.MainSection>
+        <ScheduleCard scheduleInfo={scheduleInfo} />
       )}
       <H.BgBox>
         <SectionHeader

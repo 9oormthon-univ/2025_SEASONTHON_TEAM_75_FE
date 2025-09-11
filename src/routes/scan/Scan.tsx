@@ -218,43 +218,33 @@ const Scan: React.FC = () => {
   };
 
   return (
-    <>
-      <S.Container>
-        <S.Video ref={videoRef} autoPlay playsInline muted />
-        <canvas ref={canvasRef} style={{ display: "none" }} />
-        <S.Overlay />
-        <S.ScanBox ref={scanBoxRef} />
-        <S.Header>
-          <S.Title>스캔</S.Title>
-          <S.CloseButton
-            src={CloseImg}
-            alt="닫기"
-            onClick={() => navigate(-1)}
-          />
-        </S.Header>
-        <S.ButtonContainer>
-          <S.ActionButton onClick={openGallery} src={GalleryImg} alt="갤러리" />
-          <input
-            type="file"
-            accept="image/*"
-            ref={handleGalleryInput}
-            onChange={handleFileChange}
-            style={{ display: "none" }}
-          />
-          <S.CaptureButton
-            onClick={takePhoto}
-            src={ShutterImg}
-            alt="사진 촬영"
-          />
+    <S.Container>
+      <S.Video ref={videoRef} autoPlay playsInline muted />
+      <canvas ref={canvasRef} style={{ display: "none" }} />
+      <S.Overlay />
+      <S.ScanBox ref={scanBoxRef} />
+      <S.Header>
+        <S.Title>스캔</S.Title>
+        <S.CloseButton src={CloseImg} alt="닫기" onClick={() => navigate(-1)} />
+      </S.Header>
+      <S.ButtonContainer>
+        <S.ActionButton onClick={openGallery} src={GalleryImg} alt="갤러리" />
+        <input
+          type="file"
+          accept="image/*"
+          ref={handleGalleryInput}
+          onChange={handleFileChange}
+          style={{ display: "none" }}
+        />
+        <S.CaptureButton onClick={takePhoto} src={ShutterImg} alt="사진 촬영" />
 
-          <S.ActionButton
-            onClick={toggleCameraFacingMode}
-            src={ChangeCameraImg}
-            alt="카메라 전환"
-          />
-        </S.ButtonContainer>
-      </S.Container>
-    </>
+        <S.ActionButton
+          onClick={toggleCameraFacingMode}
+          src={ChangeCameraImg}
+          alt="카메라 전환"
+        />
+      </S.ButtonContainer>
+    </S.Container>
   );
 };
 
