@@ -213,7 +213,7 @@ function ListPanel({
   items: MyLocationItem[];
   selectedId: string | number | null;
   onSelect: (id: string | number) => void;
-  onRemove: (id: string | number) => void;
+  onRemove: (id: number) => void;
   onAdd: () => void;
 }) {
   return (
@@ -243,7 +243,7 @@ function ListPanel({
 
 // 메인
 export default function LocationPage() {
-  const { fetchDistricts, setDistrict } = useDistrictActions();
+  const { fetchDistricts, setDistrict, removeDistrict } = useDistrictActions();
   const districts = useDistricts();
 
   const navigate = useNavigate();
@@ -271,6 +271,8 @@ export default function LocationPage() {
   );
   const [showInfo, setShowInfo] = useState<boolean>(false);
   const [mapCenter, setMapCenter] = useState<LatLng>(DEFAULT_CENTER); // 포커스
+
+  const [deleteTargetId, setDeleteTargetId] = useState<number | null>(null); // 삭제
   const [defaultUserDistrictId, setDefaultUserDistrictId] = useState<
     string | number | null
   >(null); // 디폴트 자치구
@@ -289,6 +291,10 @@ export default function LocationPage() {
       toastTimerRef.current = null;
     }, 2000);
   }, []);
+
+  useEffect(() => {
+    fetchDistricts();
+  }, [fetchDistricts]);
 
   useEffect(() => {
     return () => {
@@ -447,8 +453,7 @@ export default function LocationPage() {
   const handleDelete = useCallback(
     async (userDistrictId: number | string, title?: string) => {
       try {
-        await apiClient.delete(`/api/v1/users/districts/${userDistrictId}`);
-        await fetchStore();
+        await removeDistrict(Number(userDistrictId));
 
         if (title) {
           pushToast(`내 동네 '${title}'을 삭제했어요`);
@@ -457,16 +462,8 @@ export default function LocationPage() {
         console.error("자치구 삭제 실패:", e);
       }
     },
-    [fetchStore, pushToast]
+    [removeDistrict, pushToast]
   );
-
-  const [deleteTargetId, setDeleteTargetId] = useState<string | number | null>(
-    null
-  );
-
-  const requestRemove = useCallback((id: string | number) => {
-    setDeleteTargetId(id);
-  }, []);
 
   const confirmRemove = useCallback(() => {
     if (deleteTargetId != null) {
@@ -475,10 +472,6 @@ export default function LocationPage() {
     }
     setDeleteTargetId(null);
   }, [deleteTargetId, handleDelete, state.items]);
-
-  const cancelRemove = useCallback(() => {
-    setDeleteTargetId(null);
-  }, []);
 
   const deleteTarget = useMemo<MyLocationItem | undefined>(
     () => state.items.find((i) => i.id === deleteTargetId),
@@ -564,6 +557,7 @@ export default function LocationPage() {
     districtIdFromQuery,
     selectedTitle,
     setDistrict,
+    fetchDistricts,
     pushToast,
     isFromSearch,
     navigate,
@@ -622,7 +616,9 @@ export default function LocationPage() {
           items={state.items}
           selectedId={state.selectedId}
           onSelect={handleSelectLocation}
-          onRemove={requestRemove}
+          onRemove={(id: number) => {
+            setDeleteTargetId(id);
+          }}
           onAdd={handleAddLocation}
         />
       )}
@@ -631,7 +627,9 @@ export default function LocationPage() {
       <LocationDeleteModal
         district={`${deleteTarget?.title}`}
         isOpen={!!deleteTargetId}
-        onCancel={cancelRemove}
+        onCancel={() => {
+          setDeleteTargetId(null);
+        }}
         onConfirm={confirmRemove}
       />
 

@@ -32,7 +32,8 @@ interface UserDistrictState {
       sigCode: string;
     } | null>;
 
-    // removeDistrict: (userDistrictId) => Promise<void>;
+    // 자치구 삭제
+    removeDistrict: (userDistrictId: number) => Promise<void>;
   };
 }
 
@@ -209,6 +210,28 @@ const useUserDistrictStore = create<UserDistrictState>((set) => ({
       } catch (error) {
         console.error("자치구 등록 실패:", error);
         return null;
+      }
+    },
+
+    removeDistrict: async (userDistrictId: number) => {
+      try {
+        const res = await apiClient.delete<{ data: UserDistrict[] }>(
+          `/api/v1/users/districts/${userDistrictId}`
+        );
+
+        const updatedDistricts: UserDistrict[] = res.data.data ?? [];
+
+        const newDefault: Location | null =
+          updatedDistricts.find((d) => d.isDefault)?.response ??
+          updatedDistricts[0]?.response ??
+          null;
+
+        set({
+          districts: updatedDistricts,
+          defaultDistrict: newDefault,
+        });
+      } catch (error) {
+        console.error("자치구 삭제에 실패했습니다.", error);
       }
     },
   },
