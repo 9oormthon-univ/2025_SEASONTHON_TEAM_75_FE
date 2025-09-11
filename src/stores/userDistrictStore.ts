@@ -1,18 +1,6 @@
 import { create } from "zustand";
 import apiClient from "@utils/apiClient";
-
-interface Location {
-  districtId: string;
-  sido: string;
-  sigugn: string;
-  eupmyeondong: string;
-}
-
-export interface UserDistrict {
-  response: Location;
-  userDistrictId: number;
-  isDefault: boolean;
-}
+import type { Location, UserDistrict } from "@types";
 
 interface UserDistrictState {
   districts: UserDistrict[];

@@ -22,6 +22,7 @@ export default defineConfig({
       { find: "@components", replacement: "/src/components" },
       { find: "@stores", replacement: "/src/stores" },
       { find: "@utils", replacement: "/src/utils" },
+      { find: "@types", replacement: "/src/types" },
     ],
   },
   build: {
