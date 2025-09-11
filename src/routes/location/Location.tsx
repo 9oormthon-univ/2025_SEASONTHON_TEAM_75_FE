@@ -18,41 +18,16 @@ import MarkIconUrl from "@assets/map_marker.svg?url";
 import LocationList from "@components/location/LocationList";
 import MainButton from "@components/MainButton";
 import apiClient from "@utils/apiClient";
+import { useDistrictActions, useDistricts } from "@stores/userDistrictStore";
+import type { Location, GeocoderLike } from "@types";
 
 // 상수
 const DEFAULT_CENTER: LatLng = { lat: 37.525121, lng: 126.96339 };
 
 // 타입
-type GeocoderStatus = "OK" | "ZERO_RESULT" | "ERROR";
-type RegionCodeResult = {
-  code: string;
-  region_type: string;
-  address_name: string;
-};
-
-type GeocoderLike = {
-  coord2RegionCode: (
-    lng: number,
-    lat: number,
-    cb: (results: RegionCodeResult[], status: GeocoderStatus) => void
-  ) => void;
-};
-
 type KakaoLatLng = {
   getLat: () => number;
   getLng: () => number;
-};
-
-// API 타입
-type UserDistrict = {
-  response: {
-    districtId: string;
-    sido: string;
-    sigugn: string;
-    eupmyeondong: string | null;
-  };
-  userDistrictId: number;
-  isDefault: boolean;
 };
 
 declare global {
@@ -268,6 +243,9 @@ function ListPanel({
 
 // 메인
 export default function LocationPage() {
+  const { fetchDistricts, setDistrict, removeDistrict } = useDistrictActions();
+  const districts = useDistricts();
+
   const navigate = useNavigate();
   const { state: navState } = useLocation() as { state: LocationState };
   const from = navState?.from;
@@ -293,6 +271,8 @@ export default function LocationPage() {
   );
   const [showInfo, setShowInfo] = useState<boolean>(false);
   const [mapCenter, setMapCenter] = useState<LatLng>(DEFAULT_CENTER); // 포커스
+
+  const [deleteTargetId, setDeleteTargetId] = useState<number | null>(null); // 삭제
   const [defaultUserDistrictId, setDefaultUserDistrictId] = useState<
     string | number | null
   >(null); // 디폴트 자치구
@@ -311,6 +291,10 @@ export default function LocationPage() {
       toastTimerRef.current = null;
     }, 2000);
   }, []);
+
+  useEffect(() => {
+    fetchDistricts();
+  }, [fetchDistricts]);
 
   useEffect(() => {
     return () => {
@@ -435,49 +419,41 @@ export default function LocationPage() {
   }, [map, sigPaths]);
 
   // 내 자치구 API
-  const fetchDistricts = useCallback(async () => {
-    try {
-      const { data } = await apiClient.get("/api/v1/users/my/districts");
+  const fetchStore = useCallback(async () => {
+    // 서버 응답 -> 화면용 아이템
+    const items: MyLocationItem[] = districts.map((ud) => {
+      const r = ud.response;
+      const title = [r.sido, r.sigugn, r.eupmyeondong ?? undefined]
+        .filter(Boolean)
+        .join(" ");
+      return {
+        id: ud.userDistrictId,
+        title,
+        sigCode: r.districtId.slice(0, 5),
+      };
+    });
 
-      // 서버 응답 -> 화면용 아이템
-      const items: MyLocationItem[] = data.data.map((ud: UserDistrict) => {
-        const r = ud.response;
-        const title = [r.sido, r.sigugn, r.eupmyeondong ?? undefined]
-          .filter(Boolean)
-          .join(" ");
-        return {
-          id: ud.userDistrictId,
-          title,
-          sigCode: r.districtId.slice(0, 5),
-        };
-      });
+    const def = districts.find((x) => x.isDefault)?.userDistrictId ?? null;
 
-      const def =
-        data.data.find((x: UserDistrict) => x.isDefault)?.userDistrictId ??
-        null;
-      setDefaultUserDistrictId(def); // 디폴트 설정
+    setDefaultUserDistrictId(def);
 
-      // 리스트 교체
-      dispatch({ type: "replace", items: items });
+    // 리스트 교체
+    dispatch({ type: "replace", items: items });
 
-      if (def != null) {
-        dispatch({ type: "select", id: def });
-      }
-    } catch (e) {
-      console.error("내 자치구 불러오기 실패:", e);
+    if (def != null) {
+      dispatch({ type: "select", id: def });
     }
-  }, []);
+  }, [districts]);
 
   useEffect(() => {
-    fetchDistricts();
-  }, [fetchDistricts]);
+    fetchStore();
+  }, [fetchStore]);
 
   // 삭제 확인
   const handleDelete = useCallback(
     async (userDistrictId: number | string, title?: string) => {
       try {
-        await apiClient.delete(`/api/v1/users/districts/${userDistrictId}`);
-        await fetchDistricts();
+        await removeDistrict(Number(userDistrictId));
 
         if (title) {
           pushToast(`내 동네 '${title}'을 삭제했어요`);
@@ -486,16 +462,8 @@ export default function LocationPage() {
         console.error("자치구 삭제 실패:", e);
       }
     },
-    [fetchDistricts, pushToast]
+    [removeDistrict, pushToast]
   );
-
-  const [deleteTargetId, setDeleteTargetId] = useState<string | number | null>(
-    null
-  );
-
-  const requestRemove = useCallback((id: string | number) => {
-    setDeleteTargetId(id);
-  }, []);
 
   const confirmRemove = useCallback(() => {
     if (deleteTargetId != null) {
@@ -504,10 +472,6 @@ export default function LocationPage() {
     }
     setDeleteTargetId(null);
   }, [deleteTargetId, handleDelete, state.items]);
-
-  const cancelRemove = useCallback(() => {
-    setDeleteTargetId(null);
-  }, []);
 
   const deleteTarget = useMemo<MyLocationItem | undefined>(
     () => state.items.find((i) => i.id === deleteTargetId),
@@ -554,32 +518,45 @@ export default function LocationPage() {
     () => navigate("/location/search", { state: { from } }),
     [navigate, from]
   );
+
   const handleRegister = useCallback(async () => {
     const districtId = districtIdFromQuery;
+    if (!selectedTitle || !districtId) return;
 
-    if (!selectedTitle || !districtId) {
+    const parts = selectedTitle.split(" ").filter(Boolean);
+    const [sido, sigugn, eupmyeondong] = [
+      parts[0] ?? "",
+      parts[1] ?? "",
+      parts[2] ?? "",
+    ];
+
+    const loc: Location = {
+      districtId, // 10자리
+      sido,
+      sigugn,
+      eupmyeondong,
+    };
+
+    const result = await setDistrict(loc);
+    if (!result) {
+      console.error("자치구 등록 실패");
       return;
     }
 
-    try {
-      await apiClient.post(`/api/v1/users/districts/${districtId}`, {});
+    await fetchDistricts();
 
-      await fetchDistricts();
+    pushToast(`내 동네를 '${result.label}'으로 설정했어요`);
 
-      pushToast(`내 동네를 '${selectedTitle}'으로 설정했어요`);
+    setIsSetupMode(false);
+    setSelectedTitle(undefined);
 
-      setIsSetupMode(false);
-      setSelectedTitle(undefined);
-
-      if (isFromSearch) {
-        navigate(".", { replace: true, state: { from } });
-      }
-    } catch (e) {
-      console.error("자치구 업데이트 실패:", e);
+    if (isFromSearch) {
+      navigate(".", { replace: true, state: { from } });
     }
   }, [
     districtIdFromQuery,
     selectedTitle,
+    setDistrict,
     fetchDistricts,
     pushToast,
     isFromSearch,
@@ -639,7 +616,9 @@ export default function LocationPage() {
           items={state.items}
           selectedId={state.selectedId}
           onSelect={handleSelectLocation}
-          onRemove={requestRemove}
+          onRemove={(id: string | number) => {
+            setDeleteTargetId(Number(id));
+          }}
           onAdd={handleAddLocation}
         />
       )}
@@ -648,7 +627,9 @@ export default function LocationPage() {
       <LocationDeleteModal
         district={`${deleteTarget?.title}`}
         isOpen={!!deleteTargetId}
-        onCancel={cancelRemove}
+        onCancel={() => {
+          setDeleteTargetId(null);
+        }}
         onConfirm={confirmRemove}
       />
 

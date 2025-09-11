@@ -12,3 +12,8 @@ export interface UserDistrict {
   userDistrictId: number;
   isDefault: boolean;
 }
+
+export interface Sigungu {
+  code: string;
+  name: string;
+}
