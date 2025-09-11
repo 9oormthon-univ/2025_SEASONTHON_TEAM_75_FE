@@ -24,60 +24,14 @@ import {
   TrashCardSkeleton,
 } from "@components/home/Skeleton";
 import { useDistricts, useDefaultDistrict } from "@stores/userDistrictStore";
-
-interface TrashSchedule {
-  categoryName: string;
-  trashTypes: string[];
-  location: string;
-  todayDay: string;
-  todayDate: string;
-}
-
-interface ScheduleInfo {
-  categories: string[];
-  location: string;
-  date: string;
-}
-
-interface ApiRankingItem {
-  rankId: number;
-  trashImageUrl: string | null;
-  trashTypeName: string;
-  rankOrder: number;
-  totalSearchCount: number;
-  trendDirection: "UP" | "DOWN" | "SAME";
-}
-
-interface RankingApiResponse {
-  data: {
-    rankings: ApiRankingItem[];
-    lastUpdated: string;
-  };
-}
-
-interface RankingItemData {
-  rank: number;
-  imageUrl: string;
-  name: string;
-  trendDirection: "UP" | "DOWN" | "SAME";
-  searchCount: number;
-}
-
-interface ApiRevisionItem {
-  revisionId: number;
-  subTitle: string;
-  trashTypeName: string;
-  revisionDate: string;
-}
-
-interface ApiRevisionDetail {
-  revisionId: number;
-  subTitle: string;
-  title: string;
-  content: string;
-  revisionDate: string;
-  trashTypeName: string;
-}
+import type {
+  ApiTrashSchedule,
+  ScheduleInfo,
+  RankingApiResponse,
+  RankingItemData,
+  ApiRevisionItem,
+  ApiRevisionDetail,
+} from "@types";
 
 const getIconForTrashType = (trashTypeName: string): string => {
   const foundType = Object.values(TRASH_TYPES).find(
@@ -132,7 +86,7 @@ const Home = () => {
 
   const fetchTrashSchedule = async () => {
     try {
-      const response = await apiClient.get<{ data: TrashSchedule[] }>(
+      const response = await apiClient.get<{ data: ApiTrashSchedule[] }>(
         `/api/v1/disposals/today`
       );
       const responseData = response.data.data;
@@ -162,8 +116,9 @@ const Home = () => {
       const response = await apiClient.get<RankingApiResponse>(
         "/api/v1/rank/current"
       );
-      const rawData = response.data.data.rankings;
-      const lastUpdatedDate = response.data.data.lastUpdated;
+
+      const rawData = response.data.rankings;
+      const lastUpdatedDate = response.data.lastUpdated;
 
       const processedData = rawData.map((item) => ({
         rank: item.rankOrder,
