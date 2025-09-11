@@ -44,7 +44,6 @@ function getGeocoder(): Promise<GeocoderLike> {
   if (geocoderPromise) return geocoderPromise;
 
   geocoderPromise = (async () => {
-    // ✅ SDK 로드 완료까지 대기
     await waitKakao();
 
     const w = window as unknown as {
