@@ -213,7 +213,7 @@ function ListPanel({
   items: MyLocationItem[];
   selectedId: string | number | null;
   onSelect: (id: string | number) => void;
-  onRemove: (id: number) => void;
+  onRemove: (id: string | number) => void;
   onAdd: () => void;
 }) {
   return (
@@ -616,8 +616,8 @@ export default function LocationPage() {
           items={state.items}
           selectedId={state.selectedId}
           onSelect={handleSelectLocation}
-          onRemove={(id: number) => {
-            setDeleteTargetId(id);
+          onRemove={(id: string | number) => {
+            setDeleteTargetId(Number(id));
           }}
           onAdd={handleAddLocation}
         />
