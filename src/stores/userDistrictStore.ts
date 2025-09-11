@@ -8,6 +8,7 @@ import type {
   GeocoderLike,
   ReverseRegion,
 } from "@types";
+import { waitKakao } from "@utils/kakao";
 
 interface UserDistrictState {
   districts: UserDistrict[];
@@ -37,12 +38,26 @@ interface UserDistrictState {
   };
 }
 
-function getGeocoder(): GeocoderLike | null {
-  const w = window as unknown as {
-    kakao?: { maps?: { services?: { Geocoder: new () => GeocoderLike } } };
-  };
-  if (!w.kakao?.maps?.services) return null;
-  return new w.kakao.maps.services.Geocoder();
+let geocoderPromise: Promise<GeocoderLike> | null = null;
+
+function getGeocoder(): Promise<GeocoderLike> {
+  if (geocoderPromise) return geocoderPromise;
+
+  geocoderPromise = (async () => {
+    // ✅ SDK 로드 완료까지 대기
+    await waitKakao();
+
+    const w = window as unknown as {
+      kakao?: { maps?: { services?: { Geocoder: new () => GeocoderLike } } };
+    };
+    const svc = w.kakao?.maps?.services;
+    if (!svc?.Geocoder) {
+      throw new Error("Kakao services not available");
+    }
+    return new svc.Geocoder() as GeocoderLike;
+  })();
+
+  return geocoderPromise;
 }
 
 function getCurrentPosition(): Promise<GeolocationPosition> {
@@ -61,7 +76,7 @@ async function reverseFromCoord(
   lat: number,
   lng: number
 ): Promise<ReverseRegion> {
-  const geocoder = getGeocoder();
+  const geocoder = await getGeocoder();
   if (!geocoder) throw new Error("카카오 지오코더가 아직 로드되지 않았습니다.");
 
   // 법정/행정 코드

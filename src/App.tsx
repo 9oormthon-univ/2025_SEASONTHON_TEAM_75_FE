@@ -21,30 +21,47 @@ import NotFound from "@routes/NotFound";
 import theme from "@styles/theme";
 import ProfileComplete from "@routes/onboarding/ProfileComplete";
 import Feedback from "@routes/setting/Feedback";
+import GuestRedirect from "@routes/onboarding/GuestRedirect";
+import { useKakaoLoader } from "react-kakao-maps-sdk";
 
 function App() {
+  useKakaoLoader({
+    appkey: import.meta.env.VITE_KAKAO_JS_KEY,
+    libraries: ["services"],
+  });
+
   return (
     <>
       <ThemeProvider theme={theme}>
         <GlobalStyle />
         <Router>
           <Routes>
-            <Route
-              path="/"
-              element={
-                <Layout showNavbar={false}>
-                  <Splash />
-                </Layout>
-              }
-            />
-            <Route
-              path="/login"
-              element={
-                <Layout showNavbar={false}>
-                  <Login />
-                </Layout>
-              }
-            />
+            <Route path="/">
+              <Route
+                index
+                element={
+                  <Layout showNavbar={false}>
+                    <Splash />
+                  </Layout>
+                }
+              />
+              <Route
+                path="login"
+                element={
+                  <Layout showNavbar={false}>
+                    <Login />
+                  </Layout>
+                }
+              />
+              <Route
+                path="guest"
+                element={
+                  <Layout showNavbar={false}>
+                    <GuestRedirect />
+                  </Layout>
+                }
+              />
+            </Route>
             <Route path="/profile">
               <Route
                 index

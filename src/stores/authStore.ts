@@ -10,7 +10,7 @@ interface AuthStore {
   actions: {
     checkAuth: () => Promise<AuthStatus>;
     loginWithKakao: () => void;
-    loginAsGuest: () => void;
+    loginAsGuest: () => Promise<void>;
     logout: () => Promise<void>;
   };
 }
@@ -46,15 +46,13 @@ const useAuthStore = create<AuthStore>((set) => ({
       }/api/v1/auth/kakao/login`;
     },
 
-    loginAsGuest: () => {
-      window.location.href = `${
-        import.meta.env.VITE_API_URL
-      }/api/v1/auth/guest/login`;
+    loginAsGuest: async () => {
+      await apiClient.post("/api/v1/auth/guest/login", {});
     },
 
     logout: async () => {
       try {
-        await apiClient.post("/api/v1/auth/kakao/logout");
+        await apiClient.post("/api/v1/auth/logout");
       } finally {
         set({ status: "guest", info: null });
       }

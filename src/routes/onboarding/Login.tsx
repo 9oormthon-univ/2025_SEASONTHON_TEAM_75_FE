@@ -2,9 +2,21 @@ import Kakao from "@/assets/kakao_login.svg";
 import Background from "@assets/start_back.svg";
 import * as L from "./LoginStyle";
 import { useAuthActions } from "@stores/authStore";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
   const { loginWithKakao, loginAsGuest } = useAuthActions();
+  const navigate = useNavigate();
+
+  const handleGuest = async () => {
+    try {
+      await loginAsGuest(); // ← XHR 호출
+      navigate("/guest", { replace: true }); // ← 성공 시 바로 이동
+    } catch (e) {
+      console.error(e);
+      alert("게스트 로그인 실패");
+    }
+  };
 
   return (
     <L.Container>
@@ -14,7 +26,7 @@ const Login = () => {
         <button onClick={loginWithKakao}>
           <img src={Kakao} alt="카카오 로그인" />
         </button>
-        <button onClick={loginAsGuest}>건너뛰기</button>
+        <button onClick={handleGuest}>건너뛰기</button>
       </L.ButtonContainer>
 
       <L.Title>
