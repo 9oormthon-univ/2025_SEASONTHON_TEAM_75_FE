@@ -5,18 +5,10 @@ import React, { useEffect, useState } from "react";
 import BottomSheet from "@components/scan/BottomSheet";
 import PartCard from "@components/scan/PartCard";
 import NoticeIcon from "@/assets/notice.svg";
-import {
-  useScanResultStore,
-  type ApiScanResult,
-} from "@stores/scanResultStore";
+import { useScanResultStore } from "@stores/scanResultStore";
+import type { SimilarTrashItem, ApiTrashDetail } from "@types";
 import apiClient from "@utils/apiClient";
 import { RemoveScroll } from "react-remove-scroll";
-
-interface SimilarItem {
-  trashItemId: number;
-  itemName: string;
-  typeName: string;
-}
 
 const ScanResult: React.FC = () => {
   const location = useLocation();
@@ -30,13 +22,13 @@ const ScanResult: React.FC = () => {
     updateCurrentResult,
   } = useScanResultStore();
   const navigatedApiResult = location.state?.apiResult as
-    | ApiScanResult
+    | ApiTrashDetail
     | undefined;
   const capturedImage = location.state?.capturedImage;
 
   const [open, setOpen] = useState(true);
   const snapPoints = [0.5, 0.9];
-  const [similarItems, setSimilarItems] = useState<SimilarItem[]>([]);
+  const [similarItems, setSimilarItems] = useState<SimilarTrashItem[]>([]);
   const [selectedSimilarItemId, setSelectedSimilarItemId] = useState<
     number | null
   >(null);
@@ -80,7 +72,7 @@ const ScanResult: React.FC = () => {
       if (currentResult) {
         setSelectedSimilarItemId(null);
         try {
-          const response = await apiClient.get<{ data: SimilarItem[] }>(
+          const response = await apiClient.get<{ data: SimilarTrashItem[] }>(
             `/api/v1/trash/${currentResult.id}/items`
           );
           setSimilarItems(response.data.data);
@@ -100,7 +92,7 @@ const ScanResult: React.FC = () => {
     setSelectedSimilarItemId(selectedItemId);
     setIsUpdating(true);
     try {
-      const response = await apiClient.patch<{ data: ApiScanResult }>(
+      const response = await apiClient.patch<{ data: ApiTrashDetail }>(
         `/api/v1/trash/${currentResult.id}/items/${selectedItemId}`
       );
       updateCurrentResult(response.data.data);

@@ -68,9 +68,7 @@ const HistoryEdit = () => {
         {historyItems.map((item) => (
           <HistoryCard
             key={item.id}
-            id={item.id}
-            name={item.name}
-            type={item.type}
+            item={item}
             mode="edit"
             isSelected={selectedIds.includes(item.id)}
             onClick={handleCardClick}

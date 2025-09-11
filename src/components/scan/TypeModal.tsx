@@ -2,18 +2,12 @@ import styled from "styled-components";
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import apiClient from "@utils/apiClient";
-import { type ApiScanResult } from "@stores/scanResultStore";
-
-interface SimilarItem {
-  trashItemId: number;
-  itemName: string;
-  typeName: string;
-}
+import type { SimilarTrashItem, ApiTrashDetail } from "@types";
 
 interface TypeModalProps {
   trashId: number;
   onClose: () => void;
-  onSelect: (newTrashData: ApiScanResult) => void;
+  onSelect: (newTrashData: ApiTrashDetail) => void;
 }
 
 export const ModalOverlay = styled.div`
@@ -133,14 +127,14 @@ const TypeModal: React.FC<TypeModalProps> = ({
   onClose,
   onSelect,
 }) => {
-  const [items, setItems] = useState<SimilarItem[]>([]);
+  const [items, setItems] = useState<SimilarTrashItem[]>([]);
   const [selectedItemId, setSelectedItemId] = useState<number | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchSimilarItems = async () => {
       try {
-        const response = await apiClient.get<{ data: SimilarItem[] }>(
+        const response = await apiClient.get<{ data: SimilarTrashItem[] }>(
           `/api/v1/trash/${trashId}/items`
         );
         setItems(response.data.data);
@@ -159,7 +153,7 @@ const TypeModal: React.FC<TypeModalProps> = ({
     }
 
     try {
-      const response = await apiClient.patch<{ data: ApiScanResult }>(
+      const response = await apiClient.patch<{ data: ApiTrashDetail }>(
         `/api/v1/trash/${trashId}/items/${selectedItemId}`
       );
       onSelect(response.data.data);
