@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import * as L from "@routes/scan/ScanLoadingStyle";
-import LogoImg from "@assets/loading_logo.svg";
-import Typewriter from "typewriter-effect";
+import Lottie from "lottie-react";
+import loadingAnimation from "@assets/search.json";
 
 const ScanLoading = () => {
   const [displayText, setDisplayText] = useState(
@@ -11,25 +11,22 @@ const ScanLoading = () => {
   useEffect(() => {
     const timer = setTimeout(() => {
       setDisplayText("거의 다 왔어요!<br/>쓰레기 버릴 준비 됐나요?");
-    }, 10000);
+    }, 5000);
     return () => clearTimeout(timer);
   }, []);
 
+  const lottieOptions = {
+    loop: true,
+    autoplay: true,
+    animationData: loadingAnimation,
+    style: { width: "350px" },
+  };
+
   return (
     <L.Container>
-      <L.Logo src={LogoImg} alt="로고"></L.Logo>
+      <Lottie {...lottieOptions} />
       <L.Text1>
-        <Typewriter
-          key={displayText}
-          onInit={(typewriter) => {
-            typewriter.typeString(displayText).start();
-          }}
-          options={{
-            loop: true,
-            delay: 80,
-            autoStart: true,
-          }}
-        />
+        <span dangerouslySetInnerHTML={{ __html: displayText }} />
       </L.Text1>
     </L.Container>
   );

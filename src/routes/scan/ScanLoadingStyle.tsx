@@ -9,11 +9,6 @@ export const Container = styled.div`
   justify-content: center;
 `;
 
-export const Logo = styled.img`
-  width: 241px;
-  height: 212px;
-`;
-
 export const Text1 = styled.div`
   color: ${({ theme }) => theme.colors.text1};
   font-family: "Pretendard";
@@ -21,7 +16,7 @@ export const Text1 = styled.div`
   font-size: 24px;
   white-space: pre-line;
   text-align: center;
-  margin: 2rem 0 1rem 0;
+  margin-bottom: 100px;
   display: flex;
   align-items: center;
   justify-content: center;
