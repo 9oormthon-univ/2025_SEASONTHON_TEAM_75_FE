@@ -1,4 +1,3 @@
-// stores/useUserDistrictStore.ts
 import { create } from "zustand";
 import apiClient from "@utils/apiClient";
 import type { Location, UserDistrict } from "@types";
@@ -15,16 +14,10 @@ interface UserDistrictState {
   defaultDistrict: Location | null;
   actions: {
     fetchDistricts: () => Promise<void>;
-
-    // 디폴트 변경
     changeDefault: (userDistrictId: number) => Promise<void>;
 
     // 현재 위치 설정
-    setCurrentDistrict: () => Promise<{
-      label: string;
-      districtId: string; // 법정동 코드 (bcode)
-      sigCode: string; // 시군구 코드 (앞 5자리)
-    } | null>;
+    setCurrentDistrict: () => Promise<Location | null>;
 
     // 자치구 설정
     setDistrict: (district: Location) => Promise<{
@@ -35,6 +28,7 @@ interface UserDistrictState {
 
     // 자치구 삭제
     removeDistrict: (userDistrictId: number) => Promise<void>;
+    setGuestDistrict: (district: Location | null) => void;
   };
 }
 
@@ -177,17 +171,13 @@ const useUserDistrictStore = create<UserDistrictState>((set) => ({
           return null;
         }
 
-        const label =
-          info.addressName ??
-          [info.sido, info.sigungu, info.eupmyeondong]
-            .filter(Boolean)
-            .join(" ");
-
-        return {
-          label,
+        const newLocation: Location = {
           districtId: info.bcode,
-          sigCode: info.bcode.slice(0, 5),
+          sido: info.sido || "",
+          sigugn: info.sigungu || "",
+          eupmyeondong: info.eupmyeondong || "",
         };
+        return newLocation;
       } catch (error) {
         console.error("현재 위치로 자치구 설정 실패:", error);
         return null;
@@ -247,6 +237,13 @@ const useUserDistrictStore = create<UserDistrictState>((set) => ({
       } catch (error) {
         console.error("자치구 삭제에 실패했습니다.", error);
       }
+    },
+
+    setGuestDistrict: (district) => {
+      set({
+        districts: district ? [] : [],
+        defaultDistrict: district,
+      });
     },
   },
 }));
