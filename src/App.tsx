@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "styled-components";
 import { Analytics } from "@vercel/analytics/react";
@@ -23,12 +24,31 @@ import ProfileComplete from "@routes/onboarding/ProfileComplete";
 import Feedback from "@routes/setting/Feedback";
 import GuestRedirect from "@routes/onboarding/GuestRedirect";
 import { useKakaoLoader } from "react-kakao-maps-sdk";
+import { useAuthActions } from "@stores/authStore";
+import { useDistrictActions } from "@stores/userDistrictStore";
 
 function App() {
   useKakaoLoader({
     appkey: import.meta.env.VITE_KAKAO_JS_KEY,
     libraries: ["services"],
   });
+  const authActions = useAuthActions();
+  const districtActions = useDistrictActions();
+
+  useEffect(() => {
+    const initializeApp = async () => {
+      const status = await authActions.checkAuth();
+
+      if (status === "member") {
+        await districtActions.fetchDistricts();
+      } else {
+        const currentLocation = await districtActions.setCurrentDistrict();
+        districtActions.setGuestDistrict(currentLocation);
+      }
+    };
+
+    initializeApp();
+  }, []);
 
   return (
     <>
