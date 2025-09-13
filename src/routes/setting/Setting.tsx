@@ -8,6 +8,7 @@ import LogoutModal from "@components/setting/LogoutModal";
 import WithdrawModal from "@components/setting/WithdrawModal";
 import apiClient from "@utils/apiClient";
 import { useNavigate } from "react-router-dom";
+import { useAuthActions } from "@stores/authStore";
 
 // 타입
 type User = {
@@ -45,6 +46,7 @@ type DistrictResponse = {
 
 const Setting = () => {
   const navigate = useNavigate();
+  const { logout, withdraw } = useAuthActions();
 
   const [isLogoutOpen, setIsLogoutOpen] = useState(false);
   const [isWithdrawOpen, setIsWithdrawOpen] = useState(false);
@@ -89,7 +91,7 @@ const Setting = () => {
   // 로그아웃
   const handleLogout = async () => {
     try {
-      await apiClient.post("/api/v1/auth/kakao/logout");
+      await logout();
       alert("로그아웃 되었습니다.");
       navigate("/");
     } catch (e) {
@@ -103,14 +105,14 @@ const Setting = () => {
   // 탈퇴
   const handleWithdraw = async () => {
     try {
-      await apiClient.delete("/api/v1/users/me");
+      await withdraw();
       alert("탈퇴 되었습니다.");
       navigate("/");
     } catch (e) {
       console.error("탈퇴 실패:", e);
       alert("탈퇴에 실패했습니다. 다시 시도해주세요.");
     } finally {
-      setIsLogoutOpen(false);
+      setIsWithdrawOpen(false);
     }
   };
 

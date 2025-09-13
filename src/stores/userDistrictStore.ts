@@ -141,7 +141,7 @@ const useUserDistrictStore = create<UserDistrictState>((set) => ({
     changeDefault: async (userDistrictId: number) => {
       try {
         const response = await apiClient.patch<{ data: UserDistrict[] }>(
-          `/api/v1/users/my/districts/${userDistrictId}`
+          `/api/v1/users/districts/${userDistrictId}`
         );
         const updatedDistricts = response.data.data || [];
         const newDefault =
