@@ -17,7 +17,7 @@ export const Container = styled.div`
 
 export const Profile = styled.div`
   display: flex;
-  gap: 20px;
+  justify-content: space-between;
   padding: 0 16px;
   margin: 16px;
   align-items: center;
@@ -25,12 +25,18 @@ export const Profile = styled.div`
 
   border-radius: 12px;
   background: var(--white, #fff);
+`;
 
-  img {
-    width: 60px;
-    height: 60px;
-    border-radius: 30px;
-  }
+export const ProfileInfo = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 20px;
+`;
+
+export const ProfileImg = styled.img`
+  width: 60px;
+  height: 60px;
+  border-radius: 30px;
 `;
 
 export const Info = styled.div`
@@ -47,7 +53,7 @@ export const Info = styled.div`
 
   p {
     color: ${({ theme }) => theme.colors.text2};
-    font-size: 16px;
+    font-size: 15px;
     font-weight: 500;
     margin: 0;
   }
