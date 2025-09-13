@@ -239,9 +239,14 @@ const useUserDistrictStore = create<UserDistrictState>((set) => ({
       }
     },
 
+    clearDistricts: () => {
+      set({ districts: [], defaultDistrict: null });
+    },
+
     setGuestDistrict: (district) => {
+      // 게스트 설정 시, 회원 데이터는 없어야 하므로 함께 초기화
       set({
-        districts: district ? [] : [],
+        districts: [],
         defaultDistrict: district,
       });
     },

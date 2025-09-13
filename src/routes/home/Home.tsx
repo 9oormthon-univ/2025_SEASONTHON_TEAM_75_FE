@@ -28,6 +28,8 @@ import type {
   ApiRevisionDetail,
 } from "@types";
 import ScheduleCard from "@components/home/ScheduleCard";
+import { useDistrictActions } from "@stores/userDistrictStore";
+import { useAuthStatus, useAuthActions } from "@stores/authStore";
 
 const getIconForTrashType = (trashTypeName: string): string => {
   const foundType = Object.values(TRASH_TYPES).find(
@@ -64,7 +66,10 @@ const formatRelativeTime = (dateString: string): string => {
 };
 
 const Home = () => {
+  const authStatus = useAuthStatus();
+  const { checkAuth } = useAuthActions();
   const myDistricts = useDistricts();
+  const { fetchDistricts } = useDistrictActions();
   const defaultLocation = useDefaultDistrict();
   const [isModalOpen, setModalOpen] = useState(false);
   const navigate = useNavigate();
@@ -76,6 +81,19 @@ const Home = () => {
     useState<ApiRevisionDetail | null>(null);
   const [isRevisionModalOpen, setRevisionModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const initializeMember = async () => {
+      const status = await checkAuth();
+      console.log(status);
+      if (status === "member") {
+        fetchDistricts();
+      }
+    };
+    if (authStatus === "loading") {
+      initializeMember();
+    }
+  }, [authStatus, checkAuth, fetchDistricts]);
 
   const fetchTrashSchedule = async () => {
     try {
