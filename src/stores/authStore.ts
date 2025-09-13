@@ -47,7 +47,13 @@ const useAuthStore = create<AuthStore>((set) => ({
     },
 
     loginAsGuest: async () => {
-      await apiClient.post("/api/v1/auth/guest/login", {});
+      try {
+        await apiClient.post("/api/v1/auth/guest/login", {});
+        set({ status: "guest", info: null });
+      } catch (error) {
+        console.error("게스트 로그인 API 호출 실패:", error);
+        throw error;
+      }
     },
 
     logout: async () => {

@@ -44,6 +44,7 @@ export const NoHistoryBox = styled.div`
   flex-direction: column;
   align-items: center;
   flex: 1;
+  overflow-y: auto;
   color: ${({ theme }) => theme.colors.text2};
   font-family: "Pretendard";
   font-weight: 500;
@@ -73,4 +74,37 @@ export const CardWrapper = styled.div`
   }
   scrollbar-width: none;
   -ms-overflow-style: none;
+`;
+
+export const LoginBtn = styled.button`
+  all: unset;
+  background-color: ${({ theme }) => theme.colors.text1};
+  color: white;
+  font-family: "Pretendard";
+  font-weight: 600;
+  font-size: 16px;
+  border-radius: 12px;
+  width: 268px;
+  height: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
+
+export const NoLoginBox = styled.div`
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  align-items: center;
+  flex: 1;
+  color: ${({ theme }) => theme.colors.text2};
+  font-family: "Pretendard";
+  font-weight: 500;
+  font-size: 16px;
+  gap: 20px;
+  margin-top: 30%;
+  img {
+    width: 115px;
+    height: 130px;
+  }
 `;

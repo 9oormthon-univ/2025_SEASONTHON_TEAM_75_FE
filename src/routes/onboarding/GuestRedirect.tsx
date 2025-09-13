@@ -1,4 +1,3 @@
-// routes/onboarding/GuestRedirect.tsx
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDistrictActions } from "@stores/userDistrictStore";
@@ -31,7 +30,11 @@ const GuestRedirect = () => {
         const cur = await setCurrentDistrict();
         if (!cur) throw new Error("현재 위치로 자치구를 찾지 못했어요.");
 
-        const parts = parseLabelToParts(cur.label);
+        const label = [cur.sido, cur.sigugn, cur.eupmyeondong]
+          .filter(Boolean)
+          .join(" ");
+
+        const parts = parseLabelToParts(label);
 
         setMsg("자치구 등록 중...");
         const registered = await setDistrict({

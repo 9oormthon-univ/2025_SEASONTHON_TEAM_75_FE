@@ -8,11 +8,13 @@ import apiClient from "@utils/apiClient";
 import { useHistoryStore } from "@stores/historyStore";
 import { HistoryPageSkeleton } from "@components/history/Skeleton";
 import type { ApiTrashDetail } from "@types";
+import { useAuthStatus } from "@stores/authStore";
 
 const History = () => {
   const navigate = useNavigate();
   const { historyItems, setHistoryItems } = useHistoryStore();
   const [isLoading, setIsLoading] = useState(true);
+  const authStatus = useAuthStatus();
 
   useEffect(() => {
     const fetchHistoryData = async () => {
@@ -28,8 +30,13 @@ const History = () => {
       }
     };
 
-    fetchHistoryData();
-  }, []);
+    if (authStatus === "member") {
+      fetchHistoryData();
+    } else if (authStatus === "guest") {
+      setIsLoading(false);
+      setHistoryItems([]);
+    }
+  }, [authStatus, setHistoryItems]);
 
   const historyCount = historyItems.length;
 
@@ -42,6 +49,36 @@ const History = () => {
   const handleCardClick = (id: number) => {
     navigate(`/scan/result/${id}`);
   };
+
+  const handleLoginPage = () => {
+    navigate("/login");
+  };
+
+  if (authStatus === "loading" || isLoading) {
+    return (
+      <H.Container>
+        <Header title={"최근기록"} isBorder={true} />
+        <HistoryPageSkeleton />
+      </H.Container>
+    );
+  }
+
+  if (authStatus === "guest") {
+    return (
+      <H.Container>
+        <Header title={"최근기록"} isBorder={true} />
+        <H.NoLoginBox>
+          <img src={NoHistoryIcon} alt="로그인 필요" />
+          로그인하면
+          <br />
+          최근 기록을 확인할 수 있어요
+          <H.LoginBtn onClick={handleLoginPage}>
+            카카오로 로그인 하기
+          </H.LoginBtn>
+        </H.NoLoginBox>
+      </H.Container>
+    );
+  }
 
   return (
     <H.Container>
@@ -58,8 +95,8 @@ const History = () => {
           </H.SubHeader>
           {historyCount === 0 ? (
             <H.NoHistoryBox>
-              <img src={NoHistoryIcon} alt="기록 없음"></img>아직 저장된 기록이
-              없어요
+              <img src={NoHistoryIcon} alt="기록 없음" />
+              아직 저장된 기록이 없어요
             </H.NoHistoryBox>
           ) : (
             <H.CardWrapper>
