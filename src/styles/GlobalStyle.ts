@@ -2,10 +2,7 @@ import { createGlobalStyle } from "styled-components";
 
 import theme from "./theme";
 
-const GlobalStyle = createGlobalStyle`
-	@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
-  @import url('https://cdn.rawgit.com/innks/NanumSquareRound/master/nanumsquareround.min.css');
-  
+const GlobalStyle = createGlobalStyle` 
   html, body {
     font-family: 'Pretendard', 'NanumSquareRound';
     background-color: #fff;

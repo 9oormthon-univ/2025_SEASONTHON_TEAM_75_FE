@@ -6,6 +6,7 @@ import { useEffect, useRef, useState, type ChangeEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import apiClient from "@utils/apiClient";
 import MainButton from "@components/MainButton";
+import { useAuthActions, useAuthStatus } from "@stores/authStore";
 
 type User = {
   userId: number;
@@ -33,10 +34,19 @@ const ProfileSetting = () => {
   const [submitting, setSubmitting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const { checkAuth } = useAuthActions();
+  const authStatus = useAuthStatus();
+
+  useEffect(() => {
+    if (authStatus !== "member") {
+      checkAuth();
+    }
+  }, [authStatus, checkAuth]);
+
   const [imgSrc, setImgSrc] = useState<string | null>(null);
 
   useEffect(() => {
-    (async () => {
+    const fetchUserProfile = async () => {
       try {
         const { data } = await apiClient.get<UserResponse>("/api/v1/users/me");
         const me = data.data;
@@ -45,8 +55,12 @@ const ProfileSetting = () => {
       } catch (e) {
         console.error("프로필 조회 실패:", e);
       }
-    })();
-  }, []);
+    };
+
+    if (authStatus === "member") {
+      fetchUserProfile();
+    }
+  }, [authStatus]);
 
   useEffect(() => {
     return () => {
