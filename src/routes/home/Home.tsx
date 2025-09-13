@@ -83,15 +83,18 @@ const Home = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const initializeMember = async () => {
-      const status = await checkAuth();
-      console.log(status);
-      if (status === "member") {
+    const initializeUserFlow = async () => {
+      const resolvedStatus = await checkAuth();
+
+      console.log("서버에서 확인된 사용자 상태:", resolvedStatus);
+
+      if (resolvedStatus === "member") {
         fetchDistricts();
       }
     };
+
     if (authStatus === "loading") {
-      initializeMember();
+      initializeUserFlow();
     }
   }, [authStatus, checkAuth, fetchDistricts]);
 
