@@ -12,6 +12,7 @@ interface AuthStore {
     loginWithKakao: () => void;
     loginAsGuest: () => Promise<void>;
     logout: () => Promise<void>;
+    withdraw: () => Promise<void>;
   };
 }
 
@@ -23,7 +24,7 @@ const useAuthStore = create<AuthStore>((set) => ({
     checkAuth: async () => {
       try {
         const { data } = await apiClient.get<{ data: UserInfo }>(
-          "/api/v1/auth/me"
+          "/api/v1/users/me"
         );
         const user: UserInfo = {
           userId: data.data.userId,
@@ -59,6 +60,14 @@ const useAuthStore = create<AuthStore>((set) => ({
     logout: async () => {
       try {
         await apiClient.post("/api/v1/auth/logout");
+      } finally {
+        set({ status: "guest", info: null });
+      }
+    },
+
+    withdraw: async () => {
+      try {
+        await apiClient.delete("/api/v1/users/me");
       } finally {
         set({ status: "guest", info: null });
       }
