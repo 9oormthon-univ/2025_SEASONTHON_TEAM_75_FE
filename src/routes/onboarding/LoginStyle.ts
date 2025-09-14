@@ -66,3 +66,14 @@ export const Title = styled.div`
     margin: 0;
   }
 `;
+
+export const GuestLoading = styled.div`
+  position: absolute;
+  inset: 0;
+  background-color: rgba(255, 255, 255, 0.8);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 10;
+`;

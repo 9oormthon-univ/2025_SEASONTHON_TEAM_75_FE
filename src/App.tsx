@@ -21,7 +21,6 @@ import NotFound from "@routes/NotFound";
 import theme from "@styles/theme";
 import ProfileComplete from "@routes/onboarding/ProfileComplete";
 import Feedback from "@routes/setting/Feedback";
-import GuestRedirect from "@routes/onboarding/GuestRedirect";
 import { useKakaoLoader } from "react-kakao-maps-sdk";
 
 function App() {
@@ -50,14 +49,6 @@ function App() {
                 element={
                   <Layout showNavbar={false}>
                     <Login />
-                  </Layout>
-                }
-              />
-              <Route
-                path="guest"
-                element={
-                  <Layout showNavbar={false}>
-                    <GuestRedirect />
                   </Layout>
                 }
               />
