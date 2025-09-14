@@ -7,6 +7,7 @@ import TrashCard from "@components/home/TrashCard";
 import { useState, useEffect } from "react";
 import TrashCardModal from "@components/home/TrashCardModal";
 import LocationSelectModal from "@components/home/LocationSelectModal";
+import LoginGuideModal from "@components/home/LoginGuideModal";
 import apiClient from "@utils/apiClient";
 import { useNavigate } from "react-router-dom";
 import RankingImg from "@assets/rankingImg.svg";
@@ -72,6 +73,7 @@ const Home = () => {
   const { fetchDistricts } = useDistrictActions();
   const defaultLocation = useDefaultDistrict();
   const [isModalOpen, setModalOpen] = useState(false);
+  const [isLoginGuideModalOpen, setLoginGuideModalOpen] = useState(false);
   const navigate = useNavigate();
   const [scheduleInfo, setScheduleInfo] = useState<ScheduleInfo | null>(null);
   const [rankingList, setRankingList] = useState<RankingItemData[]>([]);
@@ -161,10 +163,16 @@ const Home = () => {
   };
 
   const handleLocationClick = () => {
-    if (myDistricts.length === 0) {
-      navigate("/location");
+    if (authStatus === "loading") return;
+
+    if (authStatus === "member") {
+      if (myDistricts.length === 0) {
+        navigate("/location");
+      } else {
+        setModalOpen(true);
+      }
     } else {
-      setModalOpen(true);
+      setLoginGuideModalOpen(true);
     }
   };
 
@@ -279,6 +287,10 @@ const Home = () => {
       <LocationSelectModal
         isOpen={isModalOpen}
         onClose={() => setModalOpen(false)}
+      />
+      <LoginGuideModal
+        isOpen={isLoginGuideModalOpen}
+        onClose={() => setLoginGuideModalOpen(false)}
       />
     </H.HomeContainer>
   );

@@ -10,6 +10,12 @@ export const ModalOverlay = styled.div`
   height: 100dvh;
   background-color: rgba(0, 0, 0, 0.3);
   z-index: 1000;
+
+  @media screen and (min-width: 1024px) {
+    width: 393px;
+    left: 50%;
+    transform: translateX(-50%);
+  }
 `;
 
 export const ModalContainer = styled.div`

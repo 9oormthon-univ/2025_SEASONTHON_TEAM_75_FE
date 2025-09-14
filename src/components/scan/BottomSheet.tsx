@@ -16,7 +16,7 @@ export const ScrollableContainer = styled.div`
   scrollbar-width: none;
   -ms-overflow-style: none;
 
-  @media screen and (min-width: 1025px) {
+  @media screen and (min-width: 1024px) {
     width: 393px;
     margin: 0 auto;
   }

@@ -21,6 +21,12 @@ export const ModalOverlay = styled.div`
   justify-content: center;
   align-items: center;
   z-index: 1000;
+
+  @media screen and (min-width: 1024px) {
+    width: 393px;
+    left: 50%;
+    transform: translateX(-50%);
+  }
 `;
 
 export const ModalContainer = styled.div`
