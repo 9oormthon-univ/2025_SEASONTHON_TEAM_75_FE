@@ -59,6 +59,30 @@ export const Info = styled.div`
   }
 `;
 
+export const TagContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  padding: 10px 16px 40px 16px;
+
+  h1 {
+    color: ${({ theme }) => theme.colors.text1};
+    font-family: Pretendard;
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 16px;
+    letter-spacing: 0.18px;
+    margin: 0;
+    padding-left: 4px;
+  }
+`;
+
+export const TagItemGroup = styled.div`
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 11px;
+`;
+
 export const ToggleGroup = styled.div`
   display: flex;
   flex-direction: column;

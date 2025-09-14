@@ -10,6 +10,7 @@ import WithdrawModal from "@components/setting/WithdrawModal";
 import { useNavigate } from "react-router-dom";
 import { useAuthActions, useAuthStatus, useMe } from "@stores/authStore";
 import { useDefaultDistrict } from "@stores/userDistrictStore";
+import TagItem from "@components/setting/TagItem";
 
 const Setting = () => {
   const navigate = useNavigate();
@@ -84,10 +85,20 @@ const Setting = () => {
 
         {isMember ? (
           <>
+            <S.TagContainer>
+              <h1>재활용 태그</h1>
+              <S.TagItemGroup>
+                <TagItem type="recycling" />
+                <TagItem type="eco" />
+                <TagItem type="vinyl" />
+                <TagItem type="fire" />
+                <TagItem type="pack" />
+                <TagItem type="lock" />
+              </S.TagItemGroup>
+            </S.TagContainer>
+
             <S.ToggleGroup>
-              <ToggleListItem type="location" />
-              <ToggleListItem type="mic" />
-              <ToggleListItem type="saved" />
+              <ToggleListItem type="alert" />
             </S.ToggleGroup>
 
             <S.Feedback onClick={() => navigate("/setting/feedback")}>
