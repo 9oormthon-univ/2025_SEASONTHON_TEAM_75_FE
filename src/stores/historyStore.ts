@@ -5,6 +5,7 @@ interface HistoryState {
   historyItems: HistoryItem[];
   setHistoryItems: (items: ApiTrashDetail[]) => void;
   deleteHistoryItems: (idsToDelete: number[]) => void;
+  clearHistory: () => void;
 }
 
 export const useHistoryStore = create<HistoryState>((set) => ({
@@ -25,4 +26,6 @@ export const useHistoryStore = create<HistoryState>((set) => ({
         (item) => !idsToDelete.includes(item.id)
       ),
     })),
+
+  clearHistory: () => set({ historyItems: [] }),
 }));
