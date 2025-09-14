@@ -31,7 +31,7 @@ const useAuthStore = create<AuthStore>((set) => ({
         );
         const user: UserInfo = {
           userId: data.data.userId,
-          nickname: data.data.nickname,
+          nickName: data.data.nickName,
           profileImageUrl: data.data.profileImageUrl,
           createdAt: data.data.createdAt,
           updatedAt: data.data.updatedAt,
