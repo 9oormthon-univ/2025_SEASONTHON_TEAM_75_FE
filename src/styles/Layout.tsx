@@ -23,7 +23,7 @@ const Container = styled.div<{ $hasNavbar: boolean }>`
     display: none;
   }
 
-  @media screen and (min-width: 1025px) {
+  @media screen and (min-width: 1024px) {
     width: 393px;
     margin: 0 auto;
   }
