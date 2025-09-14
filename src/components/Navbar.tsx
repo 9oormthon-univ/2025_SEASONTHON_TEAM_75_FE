@@ -4,10 +4,10 @@ import NavHomeIcon from "@assets/nav_home.svg";
 import NavChatIcon from "@assets/nav_chat.png";
 import NavScanIcon from "@assets/nav_scan.svg";
 import NavHistoryIcon from "@assets/nav_history.svg";
-import NavSettingIcon from "@/assets/nav_setting.svg";
+import NavMypageIcon from "@/assets/nav_mypage.svg";
 import NavHomeIconAct from "@assets/nav_home_act.svg";
 import NavHistoryIconAct from "@assets/nav_history_act.svg";
-import NavSettingIconAct from "@/assets/nav_setting_act.svg";
+import NavMypageIconAct from "@/assets/nav_mypage_act.svg";
 
 interface NavItemProps {
   $isActive: boolean;
@@ -109,10 +109,10 @@ function Navbar() {
       </NavItem>
       <NavItem to="/setting" $isActive={isSettingActive}>
         <NavIcon
-          src={isSettingActive ? NavSettingIconAct : NavSettingIcon}
-          alt="설정"
+          src={isSettingActive ? NavMypageIconAct : NavMypageIcon}
+          alt="마이페이지"
         />
-        <span>설정</span>
+        <span>마이페이지</span>
       </NavItem>
     </NavContainer>
   );
