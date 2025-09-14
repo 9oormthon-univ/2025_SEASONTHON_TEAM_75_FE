@@ -1,4 +1,6 @@
 import styled from "styled-components";
+import LocationImg from "@assets/modal_location.svg";
+import { useNavigate } from "react-router-dom";
 
 export const ModalOverlay = styled.div`
   position: fixed;
@@ -22,67 +24,58 @@ export const ModalOverlay = styled.div`
 export const ModalContainer = styled.div`
   background-color: #ffffff;
   border-radius: 20px;
-  padding: 40px 25px 25px 25px;
+  padding: 30px 20px 20px 20px;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
+  justify-content: center;
   align-items: center;
   box-shadow: 0 0 16px 0 rgba(0, 0, 0, 0.25);
-  width: 85%;
+  width: fit-content;
+  gap: 25px;
+`;
+
+export const LocationIcon = styled.img`
+  width: 87px;
+  height: 87px;
 `;
 
 export const Title = styled.div`
   font-family: "Pretendard";
   font-weight: 700;
-  font-size: 20px;
+  font-size: 18px;
   color: ${({ theme }) => theme.colors.text1};
   text-align: center;
 `;
 
-export const Divider = styled.div`
-  width: 95%;
-  height: 1px;
-  background-color: ${({ theme }) => theme.colors.text4};
-  margin: 15px 0;
-`;
-
-export const Description = styled.div`
-  font-family: "Pretendard";
-  font-weight: 500;
-  font-size: 16px;
-  color: ${({ theme }) => theme.colors.text2};
-  margin-bottom: 40px;
-  white-space: pre-wrap;
-`;
-
-export const ConfirmButton = styled.button`
-  width: 100%;
-  padding: 12px 0;
-  border: none;
-  border-radius: 10px;
-  background-color: ${({ theme }) => theme.colors.main};
-  color: #ffffff;
-  font-family: "Pretendard";
-  font-weight: 700;
-  font-size: 18px;
+export const LoginBtn = styled.button`
   cursor: pointer;
+  all: unset;
+  background-color: ${({ theme }) => theme.colors.text1};
+  color: white;
+  font-family: "Pretendard";
+  font-weight: 600;
+  font-size: 16px;
+  border-radius: 12px;
+  width: 268px;
+  height: 50px;
+  display: flex;
   justify-content: center;
   align-items: center;
 `;
 
-interface TrashCardModalProps {
+interface LoginGuideModalProps {
   isOpen: boolean;
   onClose: () => void;
-  title: string;
-  content: string;
 }
 
-const TrashCardModal = ({
-  isOpen,
-  onClose,
-  title,
-  content,
-}: TrashCardModalProps) => {
+const LoginGuideModal = ({ isOpen, onClose }: LoginGuideModalProps) => {
+  const navigate = useNavigate();
+
+  const handleLogin = () => {
+    navigate("/login");
+  };
+
   if (!isOpen) {
     return null;
   }
@@ -90,13 +83,15 @@ const TrashCardModal = ({
   return (
     <ModalOverlay onClick={onClose}>
       <ModalContainer onClick={(e) => e.stopPropagation()}>
-        <Title>{title}</Title>
-        <Divider />
-        <Description>{content}</Description>
-        <ConfirmButton onClick={onClose}>확인</ConfirmButton>
+        <LocationIcon src={LocationImg} alt="위치 아이콘"></LocationIcon>
+        <Title>
+          로그인하면
+          <br />내 동네를 변경할 수 있어요
+        </Title>
+        <LoginBtn onClick={handleLogin}>카카오로 로그인 하기</LoginBtn>
       </ModalContainer>
     </ModalOverlay>
   );
 };
 
-export default TrashCardModal;
+export default LoginGuideModal;

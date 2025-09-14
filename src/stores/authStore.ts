@@ -1,6 +1,9 @@
 import { create } from "zustand";
 import apiClient from "@utils/apiClient";
 import type { UserInfo } from "@types";
+import { useHistoryStore } from "@stores/historyStore";
+import { useScanResultStore } from "@stores/scanResultStore";
+import { useUserDistrictStore } from "@stores/userDistrictStore";
 
 type AuthStatus = "loading" | "member" | "guest";
 
@@ -62,6 +65,9 @@ const useAuthStore = create<AuthStore>((set) => ({
         await apiClient.post("/api/v1/auth/logout");
       } finally {
         set({ status: "guest", info: null });
+        useHistoryStore.getState().clearHistory();
+        useScanResultStore.getState().clearAllResults();
+        useUserDistrictStore.getState().actions.clearDistricts();
       }
     },
 
@@ -70,6 +76,9 @@ const useAuthStore = create<AuthStore>((set) => ({
         await apiClient.delete("/api/v1/users/me");
       } finally {
         set({ status: "guest", info: null });
+        useHistoryStore.getState().clearHistory();
+        useScanResultStore.getState().clearAllResults();
+        useUserDistrictStore.getState().actions.clearDistricts();
       }
     },
   },
