@@ -88,11 +88,12 @@ const Setting = () => {
             <S.TagContainer>
               <h1>재활용 태그</h1>
               <S.TagItemGroup>
-                <TagItem type="recycling" />
-                <TagItem type="eco" />
-                <TagItem type="vinyl" />
-                <TagItem type="fire" />
-                <TagItem type="pack" />
+                {/* 추후 api 연결 예정 */}
+                <TagItem type="lock" />
+                <TagItem type="lock" />
+                <TagItem type="lock" />
+                <TagItem type="lock" />
+                <TagItem type="lock" />
                 <TagItem type="lock" />
               </S.TagItemGroup>
             </S.TagContainer>
