@@ -1,13 +1,10 @@
 import { create } from "zustand";
 import apiClient from "@utils/apiClient";
 import type { Location, UserDistrict } from "@types";
-import type {
-  RegionCodeResultLike,
-  AddressResultLike,
-  GeocoderLike,
-  ReverseRegion,
-} from "@types";
-import { waitKakao } from "@utils/kakao";
+import {
+  getCurrentPosition,
+  reverseFromCoord,
+} from "@utils/location/districtService";
 
 interface UserDistrictState {
   districts: UserDistrict[];
@@ -15,7 +12,11 @@ interface UserDistrictState {
   actions: {
     fetchDistricts: () => Promise<void>;
     changeDefault: (userDistrictId: number) => Promise<void>;
-    setCurrentDistrict: () => Promise<Location | null>;
+    setCurrentDistrict: () => Promise<{
+      label: string;
+      districtId: string; // bcode
+      sigCode: string;
+    } | null>;
     setDistrict: (district: Location) => Promise<{
       label: string;
       districtId: string; // bcode
@@ -24,86 +25,6 @@ interface UserDistrictState {
     removeDistrict: (userDistrictId: number) => Promise<void>;
     setGuestDistrict: (district: Location | null) => void;
     clearDistricts: () => void;
-  };
-}
-
-let geocoderPromise: Promise<GeocoderLike> | null = null;
-
-function getGeocoder(): Promise<GeocoderLike> {
-  if (geocoderPromise) return geocoderPromise;
-
-  geocoderPromise = (async () => {
-    await waitKakao();
-
-    const w = window as unknown as {
-      kakao?: { maps?: { services?: { Geocoder: new () => GeocoderLike } } };
-    };
-    const svc = w.kakao?.maps?.services;
-    if (!svc?.Geocoder) {
-      throw new Error("Kakao services not available");
-    }
-    return new svc.Geocoder() as GeocoderLike;
-  })();
-
-  return geocoderPromise;
-}
-
-function getCurrentPosition(): Promise<GeolocationPosition> {
-  return new Promise((resolve, reject) => {
-    if (!navigator.geolocation)
-      return reject(new Error("Geolocation를 지원하지 않습니다."));
-    navigator.geolocation.getCurrentPosition(resolve, reject, {
-      enableHighAccuracy: true,
-      timeout: 10_000,
-      maximumAge: 0,
-    });
-  });
-}
-
-async function reverseFromCoord(
-  lat: number,
-  lng: number
-): Promise<ReverseRegion> {
-  const geocoder = await getGeocoder();
-  if (!geocoder) throw new Error("카카오 지오코더가 아직 로드되지 않았습니다.");
-
-  // 법정/행정 코드
-  const region = await new Promise<RegionCodeResultLike[]>((res, rej) => {
-    geocoder.coord2RegionCode(lng, lat, (result, status) => {
-      if (status === "OK") res(result);
-      else rej(new Error("coord2RegionCode 실패: " + status));
-    });
-  });
-
-  const legal = region.find((r) => r.region_type === "B"); // 법정동
-
-  // 지번/도로명 주소
-  const addr = await new Promise<AddressResultLike[]>((res, rej) => {
-    geocoder.coord2Address(lng, lat, (result, status) => {
-      if (status === "OK") res(result);
-      else rej(new Error("coord2Address 실패: " + status));
-    });
-  });
-
-  const jibun = addr.find((a) => a.address)?.address ?? undefined;
-
-  // 시/구/동
-  const parts = (legal?.address_name ?? "").split(" ").filter(Boolean);
-  const [sido, sigungu, eupmyeondong] = [parts[0], parts[1], parts[2]];
-
-  return {
-    bcode: legal?.code,
-    addressName: legal?.address_name,
-    sido,
-    sigungu,
-    eupmyeondong,
-    jibunAddress: jibun
-      ? `${jibun.region_1depth_name} ${jibun.region_2depth_name} ${
-          jibun.region_3depth_name
-        } ${jibun.main_address_no}${
-          jibun.sub_address_no ? "-" + jibun.sub_address_no : ""
-        }`
-      : undefined,
   };
 }
 
@@ -166,13 +87,15 @@ export const useUserDistrictStore = create<UserDistrictState>((set) => ({
           return null;
         }
 
-        const newLocation: Location = {
+        const label = [info.sido, info.sigungu, info.eupmyeondong]
+          .filter(Boolean)
+          .join(" ");
+
+        return {
+          label,
           districtId: info.bcode,
-          sido: info.sido || "",
-          sigugn: info.sigungu || "",
-          eupmyeondong: info.eupmyeondong || "",
+          sigCode: info.bcode.slice(0, 5),
         };
-        return newLocation;
       } catch (error) {
         console.error("현재 위치로 자치구 설정 실패:", error);
         return null;
