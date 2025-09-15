@@ -2,9 +2,7 @@ import styled from "styled-components";
 import LocationIcon from "@assets/modal_location.svg";
 
 interface ModalProps {
-  district: string;
   isOpen: boolean;
-  onCancel: () => void;
   onConfirm: () => void;
 }
 
