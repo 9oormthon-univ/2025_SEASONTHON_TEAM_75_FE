@@ -231,7 +231,7 @@ const Home = () => {
           <H.LocationDropdown src={dropdownIcon} alt="드롭다운 아이콘" />
         </H.LocationBox>
       </H.HomeHeader>
-      {isLoading ? (
+      {isLoading || (authStatus === "member" && !scheduleInfo) ? (
         <MainSectionSkeleton />
       ) : (
         <ScheduleCard scheduleInfo={scheduleInfo} />
