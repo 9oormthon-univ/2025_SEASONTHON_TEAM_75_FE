@@ -28,73 +28,83 @@ const SkeletonBase = styled.div`
 `;
 
 const MainSkeletonWrapper = styled(H.MainSection)`
+  display: flex;
+  flex-direction: column;
   align-items: flex-start;
 `;
+
 const SkeletonText = styled(SkeletonBase)<{ width: string; height: string }>`
   width: ${({ width }) => width};
   height: ${({ height }) => height};
   margin-bottom: 8px;
 `;
+const SkeletonIconBox = styled.div`
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+`;
 const SkeletonIcon = styled(SkeletonBase)`
-  width: 130px;
-  height: 130px;
-  border-radius: 50%;
-  position: absolute;
-  bottom: 20px;
-  right: 20px;
+  width: 150px;
+  height: 150px;
 `;
 
 export const MainSectionSkeleton = () => (
   <MainSkeletonWrapper>
-    <SkeletonText width="50px" height="20px" />
-    <SkeletonText width="200px" height="32px" />
+    <SkeletonText width="72px" height="24px" />
+    <SkeletonText width="100px" height="35px" />
     <SkeletonText
-      width="150px"
+      width="180px"
       height="32px"
-      style={{ marginBottom: "16px" }}
+      style={{ marginBottom: "10px" }}
     />
     <SkeletonText width="220px" height="20px" />
-    <SkeletonIcon />
+    <SkeletonIconBox>
+      <SkeletonIcon />
+    </SkeletonIconBox>
   </MainSkeletonWrapper>
 );
 
-const RankingSkeletonWrapper = styled.div`
+const SkeletonRankItem = styled.div`
+  width: 221px;
   display: flex;
-  align-items: center;
-  gap: 12px;
-  width: 100%;
-  padding: 8px;
+  position: relative;
+  flex-direction: column;
+  border-radius: 11px;
+  box-shadow: 0 0 6px 0 rgba(0, 0, 0, 0.07);
+  flex-shrink: 0;
+  background-color: #ffffff;
 `;
-const SkeletonRank = styled(SkeletonBase)`
-  width: 20px;
-  height: 20px;
-`;
+
 const SkeletonImage = styled(SkeletonBase)`
-  width: 48px;
-  height: 48px;
-  border-radius: 8px;
+  width: 100%;
+  height: 134px;
+  object-fit: cover;
+  border-radius: 12px 12px 0 0;
+  align-self: center;
 `;
+
 const SkeletonInfo = styled.div`
-  flex: 1;
+  padding: 4% 6%;
+  display: flex;
+  flex-direction: column;
 `;
 
 export const RankingItemSkeleton = () => (
-  <RankingSkeletonWrapper>
-    <SkeletonRank />
+  <SkeletonRankItem>
     <SkeletonImage />
     <SkeletonInfo>
-      <SkeletonText width="80%" height="20px" />
-      <SkeletonText width="50%" height="16px" style={{ marginTop: "4px" }} />
+      <SkeletonText width="50px" height="27px" />
+      <SkeletonText width="90px" height="13px" style={{ marginTop: "4px" }} />
     </SkeletonInfo>
-  </RankingSkeletonWrapper>
+  </SkeletonRankItem>
 );
 
 const CardSkeletonWrapper = styled.div`
   display: flex;
   align-items: center;
   gap: 12px;
-  width: 100%;
-  padding: 12px;
+  padding: 8px;
   background-color: #ffffff;
   border-radius: 11px;
   box-shadow: 0 0 6px 0 rgba(0, 0, 0, 0.07);
@@ -105,12 +115,19 @@ const CardSkeletonImage = styled(SkeletonBase)`
   border-radius: 8px;
 `;
 
+export const CardSkeletonInfoWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 5px;
+`;
+
 export const TrashCardSkeleton = () => (
   <CardSkeletonWrapper>
     <CardSkeletonImage />
-    <SkeletonInfo>
-      <SkeletonText width="40%" height="24px" />
-      <SkeletonText width="70%" height="20px" style={{ marginTop: "6px" }} />
-    </SkeletonInfo>
+    <CardSkeletonInfoWrapper>
+      <SkeletonText width="80px" height="27px" />
+      <SkeletonText width="100px" height="21px" />
+    </CardSkeletonInfoWrapper>
   </CardSkeletonWrapper>
 );
