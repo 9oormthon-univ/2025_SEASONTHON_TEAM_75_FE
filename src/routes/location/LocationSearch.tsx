@@ -114,18 +114,22 @@ const LocationSearch = () => {
 
   // 리스트에서 선택
   const handlePick = async (d: Location) => {
-    const result = await setDistrict(d);
-    if (!result) return;
+    try {
+      const result = await setDistrict(d);
+      if (!result.ok) return;
 
-    navigate("/location", {
-      replace: true,
-      state: {
-        source: "location_search",
-        setup: false,
-        selected: result.label,
-        from,
-      },
-    });
+      navigate("/location", {
+        replace: true,
+        state: {
+          source: "location_search",
+          setup: false,
+          selected: result.label,
+          from,
+        },
+      });
+    } catch (e) {
+      console.error("자치구 등록 실패:", e);
+    }
   };
 
   // 현재 위치로 찾기

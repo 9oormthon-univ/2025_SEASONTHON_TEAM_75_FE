@@ -1,10 +1,11 @@
 import { create } from "zustand";
 import apiClient from "@utils/apiClient";
-import type { Location, UserDistrict } from "@types";
+import type { Location, UserDistrict, SetDistrictResult } from "@types";
 import {
   getCurrentPosition,
   reverseFromCoord,
 } from "@utils/location/districtService";
+import type { AxiosError } from "axios";
 
 interface UserDistrictState {
   districts: UserDistrict[];
@@ -17,11 +18,7 @@ interface UserDistrictState {
       districtId: string; // bcode
       sigCode: string;
     } | null>;
-    setDistrict: (district: Location) => Promise<{
-      label: string;
-      districtId: string; // bcode
-      sigCode: string;
-    } | null>;
+    setDistrict: (district: Location) => Promise<SetDistrictResult>;
     removeDistrict: (userDistrictId: number) => Promise<void>;
     setGuestDistrict: (district: Location | null) => void;
     clearDistricts: () => void;
@@ -102,10 +99,10 @@ export const useUserDistrictStore = create<UserDistrictState>((set) => ({
       }
     },
 
-    setDistrict: async (district) => {
+    setDistrict: async (district): Promise<SetDistrictResult> => {
       try {
         // 서버 등록
-        const response = await apiClient.post(
+        const response = await apiClient.post<{ data: UserDistrict[] }>(
           `/api/v1/users/districts/${district.districtId}`
         );
 
@@ -125,13 +122,24 @@ export const useUserDistrictStore = create<UserDistrictState>((set) => ({
         });
 
         return {
+          ok: true,
           label,
           districtId: district.districtId,
           sigCode: district.districtId.slice(0, 5),
         };
-      } catch (error) {
+      } catch (e) {
+        const error = e as AxiosError<{ message?: string }>;
+        const status = error.response?.status;
+        const message: string | undefined = error.response?.data.message;
+
+        if (
+          status === 400 &&
+          message === "서비스에서 지원하지 않는 지역입니다."
+        ) {
+          return { ok: false, error: "UNSUPPORTED_REGION" };
+        }
         console.error("자치구 등록 실패:", error);
-        return null;
+        return { ok: false, error: "UNKNOWN" };
       }
     },
 
