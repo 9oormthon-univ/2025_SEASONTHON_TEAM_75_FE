@@ -17,3 +17,18 @@ export interface Sigungu {
   code: string;
   name: string;
 }
+
+// 자치구 설정 타입
+export interface SetDistrictSuccess {
+  ok: true;
+  label: string;
+  districtId: string;
+  sigCode: string;
+}
+
+export interface SetDistrictFailure {
+  ok: false;
+  error: "UNSUPPORTED_REGION" | "UNKNOWN";
+}
+
+export type SetDistrictResult = SetDistrictSuccess | SetDistrictFailure;

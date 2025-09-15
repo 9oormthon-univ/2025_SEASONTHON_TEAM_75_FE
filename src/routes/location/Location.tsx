@@ -11,6 +11,7 @@ import {
 import { useLocation, useNavigate } from "react-router-dom";
 import Header from "@components/Header";
 import LocationDeleteModal from "@components/location/LocationDeleteModal";
+import LocationSupportModal from "@components/location/LocationSupportModal";
 import InfoIcon from "@assets/info.svg";
 import PlusIcon from "@assets/plus.svg";
 import WarnIcon from "@assets/warning.svg";
@@ -243,10 +244,13 @@ function ListPanel({
 
 // 메인
 export default function LocationPage() {
+  const navigate = useNavigate();
+
   const { fetchDistricts, setDistrict, removeDistrict } = useDistrictActions();
   const districts = useDistricts();
 
-  const navigate = useNavigate();
+  const [showSupportModal, setShowSupportModal] = useState(false);
+
   const { state: navState } = useLocation() as { state: LocationState };
   const from = navState?.from;
   // 들어온 경로에 따라 헤더 수정
@@ -280,6 +284,7 @@ export default function LocationPage() {
   // 토스트 메시지
   const [toastTitle, setToastTitle] = useState<string | null>(null);
   const toastTimerRef = useRef<number | null>(null);
+  const toastRef = useRef(false);
 
   const pushToast = useCallback((title: string) => {
     setToastTitle(`${title}`);
@@ -305,7 +310,12 @@ export default function LocationPage() {
   }, []);
 
   useEffect(() => {
-    if (isFromSearch && !isSetupMode && selectedTitleFromQuery) {
+    if (
+      isFromSearch &&
+      !isSetupMode &&
+      selectedTitleFromQuery &&
+      !toastRef.current
+    ) {
       pushToast(`내 동네를 '${selectedTitleFromQuery}'으로 설정했어요`);
       navigate(".", { replace: true, state: { from } });
     }
@@ -537,21 +547,34 @@ export default function LocationPage() {
       eupmyeondong,
     };
 
-    const result = await setDistrict(loc);
-    if (!result) {
-      console.error("자치구 등록 실패");
-      return;
-    }
+    try {
+      const result = await setDistrict(loc);
 
-    await fetchDistricts();
+      // 패널 제거, 기본 리스트로
+      const exitToDefault = () => {
+        setIsSetupMode(false);
+        setSelectedTitle(undefined);
+        if (isFromSearch) {
+          navigate(".", { replace: true, state: { from } });
+        }
+      };
 
-    pushToast(`내 동네를 '${result.label}'으로 설정했어요`);
+      if (!result.ok) {
+        if (result.error === "UNSUPPORTED_REGION") {
+          toastRef.current = true;
+          exitToDefault();
+          setShowSupportModal(true);
+        } else {
+          alert("자치구 등록 실패");
+        }
+        return;
+      }
 
-    setIsSetupMode(false);
-    setSelectedTitle(undefined);
-
-    if (isFromSearch) {
-      navigate(".", { replace: true, state: { from } });
+      await fetchDistricts();
+      pushToast(`내 동네를 '${result.label}'으로 설정했어요`);
+      exitToDefault();
+    } catch (e) {
+      console.error("자치구 등록 처리 실패:", e);
     }
   }, [
     districtIdFromQuery,
@@ -633,6 +656,12 @@ export default function LocationPage() {
         onConfirm={confirmRemove}
       />
 
+      {/* 정보 표시 */}
+      <LocationSupportModal
+        isOpen={showSupportModal}
+        onConfirm={() => setShowSupportModal(false)}
+      />
+
       {showInfo && (
         <L.Info>
           <h1>지역을 설정하는 이유가 무엇인가요?</h1>
@@ -648,7 +677,6 @@ export default function LocationPage() {
           <MainButton
             title="동네 설정 완료"
             onClick={() => navigate("/home")}
-            disabled={state.items.length === 0}
           />
         </L.Complete>
       )}
