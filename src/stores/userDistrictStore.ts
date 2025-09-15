@@ -15,20 +15,15 @@ interface UserDistrictState {
   actions: {
     fetchDistricts: () => Promise<void>;
     changeDefault: (userDistrictId: number) => Promise<void>;
-
-    // 현재 위치 설정
     setCurrentDistrict: () => Promise<Location | null>;
-
-    // 자치구 설정
     setDistrict: (district: Location) => Promise<{
       label: string;
       districtId: string; // bcode
       sigCode: string;
     } | null>;
-
-    // 자치구 삭제
     removeDistrict: (userDistrictId: number) => Promise<void>;
     setGuestDistrict: (district: Location | null) => void;
+    clearDistricts: () => void;
   };
 }
 
@@ -112,7 +107,7 @@ async function reverseFromCoord(
   };
 }
 
-const useUserDistrictStore = create<UserDistrictState>((set) => ({
+export const useUserDistrictStore = create<UserDistrictState>((set) => ({
   districts: [],
   defaultDistrict: null,
 

@@ -1,6 +1,6 @@
 <div align="center">
 
-  <img width="100" height="100" alt="logo" src="https://github.com/user-attachments/assets/360e215b-975a-4588-8ab0-da36f3582566" />
+![서비스소개](https://github.com/user-attachments/assets/846bf2f0-b59d-4c6f-baa2-a4b6e937529e)
 
   <br/>
 

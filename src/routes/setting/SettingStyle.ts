@@ -17,7 +17,7 @@ export const Container = styled.div`
 
 export const Profile = styled.div`
   display: flex;
-  gap: 20px;
+  justify-content: space-between;
   padding: 0 16px;
   margin: 16px;
   align-items: center;
@@ -25,12 +25,18 @@ export const Profile = styled.div`
 
   border-radius: 12px;
   background: var(--white, #fff);
+`;
 
-  img {
-    width: 60px;
-    height: 60px;
-    border-radius: 30px;
-  }
+export const ProfileInfo = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 20px;
+`;
+
+export const ProfileImg = styled.img`
+  width: 60px;
+  height: 60px;
+  border-radius: 30px;
 `;
 
 export const Info = styled.div`
@@ -47,10 +53,34 @@ export const Info = styled.div`
 
   p {
     color: ${({ theme }) => theme.colors.text2};
-    font-size: 16px;
+    font-size: 15px;
     font-weight: 500;
     margin: 0;
   }
+`;
+
+export const TagContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  padding: 10px 16px 40px 16px;
+
+  h1 {
+    color: ${({ theme }) => theme.colors.text1};
+    font-family: Pretendard;
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 16px;
+    letter-spacing: 0.18px;
+    margin: 0;
+    padding-left: 4px;
+  }
+`;
+
+export const TagItemGroup = styled.div`
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 11px;
 `;
 
 export const ToggleGroup = styled.div`

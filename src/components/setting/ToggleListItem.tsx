@@ -2,9 +2,10 @@ import styled from "styled-components";
 import LocationIcon from "@assets/setting_location.svg";
 import MicIcon from "@assets/setting_mic.svg";
 import SavedIcon from "@assets/setting_saved.svg";
+import AlertIcon from "@assets/setting_alert.svg";
 
 interface ToggleProps {
-  type: "location" | "mic" | "saved";
+  type: "location" | "mic" | "saved" | "alert";
 }
 
 const Container = styled.div`
@@ -84,6 +85,7 @@ const ToggleListItem = ({ type }: ToggleProps) => {
     location: { icon: LocationIcon, title: "위치 권한 설정" },
     mic: { icon: MicIcon, title: "음성 권한 설정" },
     saved: { icon: SavedIcon, title: "최근 기록 저장 설정" },
+    alert: { icon: AlertIcon, title: "알림 설정" },
   };
 
   const { icon, title } = mapping[type];

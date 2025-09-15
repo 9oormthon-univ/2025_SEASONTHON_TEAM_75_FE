@@ -9,6 +9,7 @@ interface ScanResultState {
   fetchResultById: (id: number) => Promise<void>;
   clearCurrentResult: () => void;
   updateCurrentResult: (newResult: ApiTrashDetail) => void;
+  clearAllResults: () => void;
 }
 
 export const useScanResultStore = create<ScanResultState>((set, get) => ({
@@ -54,4 +55,6 @@ export const useScanResultStore = create<ScanResultState>((set, get) => ({
       resultsById: { ...state.resultsById, [newResult.id]: newResult },
     }));
   },
+
+  clearAllResults: () => set({ resultsById: {}, currentResult: null }),
 }));

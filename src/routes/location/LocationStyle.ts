@@ -40,10 +40,10 @@ export const Bottom = styled.div<{ $setup?: boolean }>`
 
   z-index: 1;
 
-  /* PC 환경에서 중앙 고정 */
   width: 100vw;
-  @media (hover: hover) and (pointer: fine) {
+  @media screen and (min-width: 1024px) {
     width: 393px;
+    margin: 0 auto;
   }
 
   p {
