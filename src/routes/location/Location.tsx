@@ -16,7 +16,6 @@ import type {
   MyLocationItem,
   LatLng,
   GeoJSONFeature,
-  GeoJSON,
 } from "@types";
 import {
   toLatLngPaths,
@@ -27,6 +26,7 @@ import {
 import SetupPanel from "@components/location/SetupPanel";
 import ListPanel from "@components/location/ListPanel";
 import { useMyLocationList } from "@utils/location/useMyLocationList";
+import { useSigFeatures } from "@utils/location/useSigFeatures";
 
 // 타입
 type KakaoLatLng = {
@@ -80,6 +80,9 @@ export default function LocationPage() {
   } = useMyLocationList();
   const { toastTitle, pushToast } = useToast();
 
+  // 커스텀 훅
+  const { features } = useSigFeatures();
+
   // Kakao SDK
   const [loading] = useKakaoLoader({
     appkey: import.meta.env.VITE_KAKAO_JS_KEY as string,
@@ -93,7 +96,6 @@ export default function LocationPage() {
   );
   const [mapCenter, setMapCenter] = useState<LatLng>(DEFAULT_CENTER);
   const [sigPaths, setSigPaths] = useState<LatLng[][]>([]);
-  const [features, setFeatures] = useState<GeoJSONFeature[] | null>(null);
   const [map, setMap] = useState<KakaoMap | null>(null);
 
   // Modal & Info State
@@ -108,17 +110,7 @@ export default function LocationPage() {
   const toastRef = useRef(false);
 
   // Effects
-  useEffect(() => {
-    fetch("/sig.json")
-      .then((r) => r.json())
-      .then((json: GeoJSON) => setFeatures(json.features))
-      .catch((e) => console.error("sig.json 로드 실패:", e));
-  }, []);
-
-  useEffect(() => {
-    fetchDistricts();
-  }, [fetchDistricts]);
-
+  // store districts - myLocations 동기화
   useEffect(() => {
     const items: MyLocationItem[] = districts.map((ud) => {
       const r = ud.response;
@@ -140,10 +132,17 @@ export default function LocationPage() {
     }
   }, [districts, myLocationActions]);
 
+  // 초기 districts
+  useEffect(() => {
+    fetchDistricts();
+  }, [fetchDistricts]);
+
+  // 위치 에러
   useEffect(() => {
     if (geoError) alert(geoError);
   }, [geoError]);
 
+  // 초기 맵 센터
   useEffect(() => {
     if (
       (myLocation.lat !== DEFAULT_CENTER.lat ||
@@ -155,6 +154,7 @@ export default function LocationPage() {
     }
   }, [myLocation, setupFromQuery, selectedId, DEFAULT_CENTER]);
 
+  // SIG 경계 path 계산
   useEffect(() => {
     let codeToDisplay: string | undefined;
     if (isSetupMode) {
@@ -170,10 +170,13 @@ export default function LocationPage() {
       return;
     }
 
-    const feature = features.find((f) => f.properties.SIG_CD === codeToDisplay);
+    const feature = features.find(
+      (f: GeoJSONFeature) => f.properties.SIG_CD === codeToDisplay
+    );
     setSigPaths(feature ? toLatLngPaths(feature.geometry) : []);
   }, [features, selectedId, myLocations, isSetupMode, sigCodeFromQuery]);
 
+  // bounds 맞추기
   useEffect(() => {
     if (!map || sigPaths.length === 0) return;
     const bounds = new window.kakao.maps.LatLngBounds();
@@ -185,11 +188,13 @@ export default function LocationPage() {
     map.setBounds(bounds);
   }, [map, sigPaths]);
 
+  // 쿼리 state - 로컬 반영
   useEffect(() => {
     setIsSetupMode(setupFromQuery);
     setSelectedTitle(selectedTitleFromQuery);
   }, [setupFromQuery, selectedTitleFromQuery]);
 
+  // 토스트
   useEffect(() => {
     if (
       isFromSearch &&
