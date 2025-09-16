@@ -15,7 +15,7 @@ export const useHistoryStore = create<HistoryState>((set) => ({
     const mappedData = items.map((item) => ({
       id: item.id,
       type: item.typeCode,
-      name: item.itemName || item.name,
+      name: item.name,
     }));
     set({ historyItems: mappedData });
   },
