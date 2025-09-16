@@ -13,7 +13,7 @@ const Button = styled.button<{ $active?: boolean }>`
   justify-content: center;
   align-items: center;
 
-  bottom: 20px;
+  bottom: 32px;
   left: 16px;
 
   padding: 0;

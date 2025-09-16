@@ -63,10 +63,20 @@ const Chat: React.FC = () => {
   const [isListening, setIsListening] = useState(false);
   const [selectedMode, setSelectedMode] = useState<SearchMode | null>(null);
 
+  const isInputDisabled = isListening || selectedMode !== "word";
+
   const lastTranscriptRef = useRef("");
   const sttEndedRef = useRef(false);
 
   const actionsRef = useRef<Actions | null>(null);
+
+  // 입력값 비어있는지, 단어검색 모드인지
+  const validator = (input: string) => {
+    const canInput = !isListening && selectedMode === "word";
+    const hasText = input.trim().length > 0;
+
+    return canInput && hasText;
+  };
 
   const startListening = () => {
     const SpeechRecognitionCtor = resolveSpeechRecognitionCtor();
@@ -136,12 +146,15 @@ const Chat: React.FC = () => {
             ? "메시지를 입력해주세요"
             : "옵션을 선택하세요"
         }
+        validator={validator}
       />
 
-      <ChatMicButton
-        active={selectedMode === "word"}
-        onClick={startListening}
-      />
+      <C.BottomTouchBlocker $disabled={isInputDisabled}>
+        <ChatMicButton
+          active={selectedMode === "word"}
+          onClick={startListening}
+        />
+      </C.BottomTouchBlocker>
     </C.Page>
   );
 };
