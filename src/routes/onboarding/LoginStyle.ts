@@ -16,7 +16,7 @@ export const ButtonContainer = styled.div`
   display: flex;
   flex-direction: column;
   gap: 22px;
-  bottom: 66px;
+  bottom: 50px;
 
   button {
     color: ${({ theme }) => theme.colors.text2};
@@ -44,7 +44,7 @@ export const Title = styled.div`
   gap: 14px;
   position: absolute;
   left: 38px;
-  top: 168px;
+  top: 118px;
 
   h1 {
     color: ${({ theme }) => theme.colors.text1};
