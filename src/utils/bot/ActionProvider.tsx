@@ -1,104 +1,25 @@
 import React from "react";
+import apiClient from "@utils/apiClient";
 import {
   createChatBotMessage as _createChatBotMessage,
   createClientMessage as _makeClientMessage,
 } from "react-chatbot-kit";
-import apiClient from "@utils/apiClient";
-
-// 응답 타입
-type SearchResponse = {
-  httpCode: number;
-  httpStatus: string;
-  message: string;
-  data: {
-    trashDescriptionId: number;
-    guideSteps: string[];
-    cautionNote: string;
-    typeName: string;
-  };
-};
-
-// 상위 카테고리 타입
-type TrashType = {
-  trashTypeId: number;
-  typeCode: string;
-  typeName: string;
-};
-
-type TrashTypesResponse = {
-  httpCode: number;
-  httpStatus: string;
-  message: string;
-  data: TrashType[];
-};
-
-// 하위 카테고리 타입
-type TrashItem = {
-  trashItemId: number;
-  itemName: string;
-  typeName: string;
-};
-
-type TrashItemsResponse = {
-  httpCode: number;
-  httpStatus: string;
-  message: string;
-  data: TrashItem[];
-};
-
-// 유저
-type UserResponse = {
-  httpCode: number;
-  httpStatus: string;
-  message: string;
-  data: {
-    userId: number;
-    nickName: string;
-    profileImageUrl: string | null;
-    createAt: string;
-    updatedAt: string;
-  };
-};
-
-// 공용 타입
-type BotMessage = ReturnType<typeof _createChatBotMessage>;
-type UserMessage = ReturnType<typeof _makeClientMessage>;
-type ChatMessage = BotMessage | UserMessage;
-
-type SearchMode = "word" | "category";
-
-export type ChatState = {
-  messages: ChatMessage[];
-  selectedMode?: SearchMode | null;
-};
+import type {
+  Actions,
+  ChatMessage,
+  ChatState,
+  SearchMode,
+  SearchResponse,
+  TrashItemsResponse,
+  TrashTypesResponse,
+  UserMessage,
+  UserResponse,
+} from "@types";
 
 type PossiblyWidgetMessage = {
   widget?: unknown;
   payload?: unknown;
   props?: Record<string, unknown>;
-};
-
-export type Actions = {
-  selectSearchMode: (mode: SearchMode, title: string) => void;
-  setSelectedMode: (mode: SearchMode | null) => void;
-
-  // STT
-  beginSTT: () => void;
-  updateSTT: (text: string) => void;
-  endSTT: (finalText?: string) => void;
-
-  // 단어 검색 API
-  searchKeyword: (raw: string) => Promise<void>;
-
-  // 카테고리 API
-  fetchTrashTypes: (introText?: string) => Promise<void>;
-  selectTrashCategory: (category: {
-    id: number;
-    name: string;
-    code?: string;
-  }) => void;
-  fetchTrashItemsByTypeId: (trashTypeId: number) => Promise<void>;
-  selectTrashItem: (item: { id: number; name: string }) => void;
 };
 
 export type ActionProviderProps = {

@@ -6,8 +6,7 @@ import SearchWidgetGroup from "@components/chat/SearchWidgetGroup";
 import TrashWidgetGroup from "@components/chat/TrashWidgetGroup";
 import Chatbot from "react-chatbot-kit";
 import TrashItemWidgetGroup from "@components/chat/TrashItemWidgetGroup";
-
-type SearchMode = "word" | "category";
+import type { SearchMode } from "@types";
 
 export type SearchWidgetProps = {
   actions: {

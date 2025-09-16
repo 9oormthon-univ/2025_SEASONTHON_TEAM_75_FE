@@ -1,4 +1,4 @@
-export * from "./kakaoLocation";
+export * from "./chat";
 export * from "./location";
 export * from "./ranking";
 export * from "./revision";

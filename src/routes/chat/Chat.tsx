@@ -7,42 +7,14 @@ import config from "../../utils/bot/config";
 import MessageParser from "../../utils/bot/MessageParser";
 import ActionProvider, {
   type ActionProviderProps,
-  type Actions,
 } from "../../utils/bot/ActionProvider";
 import ChatMicButton from "@components/chat/ChatMicButton";
-
-type SearchMode = "word" | "category";
-
-interface SpeechRecognitionErrorEvent extends Event {
-  error: string;
-  message: string;
-}
-interface SpeechRecognitionAlternativeLike {
-  transcript: string;
-}
-interface SpeechRecognitionResultLike {
-  0: SpeechRecognitionAlternativeLike;
-  isFinal?: boolean;
-}
-interface SpeechRecognitionEvent extends Event {
-  results: {
-    length: number;
-    [index: number]: SpeechRecognitionResultLike;
-  };
-}
-
-interface SpeechRecognitionLike {
-  lang: string;
-  continuous: boolean;
-  interimResults: boolean;
-  onresult: ((event: SpeechRecognitionEvent) => void) | null;
-  onerror: ((event: SpeechRecognitionErrorEvent) => void) | null;
-  onend: (() => void) | null;
-  start: () => void;
-  stop?: () => void;
-  abort?: () => void;
-}
-type SpeechRecognitionConstructor = new () => SpeechRecognitionLike;
+import type {
+  Actions,
+  SearchMode,
+  SpeechRecognitionConstructor,
+  SpeechRecognitionEvent,
+} from "@types";
 
 function resolveSpeechRecognitionCtor(): SpeechRecognitionConstructor | null {
   const w = window as unknown as {
