@@ -1,5 +1,4 @@
 import React from "react";
-import apiClient from "@utils/apiClient";
 import {
   createChatBotMessage as _createChatBotMessage,
   createClientMessage as _makeClientMessage,
@@ -11,7 +10,6 @@ import {
   type ChatState,
   type SearchMode,
   type UserMessage,
-  type UserResponse,
 } from "@types";
 import {
   getMsgId,
@@ -21,6 +19,7 @@ import {
   type MutableChatMessage,
 } from "../message";
 import { BotApi } from "../botApi";
+import { useMe } from "@stores/authStore";
 
 export type ActionProviderProps = {
   createChatBotMessage: typeof _createChatBotMessage;
@@ -43,18 +42,8 @@ const ActionProvider: React.FC<ActionProviderProps> = ({
   onExpose,
 }) => {
   // 사용자 이름
-  const [userName, setUserName] = React.useState<string>("");
-
-  React.useEffect(() => {
-    (async () => {
-      try {
-        const { data } = await apiClient.get<UserResponse>("/api/v1/users/me");
-        setUserName(data?.data?.nickName?.trim() ?? "");
-      } catch (e) {
-        console.error("사용자 조회 실패: ", e);
-      }
-    })();
-  }, []);
+  const me = useMe();
+  const userName = (me?.nickName ?? "").trim();
 
   // 메시지
   const clientMsg = (
