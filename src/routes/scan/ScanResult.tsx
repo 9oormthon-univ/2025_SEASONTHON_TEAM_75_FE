@@ -138,9 +138,7 @@ const ScanResult: React.FC = () => {
           isLoading={isUpdating}
         >
           <R.TopContainer>
-            <R.TrashName>
-              {currentResult.itemName || currentResult.name}
-            </R.TrashName>
+            <R.TrashName>{currentResult.name}</R.TrashName>
             <R.TrashDes>
               {prefix === "R"
                 ? `재활용 쓰레기 : ${currentResult.typeName}`
