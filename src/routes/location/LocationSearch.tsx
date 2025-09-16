@@ -11,9 +11,10 @@ import MainButton from "@components/MainButton";
 import { useDistrictActions } from "@stores/userDistrictStore";
 import type { Location } from "@types";
 import { useDistrictSearch } from "@utils/location/useDistrictSearch";
+import { useCurrentDistrict } from "@utils/location/useCurrentDistrict";
 
 const LocationSearch = () => {
-  const { setCurrentDistrict, setDistrict } = useDistrictActions();
+  const { setDistrict } = useDistrictActions();
 
   const navigate = useNavigate();
   const { state: navState } = useLocation() as {
@@ -34,19 +35,22 @@ const LocationSearch = () => {
     reset,
   } = useDistrictSearch();
 
+  const {
+    resolveCurrentDistrict,
+    loading: currentLoading,
+    error: currentError,
+  } = useCurrentDistrict();
+
   const [loading, error] = useKakaoLoader({
     appkey: import.meta.env.VITE_KAKAO_JS_KEY as string,
     libraries: ["services"],
   });
 
   useEffect(() => {
-    if (error) {
-      console.error("카카오 SDK 로드 실패:", error);
-    }
-    if (loading) {
-      console.log("카카오 SDK 로딩중:", loading);
-    }
-  }, [error, loading]);
+    if (error) console.error("카카오 SDK 로드 실패:", error);
+    if (loading) console.log("카카오 SDK 로딩중:", loading);
+    if (currentError) console.error("현재 위치 해석 실패:", currentError);
+  }, [error, loading, currentError]);
 
   // 리스트에서 선택
   const handlePick = async (d: Location) => {
@@ -70,7 +74,7 @@ const LocationSearch = () => {
 
   // 현재 위치로 찾기
   const handleCurrentPick = async () => {
-    const result = await setCurrentDistrict();
+    const result = await resolveCurrentDistrict();
     if (!result) return;
 
     navigate("/location", {
@@ -113,9 +117,9 @@ const LocationSearch = () => {
       </L.SearchBox>
 
       {!keyword && (
-        <L.Now onClick={handleCurrentPick}>
+        <L.Now onClick={handleCurrentPick} aria-busy={currentLoading}>
           <img src={ScopeIcon} alt="현재 위치" />
-          <p>현재 위치로 찾기</p>
+          <p>{currentLoading ? "현재 위치 확인 중..." : "현재 위치로 찾기"}</p>
         </L.Now>
       )}
 

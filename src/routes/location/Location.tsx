@@ -17,16 +17,14 @@ import type {
   LatLng,
   GeoJSONFeature,
 } from "@types";
-import {
-  toLatLngPaths,
-  useGeoPosition,
-  useQueryLocationState,
-  useToast,
-} from "@utils/location/districtService";
+import { toLatLngPaths } from "@utils/location/districtService";
 import SetupPanel from "@components/location/SetupPanel";
 import ListPanel from "@components/location/ListPanel";
 import { useMyLocationList } from "@utils/location/useMyLocationList";
 import { useSigFeatures } from "@utils/location/useSigFeatures";
+import { useQueryLocationState } from "@utils/location/useQueryLocationState";
+import { useGeoPosition } from "@utils/location/useGeoPosition";
+import { useToast } from "@utils/location/useToast";
 
 // 타입
 type KakaoLatLng = {
@@ -63,8 +61,12 @@ export default function LocationPage() {
   // Hooks
   const navigate = useNavigate();
   const { state: navState } = useLocation();
+
+  // Store
   const { fetchDistricts, setDistrict, removeDistrict } = useDistrictActions();
   const districts = useDistricts();
+
+  // 커스텀 훅
   const {
     isFromSearch,
     setup: setupFromQuery,
@@ -79,8 +81,6 @@ export default function LocationPage() {
     actions: myLocationActions,
   } = useMyLocationList();
   const { toastTitle, pushToast } = useToast();
-
-  // 커스텀 훅
   const { features } = useSigFeatures();
 
   // Kakao SDK
