@@ -183,24 +183,6 @@ export const GuideBox = styled.div`
   flex-direction: column;
 `;
 
-export const StepTitle = styled.div`
-  color: ${({ theme }) => theme.colors.main};
-  background-color: ${({ theme }) => theme.colors.sub1};
-  font-weight: 600;
-  font-size: 14px;
-  width: fit-content;
-  padding: 1px 11px;
-  box-sizing: border-box;
-  border-radius: 20px;
-`;
-
-export const StepContent = styled.div`
-  color: ${({ theme }) => theme.colors.text1};
-  font-weight: 500;
-  font-size: 16px;
-  margin: 10px 0 20px 5px;
-`;
-
 export const Notice = styled.div`
   color: #eb455b;
   background-color: #fdf4f4;

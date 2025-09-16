@@ -4,6 +4,7 @@ import { useLocation, useNavigate, useParams } from "react-router-dom";
 import React, { useEffect, useState } from "react";
 import BottomSheet from "@components/scan/BottomSheet";
 import PartCard from "@components/scan/PartCard";
+import GuideSteps from "@components/scan/GuideSteps";
 import NoticeIcon from "@/assets/notice.svg";
 import { useScanResultStore } from "@stores/scanResultStore";
 import type { SimilarTrashItem, ApiTrashDetail } from "@types";
@@ -112,11 +113,6 @@ const ScanResult: React.FC = () => {
     return null;
   }
 
-  const guideElements = currentResult.guideSteps.flatMap((step, index) => [
-    <R.StepTitle key={`title-${index}`}>STEP {index + 1}</R.StepTitle>,
-    <R.StepContent key={`content-${index}`}>{step}</R.StepContent>,
-  ]);
-
   const prefix = currentResult.typeCode.charAt(0);
 
   return (
@@ -175,7 +171,7 @@ const ScanResult: React.FC = () => {
             <R.MidSection>
               <R.Title>분리배출 가이드</R.Title>
               <R.GuideBox>
-                {guideElements}
+                <GuideSteps steps={currentResult.guideSteps} />
                 {currentResult.cautionNote && (
                   <R.Notice>
                     <R.NoticeIcon src={NoticeIcon} alt="주의" />

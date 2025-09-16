@@ -40,7 +40,7 @@ export const Title = styled.div`
 `;
 
 export const Divider = styled.div`
-  width: 95%;
+  width: 100%;
   height: 1px;
   background-color: ${({ theme }) => theme.colors.text4};
   margin: 15px 0;
@@ -53,6 +53,7 @@ export const Description = styled.div`
   color: ${({ theme }) => theme.colors.text2};
   margin-bottom: 40px;
   white-space: pre-wrap;
+  text-align: center;
 `;
 
 export const ConfirmButton = styled.button`
