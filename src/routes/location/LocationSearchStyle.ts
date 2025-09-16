@@ -44,6 +44,16 @@ export const SearchBox = styled.div`
   }
 `;
 
+export const Empty = styled.div`
+  color: ${({ theme }) => theme.colors.text2};
+  font-family: Pretendard;
+  font-size: 16px;
+  font-weight: 500;
+  text-align: center;
+  white-space: pre-wrap;
+  margin-top: 100px;
+`;
+
 export const Now = styled.button`
   display: flex;
   justify-content: center;
