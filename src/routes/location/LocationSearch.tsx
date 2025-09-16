@@ -77,17 +77,19 @@ const LocationSearch = () => {
     const result = await resolveCurrentDistrict();
     if (!result) return;
 
-    navigate("/location", {
-      replace: true,
-      state: {
-        source: "location_search",
-        setup: true,
-        selected: result.label,
-        districtId: result.districtId,
-        sigCode: result.sigCode,
-        from,
-      },
-    });
+    if (result.ok) {
+      navigate("/location", {
+        replace: true,
+        state: {
+          source: "location_search",
+          setup: true,
+          selected: result.label,
+          districtId: result.districtId,
+          sigCode: result.sigCode,
+          from,
+        },
+      });
+    }
   };
 
   return (
