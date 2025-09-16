@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import * as L from "./LocationSearchStyle";
 import Header from "@components/Header";
@@ -7,19 +7,14 @@ import XIcon from "@/assets/search_x.svg";
 import ScopeIcon from "@/assets/scope.svg";
 import LocationSearchItem from "@components/location/LocationSearchItem";
 import { useKakaoLoader } from "react-kakao-maps-sdk";
-import apiClient from "@utils/apiClient";
 import MainButton from "@components/MainButton";
 import { useDistrictActions } from "@stores/userDistrictStore";
-import type { Location, Sigungu } from "@types";
-
-type GeoJSONFeature = {
-  type: "Feature";
-  properties: { SIG_CD: string; SIG_KOR_NM: string };
-};
-type GeoJSON = { type: "FeatureCollection"; features: GeoJSONFeature[] };
+import type { Location } from "@types";
+import { useDistrictSearch } from "@utils/location/useDistrictSearch";
+import { useCurrentDistrict } from "@utils/location/useCurrentDistrict";
 
 const LocationSearch = () => {
-  const { setCurrentDistrict, setDistrict } = useDistrictActions();
+  const { setDistrict } = useDistrictActions();
 
   const navigate = useNavigate();
   const { state: navState } = useLocation() as {
@@ -27,97 +22,35 @@ const LocationSearch = () => {
   };
   const from = navState?.from;
 
-  const [isSearchMode, setIsSearchMode] = useState(false);
-  const [keyword, setKeyword] = useState("");
+  // 커스텀 훅
+  const {
+    keyword,
+    setKeyword,
+    results,
+    selected,
+    setSelected,
+    searching,
+    hasSearched,
+    search,
+    reset,
+  } = useDistrictSearch();
 
-  // 선택된 자치구
-  const [selectedDistrict, setSelectedDistrict] = useState<Location | null>(
-    null
-  );
-
-  const [results, setResults] = useState<Location[]>([]); // api 응답
-  const [hasSearched, setHasSearched] = useState(false); // 검색 완료 여부
-  const [searching, setSearching] = useState(false); // 검색 중 여부 추가
+  const {
+    resolveCurrentDistrict,
+    loading: currentLoading,
+    error: currentError,
+  } = useCurrentDistrict();
 
   const [loading, error] = useKakaoLoader({
     appkey: import.meta.env.VITE_KAKAO_JS_KEY as string,
     libraries: ["services"],
   });
 
-  const [sigunguList, setSigunguList] = useState<Sigungu[]>([]);
   useEffect(() => {
-    // sigunguList 미사용 (임시)
-    if (sigunguList.length) void sigunguList[0];
-  }, [sigunguList]);
-
-  useEffect(() => {
-    if (error) {
-      console.error("카카오 SDK 로드 실패:", error);
-    }
-    if (loading) {
-      console.log("카카오 SDK 로딩중:", loading);
-    }
-  }, [error, loading]);
-
-  useEffect(() => {
-    fetch("/sig.json")
-      .then((res) => res.json())
-      .then((data: GeoJSON) => {
-        const list = data.features.map((feature) => ({
-          code: feature.properties.SIG_CD,
-          name: feature.properties.SIG_KOR_NM,
-        }));
-        setSigunguList(list);
-      })
-      .catch((e) => console.error("sig.json 로드 실패:", e));
-  }, []);
-
-  const handleSearch = async () => {
-    const parts = keyword.trim().split(/\s+/).filter(Boolean);
-    if (!parts.length) return;
-
-    setSelectedDistrict(null);
-    setSearching(true); // 검색 시작
-    setHasSearched(false);
-
-    try {
-      if (parts.length >= 2) {
-        const { data } = await apiClient.get("/api/v1/districts", {
-          params: { sido: parts[0], sigungu: parts.slice(1).join(" ") },
-        });
-        setResults(data?.data ?? []);
-        return;
-      }
-
-      // 한 단어
-      const q = parts[0];
-      const [bySido, bySigungu] = await Promise.all([
-        apiClient.get("/api/v1/districts", { params: { sido: q } }),
-        apiClient.get("/api/v1/districts", { params: { sigungu: q } }),
-      ]);
-
-      const merged: Location[] = [
-        ...(bySido.data?.data ?? []),
-        ...(bySigungu.data?.data ?? []),
-      ];
-
-      // 중복 제거
-      const unique = Object.values(
-        merged.reduce(
-          (acc, d) => ((acc[d.districtId] = d), acc),
-          {} as Record<string, Location>
-        )
-      );
-
-      setResults(unique);
-    } catch (e) {
-      console.error("검색 실패:", e);
-      setResults([]);
-    } finally {
-      setSearching(false); // 검색 종료
-      setHasSearched(true); // 판정 -> 항상 종료 후
-    }
-  };
+    if (error) console.error("카카오 SDK 로드 실패:", error);
+    if (loading) console.log("카카오 SDK 로딩중:", loading);
+    if (currentError) console.error("현재 위치 해석 실패:", currentError);
+  }, [error, loading, currentError]);
 
   // 리스트에서 선택
   const handlePick = async (d: Location) => {
@@ -141,37 +74,21 @@ const LocationSearch = () => {
 
   // 현재 위치로 찾기
   const handleCurrentPick = async () => {
-    const result = await setCurrentDistrict();
+    const result = await resolveCurrentDistrict();
     if (!result) return;
 
-    navigate("/location", {
-      replace: true,
-      state: {
-        source: "location_search",
-        setup: true,
-        selected: result.label,
-        districtId: result.districtId,
-        sigCode: result.sigCode,
-        from,
-      },
-    });
-  };
-
-  // 키보드 설정
-  const handleFocus = () => setIsSearchMode(true);
-  const handleBlur = () => {
-    if (keyword.trim().length === 0) setIsSearchMode(false);
-  };
-  const handleChange = (v: string) => {
-    setKeyword(v);
-
-    if (v.trim().length === 0) {
-      setIsSearchMode(false);
-      setResults([]);
-      setSelectedDistrict(null);
-      setHasSearched(false);
-    } else {
-      setIsSearchMode(true);
+    if (result.ok) {
+      navigate("/location", {
+        replace: true,
+        state: {
+          source: "location_search",
+          setup: true,
+          selected: result.label,
+          districtId: result.districtId,
+          sigCode: result.sigCode,
+          from,
+        },
+      });
     }
   };
 
@@ -185,32 +102,26 @@ const LocationSearch = () => {
           type="text"
           placeholder="시군구 단위로 검색해 주세요"
           value={keyword}
-          onFocus={handleFocus}
-          onBlur={handleBlur}
-          onChange={(e) => handleChange(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") handleSearch();
+          onFocus={() => {}}
+          onBlur={() => {
+            if (keyword.trim().length === 0) {
+              reset();
+            }
           }}
+          onChange={(e) => setKeyword(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && search()}
         />
         {keyword && (
-          <button
-            onClick={() => {
-              setKeyword("");
-              setResults([]);
-              setSelectedDistrict(null);
-              setIsSearchMode(false);
-              setHasSearched(false);
-            }}
-          >
+          <button onClick={reset}>
             <img src={XIcon} alt="취소" />
           </button>
         )}
       </L.SearchBox>
 
-      {!isSearchMode && (
-        <L.Now onClick={handleCurrentPick}>
+      {!keyword && (
+        <L.Now onClick={handleCurrentPick} aria-busy={currentLoading}>
           <img src={ScopeIcon} alt="현재 위치" />
-          <p>현재 위치로 찾기</p>
+          <p>{currentLoading ? "현재 위치 확인 중..." : "현재 위치로 찾기"}</p>
         </L.Now>
       )}
 
@@ -232,8 +143,8 @@ const LocationSearch = () => {
             <LocationSearchItem
               key={d.districtId}
               title={label}
-              isSelected={selectedDistrict?.districtId === d.districtId}
-              onClick={() => setSelectedDistrict(d)}
+              isSelected={selected?.districtId === d.districtId}
+              onClick={() => setSelected(d)}
             />
           );
         })}
@@ -242,12 +153,8 @@ const LocationSearch = () => {
       <L.Button>
         <MainButton
           title="등록"
-          disabled={!selectedDistrict}
-          onClick={() => {
-            if (selectedDistrict) {
-              handlePick(selectedDistrict);
-            }
-          }}
+          disabled={!selected}
+          onClick={() => selected && handlePick(selected)}
         />
       </L.Button>
     </L.Page>

@@ -1,10 +1,6 @@
 import { create } from "zustand";
 import apiClient from "@utils/apiClient";
 import type { Location, UserDistrict, SetDistrictResult } from "@types";
-import {
-  getCurrentPosition,
-  reverseFromCoord,
-} from "@utils/location/districtService";
 import type { AxiosError } from "axios";
 
 interface UserDistrictState {
@@ -13,11 +9,6 @@ interface UserDistrictState {
   actions: {
     fetchDistricts: () => Promise<void>;
     changeDefault: (userDistrictId: number) => Promise<void>;
-    setCurrentDistrict: () => Promise<{
-      label: string;
-      districtId: string; // bcode
-      sigCode: string;
-    } | null>;
     setDistrict: (district: Location) => Promise<SetDistrictResult>;
     removeDistrict: (userDistrictId: number) => Promise<void>;
     setGuestDistrict: (district: Location | null) => void;
@@ -68,34 +59,6 @@ export const useUserDistrictStore = create<UserDistrictState>((set) => ({
         });
       } catch (error) {
         console.error("기본 자치구 변경에 실패했습니다.", error);
-      }
-    },
-
-    setCurrentDistrict: async () => {
-      try {
-        // 현재 좌표
-        const pos = await getCurrentPosition();
-        const { latitude, longitude } = pos.coords;
-
-        // 좌표 -> 법정동 코드/주소
-        const info = await reverseFromCoord(latitude, longitude);
-        if (!info.bcode) {
-          console.error("법정동 코드(bcode)를 찾지 못했습니다.", info);
-          return null;
-        }
-
-        const label = [info.sido, info.sigungu, info.eupmyeondong]
-          .filter(Boolean)
-          .join(" ");
-
-        return {
-          label,
-          districtId: info.bcode,
-          sigCode: info.bcode.slice(0, 5),
-        };
-      } catch (error) {
-        console.error("현재 위치로 자치구 설정 실패:", error);
-        return null;
       }
     },
 
