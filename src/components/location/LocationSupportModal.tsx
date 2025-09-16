@@ -94,7 +94,7 @@ function LocationSupportModal({ isOpen, onConfirm }: ModalProps) {
       <Container onClick={(e) => e.stopPropagation()}>
         <img src={LocationIcon} alt="지원하지 않는 지역" />
         <Title>지원하지 않는 지역</Title>
-        <SubTitle>{`현재는 서울 내 자치구만 지원중이에요.\n다른 지역이 업데이트되면 알려드릴게요!`}</SubTitle>
+        <SubTitle>{`현재는 일부 지역만 지원중이에요.\n다른 지역이 업데이트되면 알려드릴게요!`}</SubTitle>
         <ConfirmButton onClick={onConfirm}>확인하고 계속하기</ConfirmButton>
       </Container>
     </Background>
