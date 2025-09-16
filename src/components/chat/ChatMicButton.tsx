@@ -15,6 +15,7 @@ const Button = styled.button<{ $active?: boolean }>`
 
   bottom: 32px;
   left: 16px;
+  z-index: 300;
 
   padding: 0;
 `;

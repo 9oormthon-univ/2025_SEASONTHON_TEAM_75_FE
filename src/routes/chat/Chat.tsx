@@ -149,12 +149,11 @@ const Chat: React.FC = () => {
         validator={validator}
       />
 
-      <C.BottomTouchBlocker $disabled={isInputDisabled}>
-        <ChatMicButton
-          active={selectedMode === "word"}
-          onClick={startListening}
-        />
-      </C.BottomTouchBlocker>
+      <C.BottomTouchBlocker $disabled={isInputDisabled} />
+      <ChatMicButton
+        active={selectedMode === "word"}
+        onClick={startListening}
+      />
     </C.Page>
   );
 };
