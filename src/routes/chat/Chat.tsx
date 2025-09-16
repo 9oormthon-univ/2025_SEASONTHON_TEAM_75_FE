@@ -3,11 +3,11 @@ import Chatbot from "react-chatbot-kit";
 import "react-chatbot-kit/build/main.css";
 import "../../styles/chatbot.css";
 import * as C from "./ChatStyle";
-import config from "../../utils/bot/config";
-import MessageParser from "../../utils/bot/MessageParser";
+import config from "../../utils/chat/bot/config";
+import MessageParser from "../../utils/chat/bot/MessageParser";
 import ActionProvider, {
   type ActionProviderProps,
-} from "../../utils/bot/ActionProvider";
+} from "../../utils/chat/bot/ActionProvider";
 import ChatMicButton from "@components/chat/ChatMicButton";
 import type {
   Actions,

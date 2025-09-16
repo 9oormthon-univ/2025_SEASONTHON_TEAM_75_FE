@@ -79,6 +79,13 @@ export interface Actions {
 }
 
 // 위젯
+export const WidgetNames = {
+  Search: "searchWidgets",
+  TrashType: "trashTypeWidgets",
+  TrashItem: "trashItemWidgets",
+} as const;
+export type WidgetName = (typeof WidgetNames)[keyof typeof WidgetNames];
+
 export type TrashTypePayload = Array<{
   id: number;
   code?: string;
