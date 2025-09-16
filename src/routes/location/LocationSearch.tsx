@@ -36,6 +36,8 @@ const LocationSearch = () => {
   );
 
   const [results, setResults] = useState<Location[]>([]); // api 응답
+  const [hasSearched, setHasSearched] = useState(false); // 검색 완료 여부
+  const [searching, setSearching] = useState(false); // 검색 중 여부 추가
 
   const [loading, error] = useKakaoLoader({
     appkey: import.meta.env.VITE_KAKAO_JS_KEY as string,
@@ -75,6 +77,8 @@ const LocationSearch = () => {
     if (!parts.length) return;
 
     setSelectedDistrict(null);
+    setSearching(true); // 검색 시작
+    setHasSearched(false);
 
     try {
       if (parts.length >= 2) {
@@ -109,6 +113,9 @@ const LocationSearch = () => {
     } catch (e) {
       console.error("검색 실패:", e);
       setResults([]);
+    } finally {
+      setSearching(false); // 검색 종료
+      setHasSearched(true); // 판정 -> 항상 종료 후
     }
   };
 
@@ -162,6 +169,7 @@ const LocationSearch = () => {
       setIsSearchMode(false);
       setResults([]);
       setSelectedDistrict(null);
+      setHasSearched(false);
     } else {
       setIsSearchMode(true);
     }
@@ -175,7 +183,7 @@ const LocationSearch = () => {
         <img src={SearchIcon} alt="검색" />
         <input
           type="text"
-          placeholder="내 동네를 검색하세요"
+          placeholder="시군구 단위로 검색해 주세요"
           value={keyword}
           onFocus={handleFocus}
           onBlur={handleBlur}
@@ -191,6 +199,7 @@ const LocationSearch = () => {
               setResults([]);
               setSelectedDistrict(null);
               setIsSearchMode(false);
+              setHasSearched(false);
             }}
           >
             <img src={XIcon} alt="취소" />
@@ -203,6 +212,15 @@ const LocationSearch = () => {
           <img src={ScopeIcon} alt="현재 위치" />
           <p>현재 위치로 찾기</p>
         </L.Now>
+      )}
+
+      {/* 검색 결과 없을 때 */}
+      {!searching && hasSearched && results.length === 0 && (
+        <L.Empty>
+          {
+            "현재는 서울 내 자치구만 지원중이에요.\n다른 지역이 업데이트되면 알려드릴게요!\n\n(검색 예시: 서울특별시, 서울, 마포 ...)"
+          }
+        </L.Empty>
       )}
 
       <L.SearchList>
