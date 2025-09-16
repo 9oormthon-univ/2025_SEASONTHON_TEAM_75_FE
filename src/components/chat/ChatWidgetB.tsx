@@ -18,6 +18,7 @@ const Container = styled.div<{ $selected: boolean }>`
   padding: 15px 12px;
   flex-direction: column;
   gap: 4px;
+  width: 150px;
 
   border-radius: 15px;
   border: 1px solid
