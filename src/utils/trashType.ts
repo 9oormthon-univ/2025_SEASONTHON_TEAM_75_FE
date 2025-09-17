@@ -48,3 +48,8 @@ export interface TrashTypeInfo {
 export const getTrashType = (typeCode: string): TrashTypeInfo => {
   return TRASH_TYPES[typeCode] || TRASH_TYPES.UNK;
 };
+
+export const isRecyclableType = (typeCode: string): boolean => {
+  const nonRecyclableTypes = ["N01", "F01", "B01", "UNK"];
+  return !nonRecyclableTypes.includes(typeCode);
+};

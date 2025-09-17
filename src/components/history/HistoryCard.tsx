@@ -1,9 +1,10 @@
 import styled from "styled-components";
 import RecyclingIcon from "@assets/recycling.svg";
+import TrashCanIcon from "@assets/trash_icon.svg";
 import Arrow from "@assets/history_arrow.svg";
 import NonSelectIcon from "@assets/history_nosel.svg";
 import SelectIcon from "@assets/history_sel.svg";
-import { getTrashType } from "@utils/trashType";
+import { getTrashType, isRecyclableType } from "@utils/trashType";
 import type { HistoryItem } from "@types";
 
 export const Container = styled.div`
@@ -81,6 +82,7 @@ const HistorytCard = ({
 }: HistoryCardProps) => {
   const { id, type, name } = item;
   const trashType = getTrashType(type);
+  const isRecyclable = isRecyclableType(type);
 
   const renderRightIcon = () => {
     if (mode === "edit") {
@@ -98,7 +100,10 @@ const HistorytCard = ({
         <InfoWrapper>
           <Name>{name}</Name>
           <Type>
-            <Icon src={RecyclingIcon} alt="재활용 아이콘" />
+            <Icon
+              src={isRecyclable ? RecyclingIcon : TrashCanIcon}
+              alt={isRecyclable ? "재활용 아이콘" : "일반 쓰레기 아이콘"}
+            />
             {trashType.nameKo}
           </Type>
         </InfoWrapper>
