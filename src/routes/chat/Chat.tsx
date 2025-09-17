@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import { useRef, useState } from "react";
 import Chatbot from "react-chatbot-kit";
 import "react-chatbot-kit/build/main.css";
 import "../../styles/chatbot.css";
@@ -31,7 +31,7 @@ function resolveSpeechRecognitionCtor(): SpeechRecognitionConstructor | null {
   return (ctor as unknown as SpeechRecognitionConstructor) ?? null;
 }
 
-const Chat: React.FC = () => {
+const Chat = () => {
   const [isListening, setIsListening] = useState(false);
   const [selectedMode, setSelectedMode] = useState<SearchMode | null>(null);
 

@@ -21,16 +21,14 @@ import {
 import { BotApi } from "../botApi";
 import { useMe } from "@stores/authStore";
 
+// Props
 export type ActionProviderProps = {
   createChatBotMessage: typeof _createChatBotMessage;
   createClientMessage?: typeof _makeClientMessage;
   setState: React.Dispatch<React.SetStateAction<ChatState>>;
   children: React.ReactNode;
-
   setSelectedMode: React.Dispatch<React.SetStateAction<SearchMode | null>>;
-
-  // STT
-  onExpose?: (actions: Actions) => void;
+  onExpose?: (actions: Actions) => void; // STT
 };
 
 const ActionProvider: React.FC<ActionProviderProps> = ({
