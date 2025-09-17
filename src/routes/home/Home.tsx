@@ -4,6 +4,7 @@ import locationIcon from "@assets/location.svg";
 import dropdownIcon from "@assets/dropdown.svg";
 import RankingItem from "@components/home/RankingItem";
 import TrashCard from "@components/home/TrashCard";
+import AdBanner from "@components/home/AdBanner";
 import { useState, useEffect } from "react";
 import TrashCardModal from "@components/home/TrashCardModal";
 import LocationSelectModal from "@components/home/LocationSelectModal";
@@ -257,6 +258,7 @@ const Home = () => {
                 />
               ))}
         </H.RankingWrapper>
+        <AdBanner />
         <SectionHeader
           title="최신 개정 쓰레기"
           subtitle="최신 개정 반영중"

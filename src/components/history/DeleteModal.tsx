@@ -13,7 +13,7 @@ export const ModalOverlay = styled.div`
   align-items: center;
   z-index: 1000;
 
-  @media screen and (min-width: 1024px) {
+  @media screen and (min-width: 1025px) {
     width: 393px;
     left: 50%;
     transform: translateX(-50%);
