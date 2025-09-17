@@ -106,7 +106,6 @@ const BottomSheet: React.FC<CustomBottomSheetProps> = ({
             </div>
           </ScrollableContainer>
 
-          {/* 로딩 시 콘텐츠 위에 오버레이를 띄웁니다. */}
           {isLoading && (
             <SheetSpinnerOverlay>
               <Spinner />
