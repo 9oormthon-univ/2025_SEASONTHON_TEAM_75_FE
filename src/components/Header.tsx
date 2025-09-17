@@ -1,11 +1,13 @@
 import styled from "styled-components";
 import BackIcon from "@/assets/back.svg";
+import CloseIcon from "@/assets/header_close.svg";
 import { useNavigate } from "react-router-dom";
 
 interface HeaderProps {
   title: string;
   rightButton?: React.ReactNode;
   isBackButton?: boolean;
+  isCloseButton?: boolean;
   isBorder?: boolean;
 }
 
@@ -60,14 +62,21 @@ const Spacer = styled.div`
   width: 65px;
 `;
 
-function Header({ title, rightButton, isBackButton, isBorder }: HeaderProps) {
+function Header({
+  title,
+  rightButton,
+  isBackButton,
+  isCloseButton,
+  isBorder,
+}: HeaderProps) {
   const navigate = useNavigate();
+  const iconSrc = isCloseButton ? CloseIcon : BackIcon;
 
   return (
     <Container $isBorder={isBorder}>
       {isBackButton ? (
         <BackButton onClick={() => navigate(-1)}>
-          <img src={BackIcon} alt="홈" />
+          <img src={iconSrc} alt="홈" />
         </BackButton>
       ) : (
         <Spacer />

@@ -72,9 +72,7 @@ const History = () => {
           로그인하면
           <br />
           최근 기록을 확인할 수 있어요
-          <H.LoginBtn onClick={handleLoginPage}>
-            카카오로 로그인 하기
-          </H.LoginBtn>
+          <H.LoginBtn onClick={handleLoginPage}>카카오로 로그인하기</H.LoginBtn>
         </H.NoLoginBox>
       </H.Container>
     );

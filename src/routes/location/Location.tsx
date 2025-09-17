@@ -316,6 +316,7 @@ export default function LocationPage() {
       <Header
         title="내 동네 설정"
         isBackButton={from === "home"}
+        isCloseButton={from === "home"}
         rightButton={
           <button onClick={() => setShowInfo((v) => !v)}>
             <img src={InfoIcon} alt="정보" />

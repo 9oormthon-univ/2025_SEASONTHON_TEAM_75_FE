@@ -88,7 +88,7 @@ const LoginGuideModal = ({ isOpen, onClose }: LoginGuideModalProps) => {
           로그인하면
           <br />내 동네를 변경할 수 있어요
         </Title>
-        <LoginBtn onClick={handleLogin}>카카오로 로그인 하기</LoginBtn>
+        <LoginBtn onClick={handleLogin}>카카오로 로그인하기</LoginBtn>
       </ModalContainer>
     </ModalOverlay>
   );
