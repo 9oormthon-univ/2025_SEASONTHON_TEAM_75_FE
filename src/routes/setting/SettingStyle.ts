@@ -63,7 +63,7 @@ export const TagContainer = styled.div`
   display: flex;
   flex-direction: column;
   gap: 15px;
-  padding: 10px 16px 40px 16px;
+  padding: 10px 16px 20px 16px;
 
   h1 {
     color: ${({ theme }) => theme.colors.text1};
@@ -81,16 +81,6 @@ export const TagItemGroup = styled.div`
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 11px;
-`;
-
-export const ToggleGroup = styled.div`
-  display: flex;
-  flex-direction: column;
-
-  border-radius: 12px;
-  background: white;
-  margin: 10px 16px 0 16px;
-  padding: 8px 0;
 `;
 
 export const Feedback = styled.div`

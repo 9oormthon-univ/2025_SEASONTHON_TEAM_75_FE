@@ -1,6 +1,5 @@
 import Header from "@components/Header";
 import * as S from "./SettingStyle";
-import ToggleListItem from "@components/setting/ToggleListItem";
 import FeedbackIcon from "@assets/setting_feedback.svg";
 import ArrowIcon from "@assets/history_arrow.svg";
 import ProfileImg from "@assets/profile.svg";
@@ -97,10 +96,6 @@ const Setting = () => {
                 <TagItem type="lock" />
               </S.TagItemGroup>
             </S.TagContainer>
-
-            <S.ToggleGroup>
-              <ToggleListItem type="alert" />
-            </S.ToggleGroup>
 
             <S.Feedback onClick={() => navigate("/setting/feedback")}>
               <S.Left>
