@@ -5,6 +5,7 @@ import { useAuthActions } from "@stores/authStore";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { useDistrictActions } from "@stores/userDistrictStore";
+import { useCurrentDistrict } from "@utils/location/useCurrentDistrict";
 
 const parseLabelToParts = (label?: string) => {
   const [sido, sigungu, eupmyeondong] = (label ?? "")
@@ -19,7 +20,8 @@ const parseLabelToParts = (label?: string) => {
 
 const Login = () => {
   const { loginWithKakao, loginAsGuest } = useAuthActions();
-  const { setCurrentDistrict, setDistrict } = useDistrictActions();
+  const { setDistrict } = useDistrictActions();
+  const { resolveCurrentDistrict } = useCurrentDistrict();
   const navigate = useNavigate();
 
   const [loadingMsg, setLoadingMsg] = useState<string | null>(null);
@@ -30,20 +32,20 @@ const Login = () => {
       await loginAsGuest();
 
       setLoadingMsg("우리 동네 찾는 중...");
-      const cur = await setCurrentDistrict();
+      const cur = await resolveCurrentDistrict();
       if (!cur) throw new Error("현재 위치로 자치구를 찾지 못했어요.");
 
-      const label = [cur.sido, cur.sigugn, cur.eupmyeondong]
-        .filter(Boolean)
-        .join(" ");
-      const parts = parseLabelToParts(label);
+      if (cur.ok) {
+        const parts = parseLabelToParts(cur.label);
 
-      setLoadingMsg("자치구 등록 중...");
-      const registered = await setDistrict({
-        districtId: cur.districtId,
-        ...parts,
-      });
-      if (!registered) throw new Error("자치구 서버 등록 실패");
+        setLoadingMsg("자치구 등록 중...");
+        const registered = await setDistrict({
+          districtId: cur.districtId,
+          ...parts,
+        });
+
+        if (!registered) throw new Error("자치구 서버 등록 실패");
+      }
 
       navigate("/home", { replace: true });
     } catch (e) {
