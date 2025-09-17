@@ -11,6 +11,7 @@ import HomeAppliancesIcon from "@assets/homeappliances.svg";
 import EtcIcon from "@assets/etc.svg";
 import TrashIcon from "@assets/trash.svg";
 import FoodIcon from "@assets/food.svg";
+import LargeIcon from "@assets/large.svg";
 
 export const TRASH_TYPES: { [key: string]: TrashTypeInfo } = {
   R01: { nameEn: "Paper", nameKo: "종이류", icon: PaperIcon },
@@ -34,6 +35,7 @@ export const TRASH_TYPES: { [key: string]: TrashTypeInfo } = {
     icon: TrashIcon,
   },
   F01: { nameEn: "Food Waste", nameKo: "음식물 쓰레기", icon: FoodIcon },
+  B01: { nameEn: "Bulky Waste", nameKo: "대형폐기물", icon: LargeIcon },
   UNK: { nameEn: "Unknown", nameKo: "미분류", icon: EtcIcon },
 };
 

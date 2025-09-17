@@ -16,7 +16,7 @@ export const ScrollableContainer = styled.div`
   scrollbar-width: none;
   -ms-overflow-style: none;
 
-  @media screen and (min-width: 1024px) {
+  @media screen and (min-width: 1025px) {
     width: 393px;
     margin: 0 auto;
   }
@@ -106,7 +106,6 @@ const BottomSheet: React.FC<CustomBottomSheetProps> = ({
             </div>
           </ScrollableContainer>
 
-          {/* 로딩 시 콘텐츠 위에 오버레이를 띄웁니다. */}
           {isLoading && (
             <SheetSpinnerOverlay>
               <Spinner />

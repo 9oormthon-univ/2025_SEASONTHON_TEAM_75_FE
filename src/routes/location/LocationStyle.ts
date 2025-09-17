@@ -41,7 +41,7 @@ export const Bottom = styled.div<{ $setup?: boolean }>`
   z-index: 1;
 
   width: 100vw;
-  @media screen and (min-width: 1024px) {
+  @media screen and (min-width: 1025px) {
     width: 393px;
     margin: 0 auto;
   }
