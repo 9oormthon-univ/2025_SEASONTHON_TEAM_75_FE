@@ -26,6 +26,13 @@ const Container = styled.div`
       display: flex;
       justify-content: center;
       align-items: center;
+
+      a {
+        all: unset;
+        display: block;
+        width: 100%;
+        cursor: pointer;
+      }
     }
 
     .swiper-pagination {
@@ -93,7 +100,17 @@ const AdBanner = () => {
       >
         {bannersToShow.map((bannerSrc, index) => (
           <SwiperSlide key={index}>
-            <Banner src={bannerSrc} alt={`광고 배너 ${index + 1}`} />
+            {index === 0 ? (
+              <a
+                href="https://earthus.or.kr/"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Banner src={bannerSrc} alt={`광고 배너 ${index + 1}`} />
+              </a>
+            ) : (
+              <Banner src={bannerSrc} alt={`광고 배너 ${index + 1}`} />
+            )}
           </SwiperSlide>
         ))}
       </Swiper>
