@@ -31,7 +31,7 @@ const NavContainer = styled.nav`
   box-shadow: 0 -2px 7px 0 rgba(0, 0, 0, 0.07);
   pointer-events: auto;
 
-  @media screen and (min-width: 1024px) {
+  @media screen and (min-width: 1025px) {
     width: 393px;
     margin: 0 auto;
   }
