@@ -2,10 +2,10 @@ import styled from "styled-components";
 import { useState, useEffect } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Pagination } from "swiper/modules";
-import AdFirstShort from "@assets/ad_short_1.svg";
-import AdSecondShort from "@assets/ad_short_2.svg";
-import AdFirstLong from "@assets/ad_long_1.svg";
-import AdSecondLong from "@assets/ad_long_2.svg";
+import AdFirstShort from "@assets/ad_short_1.png";
+import AdSecondShort from "@assets/ad_short_2.png";
+import AdFirstLong from "@assets/ad_long_1.png";
+import AdSecondLong from "@assets/ad_long_2.png";
 
 const Container = styled.div`
   width: 100%;
@@ -53,7 +53,6 @@ const Container = styled.div`
 const Banner = styled.img`
   width: 100%;
   display: block;
-  border-radius: 12px;
 `;
 
 const useMediaQuery = (query: string): boolean => {
