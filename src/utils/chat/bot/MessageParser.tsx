@@ -1,6 +1,7 @@
+import type { Actions } from "@types";
 import React from "react";
-import type { Actions } from "./ActionProvider";
 
+// Props
 type ParserChildProps = {
   parse: (message: string) => void;
   actions: Actions;

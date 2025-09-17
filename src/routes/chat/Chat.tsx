@@ -1,48 +1,20 @@
-import React, { useRef, useState } from "react";
+import { useRef, useState } from "react";
 import Chatbot from "react-chatbot-kit";
 import "react-chatbot-kit/build/main.css";
 import "../../styles/chatbot.css";
 import * as C from "./ChatStyle";
-import config from "../../utils/bot/config";
-import MessageParser from "../../utils/bot/MessageParser";
+import config from "../../utils/chat/bot/config";
+import MessageParser from "../../utils/chat/bot/MessageParser";
 import ActionProvider, {
   type ActionProviderProps,
-  type Actions,
-} from "../../utils/bot/ActionProvider";
+} from "../../utils/chat/bot/ActionProvider";
 import ChatMicButton from "@components/chat/ChatMicButton";
-
-type SearchMode = "word" | "category";
-
-interface SpeechRecognitionErrorEvent extends Event {
-  error: string;
-  message: string;
-}
-interface SpeechRecognitionAlternativeLike {
-  transcript: string;
-}
-interface SpeechRecognitionResultLike {
-  0: SpeechRecognitionAlternativeLike;
-  isFinal?: boolean;
-}
-interface SpeechRecognitionEvent extends Event {
-  results: {
-    length: number;
-    [index: number]: SpeechRecognitionResultLike;
-  };
-}
-
-interface SpeechRecognitionLike {
-  lang: string;
-  continuous: boolean;
-  interimResults: boolean;
-  onresult: ((event: SpeechRecognitionEvent) => void) | null;
-  onerror: ((event: SpeechRecognitionErrorEvent) => void) | null;
-  onend: (() => void) | null;
-  start: () => void;
-  stop?: () => void;
-  abort?: () => void;
-}
-type SpeechRecognitionConstructor = new () => SpeechRecognitionLike;
+import type {
+  Actions,
+  SearchMode,
+  SpeechRecognitionConstructor,
+  SpeechRecognitionEvent,
+} from "@types";
 
 function resolveSpeechRecognitionCtor(): SpeechRecognitionConstructor | null {
   const w = window as unknown as {
@@ -59,7 +31,7 @@ function resolveSpeechRecognitionCtor(): SpeechRecognitionConstructor | null {
   return (ctor as unknown as SpeechRecognitionConstructor) ?? null;
 }
 
-const Chat: React.FC = () => {
+const Chat = () => {
   const [isListening, setIsListening] = useState(false);
   const [selectedMode, setSelectedMode] = useState<SearchMode | null>(null);
 

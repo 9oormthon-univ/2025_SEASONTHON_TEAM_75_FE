@@ -3,135 +3,33 @@ import {
   createChatBotMessage as _createChatBotMessage,
   createClientMessage as _makeClientMessage,
 } from "react-chatbot-kit";
-import apiClient from "@utils/apiClient";
+import {
+  WidgetNames,
+  type Actions,
+  type ChatMessage,
+  type ChatState,
+  type SearchMode,
+  type UserMessage,
+} from "@types";
+import {
+  getMsgId,
+  getMsgText,
+  stripWidget,
+  STT_MESSAGE_ID,
+  type MutableChatMessage,
+} from "../message";
+import { BotApi } from "../botApi";
+import { useMe } from "@stores/authStore";
 
-// 응답 타입
-type SearchResponse = {
-  httpCode: number;
-  httpStatus: string;
-  message: string;
-  data: {
-    trashDescriptionId: number;
-    guideSteps: string[];
-    cautionNote: string;
-    typeName: string;
-  };
-};
-
-// 상위 카테고리 타입
-type TrashType = {
-  trashTypeId: number;
-  typeCode: string;
-  typeName: string;
-};
-
-type TrashTypesResponse = {
-  httpCode: number;
-  httpStatus: string;
-  message: string;
-  data: TrashType[];
-};
-
-// 하위 카테고리 타입
-type TrashItem = {
-  trashItemId: number;
-  itemName: string;
-  typeName: string;
-};
-
-type TrashItemsResponse = {
-  httpCode: number;
-  httpStatus: string;
-  message: string;
-  data: TrashItem[];
-};
-
-// 유저
-type UserResponse = {
-  httpCode: number;
-  httpStatus: string;
-  message: string;
-  data: {
-    userId: number;
-    nickName: string;
-    profileImageUrl: string | null;
-    createAt: string;
-    updatedAt: string;
-  };
-};
-
-// 공용 타입
-type BotMessage = ReturnType<typeof _createChatBotMessage>;
-type UserMessage = ReturnType<typeof _makeClientMessage>;
-type ChatMessage = BotMessage | UserMessage;
-
-type SearchMode = "word" | "category";
-
-export type ChatState = {
-  messages: ChatMessage[];
-  selectedMode?: SearchMode | null;
-};
-
-type PossiblyWidgetMessage = {
-  widget?: unknown;
-  payload?: unknown;
-  props?: Record<string, unknown>;
-};
-
-export type Actions = {
-  selectSearchMode: (mode: SearchMode, title: string) => void;
-  setSelectedMode: (mode: SearchMode | null) => void;
-
-  // STT
-  beginSTT: () => void;
-  updateSTT: (text: string) => void;
-  endSTT: (finalText?: string) => void;
-
-  // 단어 검색 API
-  searchKeyword: (raw: string) => Promise<void>;
-
-  // 카테고리 API
-  fetchTrashTypes: (introText?: string) => Promise<void>;
-  selectTrashCategory: (category: {
-    id: number;
-    name: string;
-    code?: string;
-  }) => void;
-  fetchTrashItemsByTypeId: (trashTypeId: number) => Promise<void>;
-  selectTrashItem: (item: { id: number; name: string }) => void;
-};
-
+// Props
 export type ActionProviderProps = {
   createChatBotMessage: typeof _createChatBotMessage;
   createClientMessage?: typeof _makeClientMessage;
   setState: React.Dispatch<React.SetStateAction<ChatState>>;
   children: React.ReactNode;
-
   setSelectedMode: React.Dispatch<React.SetStateAction<SearchMode | null>>;
-
-  // STT
-  onExpose?: (actions: Actions) => void;
+  onExpose?: (actions: Actions) => void; // STT
 };
-
-function isPossiblyWidgetMessage(
-  m: unknown
-): m is PossiblyWidgetMessage & ChatMessage {
-  return typeof m === "object" && m !== null;
-}
-
-type MessageWithId = { id?: string; messageId?: string };
-type MessageWithText = { message?: string };
-
-const STT_MESSAGE_ID = "STT_MESSAGE_ID";
-
-function getMsgId(m: ChatMessage): string | undefined {
-  const maybe = m as unknown as MessageWithId;
-  return maybe.id ?? maybe.messageId;
-}
-
-function getMsgText(m: ChatMessage): string | undefined {
-  return (m as MessageWithText).message;
-}
 
 const ActionProvider: React.FC<ActionProviderProps> = ({
   createChatBotMessage,
@@ -142,18 +40,8 @@ const ActionProvider: React.FC<ActionProviderProps> = ({
   onExpose,
 }) => {
   // 사용자 이름
-  const [userName, setUserName] = React.useState<string>("");
-
-  React.useEffect(() => {
-    (async () => {
-      try {
-        const { data } = await apiClient.get<UserResponse>("/api/v1/users/me");
-        setUserName(data?.data?.nickName?.trim() ?? "");
-      } catch (e) {
-        console.error("사용자 조회 실패: ", e);
-      }
-    })();
-  }, []);
+  const me = useMe();
+  const userName = (me?.nickName ?? "").trim();
 
   // 메시지
   const clientMsg = (
@@ -175,39 +63,18 @@ const ActionProvider: React.FC<ActionProviderProps> = ({
 
       const next = pushBot(introText);
 
+      // 위젯 제거
       setState((prev) => {
         const msgs = [...prev.messages];
-
-        // 위젯 제거
         const revIdx = [...msgs]
           .reverse()
           .findIndex(
-            (m) => isPossiblyWidgetMessage(m) && m.widget === "searchWidgets"
+            (m) => (m as MutableChatMessage).widget === WidgetNames.Search
           );
-
         if (revIdx !== -1) {
           const realIdx = msgs.length - 1 - revIdx;
-          const original = msgs[realIdx];
-
-          if (isPossiblyWidgetMessage(original)) {
-            const clone: Record<string, unknown> = { ...original };
-            delete clone.widget;
-            delete clone.payload;
-
-            if (
-              "props" in clone &&
-              typeof clone.props === "object" &&
-              clone.props
-            ) {
-              const cp = { ...(clone.props as Record<string, unknown>) };
-              delete cp.widget;
-              delete cp.payload;
-              clone.props = cp;
-            }
-            msgs[realIdx] = clone as ChatMessage;
-          }
+          msgs[realIdx] = stripWidget(msgs[realIdx]);
         }
-
         return {
           ...prev,
           messages: [...msgs, userMsg, next],
@@ -218,9 +85,7 @@ const ActionProvider: React.FC<ActionProviderProps> = ({
       setSelectedMode(mode);
 
       // 카테고리 모드면 카테고리 API 호출
-      if (mode === "category") {
-        void actions.fetchTrashTypes(introText);
-      }
+      if (mode === "category") void actions.fetchTrashTypes(introText);
     },
 
     setSelectedMode: (mode) => {
@@ -231,58 +96,48 @@ const ActionProvider: React.FC<ActionProviderProps> = ({
     // STT
     beginSTT: () => {
       setState((prev) => {
-        const exists = prev.messages.some(
-          (m) => getMsgId(m) === STT_MESSAGE_ID
-        );
-        if (exists) return prev;
+        if (prev.messages.some((m) => getMsgId(m) === STT_MESSAGE_ID))
+          return prev;
 
-        const msg = clientMsg("듣는 중...", { withAvatar: false });
-        (msg as unknown as MessageWithId).id = STT_MESSAGE_ID;
+        const base = clientMsg("듣는 중...", { withAvatar: false }); // UserMessage
+        const msg: MutableChatMessage = {
+          ...base,
+          messageId: STT_MESSAGE_ID,
+        };
+
         return { ...prev, messages: [...prev.messages, msg] };
       });
     },
 
-    updateSTT: (text: string) => {
+    updateSTT: (text) => {
       setState((prev) => {
         const msgs = [...prev.messages];
         const idx = msgs.findIndex((m) => getMsgId(m) === STT_MESSAGE_ID);
         if (idx === -1) return prev;
 
-        const prevMsg = msgs[idx];
+        const prevMsg = msgs[idx] as MutableChatMessage;
         msgs[idx] = { ...prevMsg, message: text } as ChatMessage;
         return { ...prev, messages: msgs };
       });
     },
 
-    endSTT: (finalText?: string) => {
+    endSTT: (finalText) => {
       let finalized = (finalText ?? "").trim();
-
       setState((prev) => {
         const msgs = [...prev.messages];
         const idx = msgs.findIndex((m) => getMsgId(m) === STT_MESSAGE_ID);
-        if (idx === -1) {
-          return prev;
-        }
-        const last = msgs[idx];
-        // 파라미터 없음 -> 말풍선에 남은 텍스트 사용
-        if (!finalized) {
-          finalized = (getMsgText(last) ?? "").trim();
-        }
+        if (idx === -1) return prev;
 
-        const finalizedMsg: ChatMessage = {
-          ...(last as object),
-          message: finalized,
-        } as ChatMessage;
-        const withId = finalizedMsg as unknown as MessageWithId;
-        delete withId.id; // STT ID 제거
+        const last = msgs[idx] as MutableChatMessage;
+        if (!finalized) finalized = (getMsgText(last) ?? "").trim();
 
-        msgs[idx] = finalizedMsg;
+        const done: MutableChatMessage = { ...last, message: finalized };
+        delete done.messageId;
+
+        msgs[idx] = done as ChatMessage;
         return { ...prev, messages: msgs };
       });
-
-      if (finalized) {
-        void actions.searchKeyword(finalized);
-      }
+      if (finalized) void actions.searchKeyword(finalized);
     },
 
     // 단어검색 API 호출
@@ -291,16 +146,10 @@ const ActionProvider: React.FC<ActionProviderProps> = ({
       if (!keyword) return;
 
       // 로딩
-      const loading = pushBot("•••");
-      setState((prev) => ({ ...prev, messages: [...prev.messages, loading] }));
+      setState((p) => ({ ...p, messages: [...p.messages, pushBot("•••")] }));
 
       try {
-        const { data } = await apiClient.get<SearchResponse>(
-          "/api/v1/questions/search",
-          {
-            params: { keyword },
-          }
-        );
+        const { data } = await BotApi.searchByKeyword(keyword);
 
         // 응답 없음 처리
         if (!data?.data) {
@@ -373,13 +222,10 @@ const ActionProvider: React.FC<ActionProviderProps> = ({
     // 상위 카테고리 API
     fetchTrashTypes: async (introText?: string) => {
       // 로딩
-      const loading = pushBot("•••");
-      setState((prev) => ({ ...prev, messages: [...prev.messages, loading] }));
+      setState((p) => ({ ...p, messages: [...p.messages, pushBot("•••")] }));
 
       try {
-        const { data } = await apiClient.get<TrashTypesResponse>(
-          "/api/v1/questions/trash-types"
-        );
+        const { data } = await BotApi.fetchTrashTypes();
 
         const items = Array.isArray(data?.data) ? data.data : [];
 
@@ -443,60 +289,34 @@ const ActionProvider: React.FC<ActionProviderProps> = ({
         `확인 완료! ${name} 구역에 진입했어. 이제 목표물을 조준해 줘!`
       );
 
-      setState((prev) => {
-        const msgs = [...prev.messages];
+      setState((p) => {
+        const msgs = [...p.messages];
         const revIdx = [...msgs]
           .reverse()
           .findIndex(
-            (m) =>
-              (isPossiblyWidgetMessage(m) &&
-                (m as PossiblyWidgetMessage).widget === "trashTypeWidgets") ||
-              (m as unknown as { widget?: unknown })?.widget ===
-                "trashTypeWidgets"
+            (m) => (m as MutableChatMessage).widget === WidgetNames.TrashType
           );
         if (revIdx !== -1) {
           const realIdx = msgs.length - 1 - revIdx;
-          const original = msgs[realIdx];
-          if (isPossiblyWidgetMessage(original)) {
-            const clone: Record<string, unknown> = { ...original };
-            delete clone.widget;
-            delete clone.payload;
-            if (
-              "props" in clone &&
-              typeof clone.props === "object" &&
-              clone.props
-            ) {
-              const cp = { ...(clone.props as Record<string, unknown>) };
-              delete cp.widget;
-              delete cp.payload;
-              clone.props = cp;
-            }
-            msgs[realIdx] = clone as ChatMessage;
-          }
+          msgs[realIdx] = stripWidget(msgs[realIdx]);
         }
-
         return {
-          ...prev,
+          ...p,
           messages: [...msgs, userMsg, anchor],
           selectedMode: "category",
         };
       });
-
       setSelectedMode("category");
-
       void actions.fetchTrashItemsByTypeId(id);
     },
 
     // 하위 카테고리 조회
     fetchTrashItemsByTypeId: async (trashTypeId) => {
       // 로딩
-      const loading = pushBot("•••");
-      setState((prev) => ({ ...prev, messages: [...prev.messages, loading] }));
+      setState((p) => ({ ...p, messages: [...p.messages, pushBot("•••")] }));
 
       try {
-        const { data } = await apiClient.get<TrashItemsResponse>(
-          `/api/v1/questions/trash-types/${trashTypeId}`
-        );
+        const { data } = await BotApi.fetchTrashItemsByTypeId(trashTypeId);
 
         const items = Array.isArray(data?.data) ? data.data : [];
         const payload = items.map((it) => ({
@@ -509,10 +329,9 @@ const ActionProvider: React.FC<ActionProviderProps> = ({
 
           // 직전 말풍선
           const lastIdx = msgs.length - 1;
-          const lastMsg = msgs[lastIdx];
 
           // 텍스트 유지, 위젯 추가
-          const anchorText = getMsgText(lastMsg) ?? "목표물을 조준해 줘!";
+          const anchorText = getMsgText(msgs[lastIdx]) ?? "목표물을 조준해 줘!";
           msgs[lastIdx] = createChatBotMessage(anchorText, {
             widget: "trashItemWidgets",
             payload,
@@ -535,44 +354,19 @@ const ActionProvider: React.FC<ActionProviderProps> = ({
     // 하위 카테고리 선택
     selectTrashItem: ({ name }) => {
       const userMsg = clientMsg(name);
-
-      setState((prev) => {
-        const msgs = [...prev.messages];
-
+      setState((p) => {
+        const msgs = [...p.messages];
         const revIdx = [...msgs]
           .reverse()
           .findIndex(
-            (m) =>
-              (isPossiblyWidgetMessage(m) &&
-                (m as PossiblyWidgetMessage).widget === "trashItemWidgets") ||
-              (m as unknown as { widget?: unknown })?.widget ===
-                "trashItemWidgets"
+            (m) => (m as MutableChatMessage).widget === WidgetNames.TrashItem
           );
-
         if (revIdx !== -1) {
           const realIdx = msgs.length - 1 - revIdx;
-          const original = msgs[realIdx];
-          if (isPossiblyWidgetMessage(original)) {
-            const clone: Record<string, unknown> = { ...original };
-            delete clone.widget;
-            delete clone.payload;
-            if (
-              "props" in clone &&
-              typeof clone.props === "object" &&
-              clone.props
-            ) {
-              const cp = { ...(clone.props as Record<string, unknown>) };
-              delete cp.widget;
-              delete cp.payload;
-              clone.props = cp;
-            }
-            msgs[realIdx] = clone as ChatMessage;
-          }
+          msgs[realIdx] = stripWidget(msgs[realIdx]);
         }
-
-        return { ...prev, messages: [...msgs, userMsg] };
+        return { ...p, messages: [...msgs, userMsg] };
       });
-      // 아이템 이름 검색
       void actions.searchKeyword(name);
     },
   };

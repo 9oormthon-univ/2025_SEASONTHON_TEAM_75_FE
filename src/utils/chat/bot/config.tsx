@@ -6,9 +6,9 @@ import SearchWidgetGroup from "@components/chat/SearchWidgetGroup";
 import TrashWidgetGroup from "@components/chat/TrashWidgetGroup";
 import Chatbot from "react-chatbot-kit";
 import TrashItemWidgetGroup from "@components/chat/TrashItemWidgetGroup";
+import type { SearchMode } from "@types";
 
-type SearchMode = "word" | "category";
-
+// Props
 export type SearchWidgetProps = {
   actions: {
     selectSearchMode: (mode: SearchMode, title: string) => void;
@@ -32,6 +32,7 @@ export type TrashItemWidgetProps = {
   payload?: Array<{ id: number; name: string }>;
 };
 
+// Widgets
 type WidgetConfig<T> = {
   widgetName: string;
   widgetFunc: (props: T) => React.ReactElement;
@@ -44,6 +45,7 @@ type WidgetEntry =
   | WidgetConfig<TrashWidgetProps>
   | WidgetConfig<TrashItemWidgetProps>;
 
+// Config
 type MinimalChatbotConfig = {
   botName?: string;
   initialMessages: ReturnType<typeof createChatBotMessage>[];
