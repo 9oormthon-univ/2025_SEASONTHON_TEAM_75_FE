@@ -1,5 +1,6 @@
-import { getTrashType } from "@utils/trashType";
+import { getTrashType, isRecyclableType } from "@utils/trashType";
 import RecyclingIcon from "@assets/recycling.svg";
+import TrashCanIcon from "@assets/trash_icon.svg";
 import styled from "styled-components";
 
 export const Container = styled.div`
@@ -61,6 +62,7 @@ interface PartCardProps {
 
 const PartCard = ({ type, name }: PartCardProps) => {
   const trashType = getTrashType(type);
+  const isRecyclable = isRecyclableType(type);
 
   return (
     <Container>
@@ -69,7 +71,10 @@ const PartCard = ({ type, name }: PartCardProps) => {
         <InfoWrapper>
           <Name>{name}</Name>
           <Type>
-            <Icon src={RecyclingIcon} alt="재활용 아이콘" />
+            <Icon
+              src={isRecyclable ? RecyclingIcon : TrashCanIcon}
+              alt={isRecyclable ? "재활용 아이콘" : "일반 쓰레기 아이콘"}
+            />
             {trashType.nameKo}
           </Type>
         </InfoWrapper>
