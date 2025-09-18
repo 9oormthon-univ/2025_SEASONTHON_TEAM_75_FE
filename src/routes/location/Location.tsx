@@ -12,10 +12,10 @@ import apiClient from "@utils/apiClient";
 import { useDistrictActions, useDistricts } from "@stores/userDistrictStore";
 import type {
   Location,
-  GeocoderLike,
   MyLocationItem,
   LatLng,
   GeoJSONFeature,
+  KakaoMap,
 } from "@types";
 import { toLatLngPaths } from "@utils/location/districtService";
 import SetupPanel from "@components/location/SetupPanel";
@@ -25,36 +25,6 @@ import { useSigFeatures } from "@utils/location/useSigFeatures";
 import { useQueryLocationState } from "@utils/location/useQueryLocationState";
 import { useGeoPosition } from "@utils/location/useGeoPosition";
 import { useToast } from "@utils/location/useToast";
-
-// 타입
-type KakaoLatLng = {
-  getLat: () => number;
-  getLng: () => number;
-};
-
-type KakaoMap = {
-  setBounds: (bounds: any) => void;
-};
-
-declare global {
-  interface Window {
-    kakao: {
-      maps: {
-        LatLng: new (lat: number, lng: number) => KakaoLatLng;
-
-        LatLngBounds: new () => {
-          extend: (latlng: KakaoLatLng) => void;
-          getSouthWest: () => KakaoLatLng;
-          getNorthEast: () => KakaoLatLng;
-        };
-
-        services: {
-          Geocoder: new () => GeocoderLike;
-        };
-      };
-    };
-  }
-}
 
 // 메인
 export default function LocationPage() {
