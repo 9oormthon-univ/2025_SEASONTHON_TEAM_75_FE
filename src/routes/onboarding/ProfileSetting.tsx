@@ -7,21 +7,7 @@ import { useNavigate } from "react-router-dom";
 import apiClient from "@utils/apiClient";
 import MainButton from "@components/MainButton";
 import { useAuthActions, useAuthStatus } from "@stores/authStore";
-
-type User = {
-  userId: number;
-  nickName: string;
-  profileImageUrl: string | null;
-  createAt: string;
-  updatedAt: string;
-};
-
-type UserResponse = {
-  httpCode: number;
-  httpStatus: string;
-  message: string;
-  data: User;
-};
+import type { UserResponse } from "@types";
 
 const MAX_LEN = 20;
 
