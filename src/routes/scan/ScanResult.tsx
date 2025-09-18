@@ -169,7 +169,7 @@ const ScanResult: React.FC = () => {
               </R.MidSection>
             )}
             <R.MidSection>
-              <R.Title>분리배출 가이드</R.Title>
+              <R.Title>분리수거 가이드</R.Title>
               <R.GuideBox>
                 <GuideSteps steps={currentResult.guideSteps} />
                 {currentResult.cautionNote && (
