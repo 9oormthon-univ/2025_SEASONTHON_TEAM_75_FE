@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import { Swiper } from "swiper/react";
 
 export const HomeContainer = styled.div`
   width: 100%;
@@ -133,17 +134,14 @@ export const BgBox = styled.div`
   flex: 1;
 `;
 
-export const RankingWrapper = styled.div`
-  display: flex;
-  overflow-x: auto;
-  gap: 16px;
+export const RankingSwiper = styled(Swiper)`
   padding: 0 1.5rem;
+  width: 100%;
+  box-sizing: border-box;
 
-  &::-webkit-scrollbar {
-    display: none;
+  .swiper-slide {
+    width: auto;
   }
-  -ms-overflow-style: none;
-  scrollbar-width: none;
 `;
 
 export const TrashCardList = styled.div`

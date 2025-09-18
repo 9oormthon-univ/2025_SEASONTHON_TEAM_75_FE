@@ -32,6 +32,8 @@ import type {
 import ScheduleCard from "@components/home/ScheduleCard";
 import { useDistrictActions } from "@stores/userDistrictStore";
 import { useAuthStatus, useAuthActions } from "@stores/authStore";
+import { SwiperSlide } from "swiper/react";
+import { Mousewheel, FreeMode } from "swiper/modules";
 
 const getIconForTrashType = (trashTypeName: string): string => {
   const foundType = Object.values(TRASH_TYPES).find(
@@ -242,22 +244,37 @@ const Home = () => {
           title="실시간 쓰레기 인기랭킹"
           subtitle={formattedLastUpdated}
         ></SectionHeader>
-        <H.RankingWrapper>
+        <H.RankingSwiper
+          modules={[Mousewheel, FreeMode]}
+          slidesPerView={"auto"}
+          spaceBetween={16}
+          freeMode={{
+            enabled: true,
+            momentum: false,
+          }}
+          mousewheel={{
+            forceToAxis: true,
+          }}
+        >
           {isLoading
             ? Array.from({ length: 5 }).map((_, index) => (
-                <RankingItemSkeleton key={index} />
+                <SwiperSlide key={index}>
+                  <RankingItemSkeleton key={index} />
+                </SwiperSlide>
               ))
             : rankingList.map((item) => (
-                <RankingItem
-                  key={item.rank}
-                  rank={item.rank}
-                  imageUrl={item.imageUrl}
-                  name={item.name}
-                  searchCount={item.searchCount}
-                  trendDirection={item.trendDirection}
-                />
+                <SwiperSlide key={item.rank}>
+                  <RankingItem
+                    key={item.rank}
+                    rank={item.rank}
+                    imageUrl={item.imageUrl}
+                    name={item.name}
+                    searchCount={item.searchCount}
+                    trendDirection={item.trendDirection}
+                  />
+                </SwiperSlide>
               ))}
-        </H.RankingWrapper>
+        </H.RankingSwiper>
         <AdBanner />
         <SectionHeader
           title="최신 개정 쓰레기"

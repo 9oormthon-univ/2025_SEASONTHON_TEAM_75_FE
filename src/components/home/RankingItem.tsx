@@ -9,7 +9,7 @@ export const ItemContainer = styled.div`
   display: flex;
   position: relative;
   flex-direction: column;
-  border-radius: 11px;
+  border-radius: 12px;
   box-shadow: 0 0 6px 0 rgba(0, 0, 0, 0.07);
   flex-shrink: 0;
   background-color: #ffffff;
