@@ -7,18 +7,19 @@ import { useEffect, useState } from "react";
 import LogoutModal from "@components/setting/LogoutModal";
 import WithdrawModal from "@components/setting/WithdrawModal";
 import { useNavigate } from "react-router-dom";
-import { useAuthActions, useAuthStatus, useMe } from "@stores/authStore";
+import { useAuthActions, useMe } from "@stores/authStore";
 import { useDefaultDistrict } from "@stores/userDistrictStore";
 import TagItem, { type TagProps } from "@components/setting/TagItem";
 import apiClient from "@utils/apiClient";
 import type { Badge } from "@types";
+import useEnsureAuthInitialized from "@utils/useEnsureAuthInitialized";
 
 const Setting = () => {
   const navigate = useNavigate();
   const { logout, withdraw } = useAuthActions();
 
   const authMe = useMe();
-  const authStatus = useAuthStatus();
+  const authStatus = useEnsureAuthInitialized();
   const isMember = authStatus === "member";
 
   const defaultDistrict = useDefaultDistrict();
@@ -29,7 +30,7 @@ const Setting = () => {
 
   // 뱃지
   useEffect(() => {
-    if (!isMember) {
+    if (authStatus !== "member") {
       setBadges([]);
       return;
     }
@@ -43,7 +44,7 @@ const Setting = () => {
         console.error("뱃지 가져오기 실패:", e);
       }
     })();
-  }, [isMember]);
+  }, [authStatus]);
 
   // 로그아웃
   const handleLogout = async () => {
