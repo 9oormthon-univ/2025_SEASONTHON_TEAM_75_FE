@@ -11,15 +11,7 @@ import { useAuthActions, useAuthStatus, useMe } from "@stores/authStore";
 import { useDefaultDistrict } from "@stores/userDistrictStore";
 import TagItem, { type TagProps } from "@components/setting/TagItem";
 import apiClient from "@utils/apiClient";
-
-// 뱃지
-type Badge = {
-  badgeId: number;
-  badgeName: string;
-  badgeDescription: string;
-  ruleTypeDescription: string;
-  earnedAt: string;
-};
+import type { Badge } from "@types";
 
 const Setting = () => {
   const navigate = useNavigate();

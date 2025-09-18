@@ -13,3 +13,12 @@ export interface UserResponse {
   message: string;
   data: UserInfo;
 }
+
+// 뱃지
+export interface Badge {
+  badgeId: number;
+  badgeName: string;
+  badgeDescription: string;
+  ruleTypeDescription: string;
+  earnedAt: string;
+}
