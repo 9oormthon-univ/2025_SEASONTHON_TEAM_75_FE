@@ -30,10 +30,9 @@ import type {
   ApiRevisionDetail,
 } from "@types";
 import ScheduleCard from "@components/home/ScheduleCard";
-import { useDistrictActions } from "@stores/userDistrictStore";
-import { useAuthStatus, useAuthActions } from "@stores/authStore";
 import { SwiperSlide } from "swiper/react";
 import { Mousewheel, FreeMode } from "swiper/modules";
+import useEnsureAuthInitialized from "@utils/useEnsureAuthInitialized";
 
 const getIconForTrashType = (trashTypeName: string): string => {
   const foundType = Object.values(TRASH_TYPES).find(
@@ -70,10 +69,8 @@ const formatRelativeTime = (dateString: string): string => {
 };
 
 const Home = () => {
-  const authStatus = useAuthStatus();
-  const { checkAuth } = useAuthActions();
+  const authStatus = useEnsureAuthInitialized();
   const myDistricts = useDistricts();
-  const { fetchDistricts } = useDistrictActions();
   const defaultLocation = useDefaultDistrict();
   const [isModalOpen, setModalOpen] = useState(false);
   const [isLoginGuideModalOpen, setLoginGuideModalOpen] = useState(false);
@@ -86,22 +83,6 @@ const Home = () => {
     useState<ApiRevisionDetail | null>(null);
   const [isRevisionModalOpen, setRevisionModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    const initializeUserFlow = async () => {
-      const resolvedStatus = await checkAuth();
-
-      console.log("서버에서 확인된 사용자 상태:", resolvedStatus);
-
-      if (resolvedStatus === "member") {
-        fetchDistricts();
-      }
-    };
-
-    if (authStatus === "loading") {
-      initializeUserFlow();
-    }
-  }, [authStatus, checkAuth, fetchDistricts]);
 
   const fetchTrashSchedule = async () => {
     try {
