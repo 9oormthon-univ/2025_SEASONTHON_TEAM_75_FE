@@ -104,6 +104,8 @@ export const Input = styled.div`
 
 export const Button = styled.button`
   position: absolute;
+  display: flex;
+  justify-content: center;
   bottom: 55px;
 
   width: 100%;

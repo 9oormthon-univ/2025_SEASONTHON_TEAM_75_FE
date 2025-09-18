@@ -40,6 +40,8 @@ export const SubTitle = styled.div`
 
 export const ButtonGroup = styled.div`
   position: absolute;
+  display: flex;
+  justify-content: center;
   bottom: 55px;
   left: 16px;
   right: 16px;
