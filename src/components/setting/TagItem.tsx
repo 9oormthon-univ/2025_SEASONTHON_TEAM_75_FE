@@ -1,10 +1,10 @@
 import styled from "styled-components";
-import Recycling from "@assets/badge_recycling.svg";
-import Eco from "@assets/badge_eco.svg";
-import Vinyl from "@assets/badge_vinyl.svg";
-import Fire from "@assets/badge_fire.svg";
-import Pack from "@assets/badge_pack.svg";
-import Lock from "@assets/badge_lock.svg";
+import Recycling from "@assets/badge_recycling.png";
+import Eco from "@assets/badge_eco.png";
+import Vinyl from "@assets/badge_vinyl.png";
+import Fire from "@assets/badge_fire.png";
+import Pack from "@assets/badge_pack.png";
+import Lock from "@assets/badge_lock.png";
 
 export interface TagProps {
   type:
@@ -39,6 +39,7 @@ const Container = styled.div<{ $isLocked: boolean }>`
 
   img {
     width: 60px;
+    height: 66px;
   }
 `;
 
