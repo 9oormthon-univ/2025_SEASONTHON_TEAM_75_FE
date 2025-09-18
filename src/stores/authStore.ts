@@ -63,22 +63,24 @@ const useAuthStore = create<AuthStore>((set) => ({
     logout: async () => {
       try {
         await apiClient.post("/api/v1/auth/logout");
-      } finally {
         set({ status: "guest", info: null });
         useHistoryStore.getState().clearHistory();
         useScanResultStore.getState().clearAllResults();
         useUserDistrictStore.getState().actions.clearDistricts();
+      } catch (error) {
+        throw error;
       }
     },
 
     withdraw: async () => {
       try {
         await apiClient.delete("/api/v1/users/me");
-      } finally {
         set({ status: "guest", info: null });
         useHistoryStore.getState().clearHistory();
         useScanResultStore.getState().clearAllResults();
         useUserDistrictStore.getState().actions.clearDistricts();
+      } catch (error) {
+        throw error;
       }
     },
   },
