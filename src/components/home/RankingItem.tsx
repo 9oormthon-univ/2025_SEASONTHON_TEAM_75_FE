@@ -13,6 +13,7 @@ export const ItemContainer = styled.div`
   box-shadow: 0 0 6px 0 rgba(0, 0, 0, 0.07);
   flex-shrink: 0;
   background-color: #ffffff;
+  overflow: hidden;
 `;
 
 export const Rank = styled.div`
@@ -35,7 +36,6 @@ export const ItemImage = styled.img`
   width: 100%;
   height: 134px;
   object-fit: cover;
-  border-radius: 12px 12px 0 0;
   align-self: center;
 `;
 
