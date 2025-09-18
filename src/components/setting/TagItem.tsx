@@ -16,6 +16,15 @@ export interface TagProps {
     | "lock";
 }
 
+const mapping: Record<TagProps["type"], { icon: string; title: string }> = {
+  "재활용 마스터": { icon: Recycling, title: "재활용 마스터" },
+  "친환경 전사": { icon: Eco, title: "친환경 전사" },
+  비닐사냥꾼: { icon: Vinyl, title: "비닐사냥꾼" },
+  "연속 7일": { icon: Fire, title: "연속 7일" },
+  종이팩사냥꾼: { icon: Pack, title: "종이팩사냥꾼" },
+  lock: { icon: Lock, title: "잠금됨" },
+};
+
 const Container = styled.div<{ $isLocked: boolean }>`
   display: flex;
   padding: 14px 16px 12px 16px;
@@ -44,22 +53,13 @@ const Container = styled.div<{ $isLocked: boolean }>`
 `;
 
 const TagItem = ({ type }: TagProps) => {
-  const mapping = {
-    "재활용 마스터": { icon: Recycling, title: type },
-    "친환경 전사": { icon: Eco, title: type },
-    비닐사냥꾼: { icon: Vinyl, title: type },
-    "연속 7일": { icon: Fire, title: type },
-    종이팩사냥꾼: { icon: Pack, title: type },
-    lock: { icon: Lock, title: "잠금됨" },
-  };
-
-  const { icon, title } = mapping[type];
+  const meta = mapping[type] ?? mapping.lock;
   const isLocked = type === "lock";
 
   return (
     <Container $isLocked={isLocked}>
-      <img src={icon} alt={title} />
-      <p>{title}</p>
+      <img src={meta.icon} alt={meta.title} />
+      <p>{meta.title}</p>
     </Container>
   );
 };
