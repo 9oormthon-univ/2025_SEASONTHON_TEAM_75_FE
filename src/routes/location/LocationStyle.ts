@@ -27,7 +27,7 @@ export const Top = styled.div`
 export const Bottom = styled.div<{ $setup?: boolean }>`
   position: fixed;
   bottom: 0;
-  height: ${({ $setup }) => ($setup ? "254px" : "408px")};
+  height: ${({ $setup }) => ($setup ? "254px" : "53%")};
   padding: 24px 16px;
   box-sizing: border-box; /* 패딩 포함 width 계산 */
 
@@ -49,6 +49,25 @@ export const Bottom = styled.div<{ $setup?: boolean }>`
   p {
     margin: 0;
   }
+`;
+
+export const Toast = styled.div`
+  position: fixed;
+  left: 16px;
+  right: 16px;
+  bottom: calc(53% + 5px);
+
+  padding: 16px;
+  border-radius: 12px;
+  background: rgba(47, 47, 46, 0.75);
+  z-index: 100;
+
+  color: white;
+  text-align: left;
+  font-family: Pretendard;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: -0.165px;
 `;
 
 export const Warn = styled.div`
@@ -131,26 +150,10 @@ export const Info = styled.div`
   }
 `;
 
-export const Toast = styled.div`
-  position: relative;
-  bottom: 115px;
-
-  padding: 16px;
-  margin: 0 16px;
-  border-radius: 12px;
-  background: rgba(47, 47, 46, 0.75);
-  z-index: 100;
-
-  color: white;
-  text-align: left;
-  font-family: Pretendard;
-  font-size: 14px;
-  font-weight: 500;
-  letter-spacing: -0.165px;
-`;
-
 export const Complete = styled.div`
   position: absolute;
+  display: flex;
+  justify-content: center;
   bottom: 55px;
   left: 16px;
   right: 16px;
