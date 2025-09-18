@@ -3,13 +3,23 @@ import * as S from "./SettingStyle";
 import FeedbackIcon from "@assets/setting_feedback.svg";
 import ArrowIcon from "@assets/history_arrow.svg";
 import ProfileImg from "@assets/profile.svg";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import LogoutModal from "@components/setting/LogoutModal";
 import WithdrawModal from "@components/setting/WithdrawModal";
 import { useNavigate } from "react-router-dom";
 import { useAuthActions, useAuthStatus, useMe } from "@stores/authStore";
 import { useDefaultDistrict } from "@stores/userDistrictStore";
-import TagItem from "@components/setting/TagItem";
+import TagItem, { type TagProps } from "@components/setting/TagItem";
+import apiClient from "@utils/apiClient";
+
+// 뱃지
+type Badge = {
+  badgeId: number;
+  badgeName: string;
+  badgeDescription: string;
+  ruleTypeDescription: string;
+  earnedAt: string;
+};
 
 const Setting = () => {
   const navigate = useNavigate();
@@ -23,6 +33,25 @@ const Setting = () => {
 
   const [isLogoutOpen, setIsLogoutOpen] = useState(false);
   const [isWithdrawOpen, setIsWithdrawOpen] = useState(false);
+  const [badges, setBadges] = useState<Badge[]>([]); // 뱃지
+
+  // 뱃지
+  useEffect(() => {
+    if (!isMember) {
+      setBadges([]);
+      return;
+    }
+    (async () => {
+      try {
+        const result = await apiClient.get("/api/v1/users/my/badges");
+        const data: Badge[] = result.data?.data ?? [];
+        setBadges(data);
+        console.log("[badges]", data);
+      } catch (e) {
+        console.error("뱃지 가져오기 실패:", e);
+      }
+    })();
+  }, [isMember]);
 
   // 로그아웃
   const handleLogout = async () => {
@@ -87,13 +116,19 @@ const Setting = () => {
             <S.TagContainer>
               <h1>재활용 태그</h1>
               <S.TagItemGroup>
-                {/* 추후 api 연결 예정 */}
-                <TagItem type="lock" />
-                <TagItem type="lock" />
-                <TagItem type="lock" />
-                <TagItem type="lock" />
-                <TagItem type="lock" />
-                <TagItem type="lock" />
+                {Array.from({ length: 6 }).map((_, i) => {
+                  const badge = badges[i];
+
+                  const type: TagProps["type"] = badge
+                    ? (badge.badgeName as TagProps["type"])
+                    : "lock";
+
+                  const key = badge
+                    ? `badge-${badge.badgeId}-${i}`
+                    : `lock-${i}`;
+
+                  return <TagItem key={key} type={type} />;
+                })}
               </S.TagItemGroup>
             </S.TagContainer>
 

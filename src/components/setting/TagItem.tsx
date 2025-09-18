@@ -1,13 +1,19 @@
 import styled from "styled-components";
-import Recycling from "@assets/badge_recycling.svg";
-import Eco from "@assets/badge_eco.svg";
-import Vinyl from "@assets/badge_vinyl.svg";
-import Fire from "@assets/badge_fire.svg";
-import Pack from "@assets/badge_pack.svg";
-import Lock from "@assets/badge_lock.svg";
+import Recycling from "@assets/badge_recycling.png";
+import Eco from "@assets/badge_eco.png";
+import Vinyl from "@assets/badge_vinyl.png";
+import Fire from "@assets/badge_fire.png";
+import Pack from "@assets/badge_pack.png";
+import Lock from "@assets/badge_lock.png";
 
-interface TagProps {
-  type: "recycling" | "eco" | "vinyl" | "fire" | "pack" | "lock";
+export interface TagProps {
+  type:
+    | "재활용 마스터"
+    | "친환경 전사"
+    | "비닐사냥꾼"
+    | "연속 7일"
+    | "종이팩사냥꾼"
+    | "lock";
 }
 
 const Container = styled.div<{ $isLocked: boolean }>`
@@ -30,15 +36,19 @@ const Container = styled.div<{ $isLocked: boolean }>`
     font-size: 14px;
     font-weight: 600;
   }
+
+  img {
+    width: 60px;
+  }
 `;
 
 const TagItem = ({ type }: TagProps) => {
   const mapping = {
-    recycling: { icon: Recycling, title: "재활용 마스터" },
-    eco: { icon: Eco, title: "친환경 전사" },
-    vinyl: { icon: Vinyl, title: "비닐 사냥꾼" },
-    fire: { icon: Fire, title: "연속 7일" },
-    pack: { icon: Pack, title: "종이팩 사냥꾼" },
+    "재활용 마스터": { icon: Recycling, title: type },
+    "친환경 전사": { icon: Eco, title: type },
+    비닐사냥꾼: { icon: Vinyl, title: type },
+    "연속 7일": { icon: Fire, title: type },
+    종이팩사냥꾼: { icon: Pack, title: type },
     lock: { icon: Lock, title: "잠금됨" },
   };
 
