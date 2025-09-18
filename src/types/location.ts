@@ -118,3 +118,33 @@ export interface MyLocationItem {
   title: string;
   sigCode: string;
 }
+
+// 카카오 맵
+export interface KakaoLatLng {
+  getLat: () => number;
+  getLng: () => number;
+}
+
+export interface KakaoMap {
+  setBounds: (bounds: any) => void;
+}
+
+declare global {
+  interface Window {
+    kakao: {
+      maps: {
+        LatLng: new (lat: number, lng: number) => KakaoLatLng;
+
+        LatLngBounds: new () => {
+          extend: (latlng: KakaoLatLng) => void;
+          getSouthWest: () => KakaoLatLng;
+          getNorthEast: () => KakaoLatLng;
+        };
+
+        services: {
+          Geocoder: new () => GeocoderLike;
+        };
+      };
+    };
+  }
+}
