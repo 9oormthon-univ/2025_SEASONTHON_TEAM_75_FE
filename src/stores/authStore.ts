@@ -68,6 +68,7 @@ const useAuthStore = create<AuthStore>((set) => ({
         useScanResultStore.getState().clearAllResults();
         useUserDistrictStore.getState().actions.clearDistricts();
       } catch (error) {
+        console.log("로그아웃이 실패하여 멤버 상태를 유지합니다");
         throw error;
       }
     },
@@ -80,6 +81,7 @@ const useAuthStore = create<AuthStore>((set) => ({
         useScanResultStore.getState().clearAllResults();
         useUserDistrictStore.getState().actions.clearDistricts();
       } catch (error) {
+        console.log("탈퇴를 실패하여 멤버 상태를 유지합니다");
         throw error;
       }
     },
