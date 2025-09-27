@@ -1,7 +1,7 @@
 <div align="center">
 
   <h1>
-    ♻️ [2025 kakao X 9oorm 시즌톤] 75팀 분리특공대 ♻️
+    ♻️ [2025 kakao X 9oorm 시즌톤 대상 🏆] 75팀 분리특공대 ♻️
   </h1>
   <strong>IT 연합 동아리 구름톤 유니브</strong>
   <p>2025_SEASONTHON_TEAM_75_FE</p>
@@ -70,6 +70,6 @@
 <div align="center">
   <h5>
     Presented by <br/>
-    <a href="https://9oormthon.university"><strong>Goormthon Univ.</strong></a>
+    <a href="https://9oormthon.university"><strong>9oormthon Univ.</strong></a>
   </h3>
 </div>
