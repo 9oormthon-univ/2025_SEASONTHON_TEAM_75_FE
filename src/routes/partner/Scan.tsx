@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from "react";
+import React, { useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import * as S from "@routes/partner/ScanStyle";
 import CloseImg from "@assets/cam_close.svg";
@@ -7,7 +7,7 @@ import QrScanner from "qr-scanner";
 const Scan: React.FC = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const navigate = useNavigate();
-  const [isScanned, setIsScanned] = useState(false);
+  const isScannedRef = useRef(false);
   const QrOptions = {
     preferredCamera: "environment",
     maxScansPerSecond: 5,
@@ -23,9 +23,9 @@ const Scan: React.FC = () => {
       qrScanner = new QrScanner(
         videoElem,
         (result) => {
-          if (!isScanned) {
+          if (!isScannedRef.current) {
             console.log("QR 스캔 결과: ", result.data);
-            setIsScanned(true);
+            isScannedRef.current = true;
             navigate("/partner/scan/loading", {
               state: { code: result.data },
             });
@@ -47,7 +47,7 @@ const Scan: React.FC = () => {
         qrScanner.destroy();
       }
     };
-  }, [navigate, isScanned]);
+  }, [navigate]);
 
   return (
     <S.Container>

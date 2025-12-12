@@ -93,7 +93,6 @@ export const Title = styled.div`
 `;
 
 export const CloseButton = styled.div`
-  right: 1.5rem;
   cursor: pointer;
   display: flex;
   flex-direction: row;
