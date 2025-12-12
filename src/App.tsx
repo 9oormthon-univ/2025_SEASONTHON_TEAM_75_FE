@@ -21,6 +21,12 @@ import NotFound from "@routes/NotFound";
 import theme from "@styles/theme";
 import ProfileComplete from "@routes/onboarding/ProfileComplete";
 import Feedback from "@routes/setting/Feedback";
+import PartnerHome from "@routes/partner/Home";
+import Usage from "@routes/partner/Usage";
+import QRScan from "@routes/partner/Scan";
+import QRScanLoading from "@routes/partner/ScanLoading";
+import QRScanFail from "@routes/partner/ScanFail";
+import QRScanSuccess from "@routes/partner/ScanSuccess";
 import { useKakaoLoader } from "react-kakao-maps-sdk";
 
 function App() {
@@ -171,6 +177,65 @@ function App() {
                 element={
                   <Layout showNavbar={false}>
                     <Feedback />
+                  </Layout>
+                }
+              />
+            </Route>
+            <Route path="/partner">
+              <Route
+                index
+                element={
+                  <Layout showNavbar={true}>
+                    {/* 파트너용 시작 화면으로 교체 */}
+                    <Feedback />
+                  </Layout>
+                }
+              />
+              <Route
+                path="home"
+                element={
+                  <Layout showNavbar={false}>
+                    <PartnerHome />
+                  </Layout>
+                }
+              />
+              <Route
+                path="scan"
+                element={
+                  <Layout showNavbar={false}>
+                    <QRScan />
+                  </Layout>
+                }
+              />
+              <Route
+                path="scan/loading"
+                element={
+                  <Layout showNavbar={false}>
+                    <QRScanLoading />
+                  </Layout>
+                }
+              />
+              <Route
+                path="scan/fail"
+                element={
+                  <Layout showNavbar={false}>
+                    <QRScanFail />
+                  </Layout>
+                }
+              />
+              <Route
+                path="scan/success"
+                element={
+                  <Layout showNavbar={false}>
+                    <QRScanSuccess />
+                  </Layout>
+                }
+              />
+              <Route
+                path="usage"
+                element={
+                  <Layout showNavbar={false}>
+                    <Usage />
                   </Layout>
                 }
               />

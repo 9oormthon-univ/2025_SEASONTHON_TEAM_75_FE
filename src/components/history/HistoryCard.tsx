@@ -74,12 +74,7 @@ interface HistoryCardProps {
   onClick: (id: number) => void;
 }
 
-const HistorytCard = ({
-  item,
-  mode,
-  isSelected,
-  onClick,
-}: HistoryCardProps) => {
+const HistoryCard = ({ item, mode, isSelected, onClick }: HistoryCardProps) => {
   const { id, type, name } = item;
   const trashType = getTrashType(type);
   const isRecyclable = isRecyclableType(type);
@@ -113,4 +108,4 @@ const HistorytCard = ({
   );
 };
 
-export default HistorytCard;
+export default HistoryCard;
