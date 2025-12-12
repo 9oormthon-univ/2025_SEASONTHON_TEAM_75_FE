@@ -3,5 +3,6 @@ export interface UserCoupon {
   id: number;
   profile: string | null;
   title: string;
-  user: string;
+  userName: string;
+  userId: number;
 }

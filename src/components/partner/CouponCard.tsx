@@ -46,14 +46,17 @@ export const Title = styled.div`
 `;
 
 export const User = styled.div`
-  color: ${({ theme }) => theme.colors.text2};
+  color: ${({ theme }) => theme.colors.text1};
   font-family: "Pretendard";
   font-weight: 500;
   font-size: 14px;
+  span {
+    color: ${({ theme }) => theme.colors.text2};
+  }
 `;
 
 const CouponCard = ({ item }: { item: UserCoupon }) => {
-  const { profile, title, user } = item;
+  const { profile, title, userName, userId } = item;
 
   return (
     <Container>
@@ -61,8 +64,10 @@ const CouponCard = ({ item }: { item: UserCoupon }) => {
         <ProfileImage src={profile || DefaultProfile} alt="프로필 사진" />
       </LeftSection>
       <RightSection>
+        <User>
+          {userName}님 <span>#{userId}</span>
+        </User>
         <Title>{title}</Title>
-        <User>{user}님</User>
       </RightSection>
     </Container>
   );
