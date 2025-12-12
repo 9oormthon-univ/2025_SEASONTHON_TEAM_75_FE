@@ -13,13 +13,15 @@ const Usage = () => {
       id: 1,
       profile: null,
       title: "[오프라인] 공방 10% 할인쿠폰",
-      user: "꽃돌이",
+      userName: "꽃돌이",
+      userId: 111111,
     },
     {
       id: 2,
       profile: DummyImg,
       title: "[오프라인] 공방 20% 할인쿠폰",
-      user: "지구지킴이",
+      userName: "지구지킴이",
+      userId: 222222,
     },
   ];
 
