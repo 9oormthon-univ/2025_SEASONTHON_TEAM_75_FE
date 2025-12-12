@@ -5,3 +5,4 @@ export * from "./revision";
 export * from "./schedule";
 export * from "./trash";
 export * from "./user";
+export * from "./coupon";
