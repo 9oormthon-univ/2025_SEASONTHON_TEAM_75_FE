@@ -1,4 +1,11 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { useEffect } from "react";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  useNavigate,
+  Outlet,
+} from "react-router-dom";
 import { ThemeProvider } from "styled-components";
 import { Analytics } from "@vercel/analytics/react";
 import GlobalStyle from "@styles/GlobalStyle";
@@ -28,6 +35,53 @@ import QRScanLoading from "@routes/partner/ScanLoading";
 import QRScanFail from "@routes/partner/ScanFail";
 import QRScanSuccess from "@routes/partner/ScanSuccess";
 import { useKakaoLoader } from "react-kakao-maps-sdk";
+import { useAuthActions, useAuthStatus } from "@stores/authStore";
+import { useDistrictActions } from "@stores/userDistrictStore";
+
+function AuthInitializer() {
+  const status = useAuthStatus();
+  const { checkAuth } = useAuthActions();
+  const { fetchDistricts } = useDistrictActions();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const init = async () => {
+      if (status === "loading") {
+        const result = await checkAuth();
+        if (result === "invalid_token") {
+          if (window.confirm("로그인 정보가 만료되었습니다.")) {
+            navigate("/login");
+          }
+        }
+      }
+    };
+    init();
+
+    if (status === "member" || status === "guest") {
+      fetchDistricts();
+    }
+  }, [status, checkAuth, fetchDistricts, navigate]);
+
+  return null;
+}
+
+function PartnerGuard() {
+  const status = useAuthStatus();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (status === "loading") return;
+
+    if (status !== "partner") {
+      alert("파트너 로그인이 필요한 서비스입니다.");
+      navigate("/partner");
+    }
+  }, [status, navigate]);
+
+  if (status !== "partner") return null;
+
+  return <Outlet />;
+}
 
 function App() {
   useKakaoLoader({
@@ -40,6 +94,7 @@ function App() {
       <ThemeProvider theme={theme}>
         <GlobalStyle />
         <Router>
+          <AuthInitializer />
           <Routes>
             <Route path="/">
               <Route
@@ -191,54 +246,56 @@ function App() {
                   </Layout>
                 }
               />
-              <Route
-                path="home"
-                element={
-                  <Layout showNavbar={false}>
-                    <PartnerHome />
-                  </Layout>
-                }
-              />
-              <Route
-                path="scan"
-                element={
-                  <Layout showNavbar={false}>
-                    <QRScan />
-                  </Layout>
-                }
-              />
-              <Route
-                path="scan/loading"
-                element={
-                  <Layout showNavbar={false}>
-                    <QRScanLoading />
-                  </Layout>
-                }
-              />
-              <Route
-                path="scan/fail"
-                element={
-                  <Layout showNavbar={false}>
-                    <QRScanFail />
-                  </Layout>
-                }
-              />
-              <Route
-                path="scan/success"
-                element={
-                  <Layout showNavbar={false}>
-                    <QRScanSuccess />
-                  </Layout>
-                }
-              />
-              <Route
-                path="usage"
-                element={
-                  <Layout showNavbar={false}>
-                    <Usage />
-                  </Layout>
-                }
-              />
+              <Route element={<PartnerGuard />}>
+                <Route
+                  path="home"
+                  element={
+                    <Layout showNavbar={false}>
+                      <PartnerHome />
+                    </Layout>
+                  }
+                />
+                <Route
+                  path="scan"
+                  element={
+                    <Layout showNavbar={false}>
+                      <QRScan />
+                    </Layout>
+                  }
+                />
+                <Route
+                  path="scan/loading"
+                  element={
+                    <Layout showNavbar={false}>
+                      <QRScanLoading />
+                    </Layout>
+                  }
+                />
+                <Route
+                  path="scan/fail"
+                  element={
+                    <Layout showNavbar={false}>
+                      <QRScanFail />
+                    </Layout>
+                  }
+                />
+                <Route
+                  path="scan/success"
+                  element={
+                    <Layout showNavbar={false}>
+                      <QRScanSuccess />
+                    </Layout>
+                  }
+                />
+                <Route
+                  path="usage"
+                  element={
+                    <Layout showNavbar={false}>
+                      <Usage />
+                    </Layout>
+                  }
+                />
+              </Route>
             </Route>
             <Route
               path="*"

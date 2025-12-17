@@ -5,13 +5,14 @@ import { useHistoryStore } from "@stores/historyStore";
 import { useScanResultStore } from "@stores/scanResultStore";
 import { useUserDistrictStore } from "@stores/userDistrictStore";
 
-type AuthStatus = "loading" | "member" | "guest";
+type AuthStatus = "loading" | "member" | "guest" | "partner";
+type CheckAuthResult = AuthStatus | "invalid_token";
 
 interface AuthStore {
   status: AuthStatus;
   info: UserInfo | null;
   actions: {
-    checkAuth: () => Promise<AuthStatus>;
+    checkAuth: () => Promise<CheckAuthResult>;
     loginWithKakao: () => void;
     loginAsGuest: () => Promise<void>;
     logout: () => Promise<void>;
@@ -26,21 +27,47 @@ const useAuthStore = create<AuthStore>((set) => ({
   actions: {
     checkAuth: async () => {
       try {
-        const { data } = await apiClient.get<{ data: UserInfo }>(
-          "/api/v1/users/me"
-        );
-        const user: UserInfo = {
-          userId: data.data.userId,
-          nickName: data.data.nickName,
-          profileImageUrl: data.data.profileImageUrl,
-          createdAt: data.data.createdAt,
-          updatedAt: data.data.updatedAt,
-        };
-        set({ status: "member", info: user });
-        return "member" as const;
-      } catch {
+        const { data: verifyData } = await apiClient.get<{
+          data: {
+            role: "USER" | "GUEST" | "PARTNER";
+            isTokenVerified: boolean;
+          };
+        }>("/api/v1/auth/verify");
+
+        const { role, isTokenVerified } = verifyData.data;
+
+        if (!isTokenVerified) {
+          set({ status: "guest", info: null });
+          return "invalid_token";
+        }
+
+        if (role === "USER") {
+          const { data: userData } = await apiClient.get<{ data: UserInfo }>(
+            "/api/v1/users/me"
+          );
+
+          const user: UserInfo = {
+            userId: userData.data.userId,
+            nickName: userData.data.nickName,
+            profileImageUrl: userData.data.profileImageUrl,
+            createdAt: userData.data.createdAt,
+            updatedAt: userData.data.updatedAt,
+          };
+
+          set({ status: "member", info: user });
+          return "member";
+        } else if (role === "PARTNER") {
+          // 파트너인 경우 추후 처리 추가
+          set({ status: "partner", info: null });
+          return "partner";
+        } else {
+          set({ status: "guest", info: null });
+          return "guest";
+        }
+      } catch (error) {
+        console.error("Auth verify failed:", error);
         set({ status: "guest", info: null });
-        return "guest" as const;
+        return "guest";
       }
     },
 

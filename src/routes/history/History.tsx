@@ -8,13 +8,13 @@ import apiClient from "@utils/apiClient";
 import { useHistoryStore } from "@stores/historyStore";
 import { HistoryPageSkeleton } from "@components/history/Skeleton";
 import type { ApiTrashDetail } from "@types";
-import useEnsureAuthInitialized from "@utils/useEnsureAuthInitialized";
+import { useAuthStatus } from "@stores/authStore";
 
 const History = () => {
   const navigate = useNavigate();
   const { historyItems, setHistoryItems } = useHistoryStore();
   const [isLoading, setIsLoading] = useState(true);
-  const authStatus = useEnsureAuthInitialized();
+  const authStatus = useAuthStatus();
 
   useEffect(() => {
     const fetchHistoryData = async () => {
