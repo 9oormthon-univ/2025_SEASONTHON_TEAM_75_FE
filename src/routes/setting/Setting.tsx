@@ -7,19 +7,18 @@ import { useEffect, useState } from "react";
 import LogoutModal from "@components/setting/LogoutModal";
 import WithdrawModal from "@components/setting/WithdrawModal";
 import { useNavigate } from "react-router-dom";
-import { useAuthActions, useMe } from "@stores/authStore";
 import { useDefaultDistrict } from "@stores/userDistrictStore";
 import TagItem, { type TagProps } from "@components/setting/TagItem";
 import apiClient from "@utils/apiClient";
 import type { Badge } from "@types";
-import useEnsureAuthInitialized from "@utils/useEnsureAuthInitialized";
+import { useAuthActions, useMe, useAuthStatus } from "@stores/authStore";
 
 const Setting = () => {
   const navigate = useNavigate();
   const { logout, withdraw } = useAuthActions();
 
   const authMe = useMe();
-  const authStatus = useEnsureAuthInitialized();
+  const authStatus = useAuthStatus();
   const isMember = authStatus === "member";
 
   const defaultDistrict = useDefaultDistrict();

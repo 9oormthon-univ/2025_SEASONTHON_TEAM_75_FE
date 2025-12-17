@@ -32,7 +32,7 @@ import type {
 import ScheduleCard from "@components/home/ScheduleCard";
 import { SwiperSlide } from "swiper/react";
 import { Mousewheel, FreeMode } from "swiper/modules";
-import useEnsureAuthInitialized from "@utils/useEnsureAuthInitialized";
+import { useAuthStatus } from "@stores/authStore";
 
 const getIconForTrashType = (trashTypeName: string): string => {
   const foundType = Object.values(TRASH_TYPES).find(
@@ -69,7 +69,7 @@ const formatRelativeTime = (dateString: string): string => {
 };
 
 const Home = () => {
-  const authStatus = useEnsureAuthInitialized();
+  const authStatus = useAuthStatus();
   const myDistricts = useDistricts();
   const defaultLocation = useDefaultDistrict();
   const [isModalOpen, setModalOpen] = useState(false);
