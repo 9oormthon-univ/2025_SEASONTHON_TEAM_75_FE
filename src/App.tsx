@@ -38,6 +38,7 @@ import { useKakaoLoader } from "react-kakao-maps-sdk";
 import { useAuthActions, useAuthStatus } from "@stores/authStore";
 import { useDistrictActions } from "@stores/userDistrictStore";
 import PartnerLogin from "@routes/partner/onboarding/PartnerLogin";
+import PartnerSignup from "@routes/partner/onboarding/PartnerSignup";
 import PartnerStart from "@routes/partner/onboarding/PartnerStart";
 
 function AuthInitializer() {
@@ -252,6 +253,14 @@ function App() {
 								element={
 									<Layout showNavbar={false}>
 										<PartnerLogin />
+									</Layout>
+								}
+							/>
+							<Route
+								path="signup"
+								element={
+									<Layout showNavbar={false}>
+										<PartnerSignup />
 									</Layout>
 								}
 							/>
