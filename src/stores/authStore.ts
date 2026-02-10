@@ -15,6 +15,7 @@ interface AuthStore {
     checkAuth: () => Promise<CheckAuthResult>;
     loginWithKakao: () => void;
     loginAsGuest: () => Promise<void>;
+    loginAsPartner: (email: string, password: string) => Promise<void>;
     logout: () => Promise<void>;
     withdraw: () => Promise<void>;
   };
@@ -83,6 +84,19 @@ const useAuthStore = create<AuthStore>((set) => ({
         set({ status: "guest", info: null });
       } catch (error) {
         console.error("게스트 로그인 API 호출 실패:", error);
+        throw error;
+      }
+    },
+
+    loginAsPartner: async (email: string, password: string) => {
+      try {
+        await apiClient.post("/api/v1/auth/partner/login", {
+          email,
+          password,
+        });
+        set({ status: "partner", info: null });
+      } catch (error) {
+        console.error("파트너 로그인 API 호출 실패:", error);
         throw error;
       }
     },
