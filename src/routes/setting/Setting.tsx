@@ -116,7 +116,7 @@ const Setting = () => {
               </S.PointTop>
               <S.PointBottom>
                 <button>포인트 사용하기</button>
-                <button>구매한 쿠폰 사용하기</button>
+                <button onClick={() => navigate("/coupon")}>구매한 쿠폰 사용하기</button>
               </S.PointBottom>
             </S.PointContainer>
 
