@@ -19,7 +19,7 @@ const PartnerLogin = () => {
 	const handleLogin = async () => {
 		try {
 			await loginAsPartner(id, pw);
-			navigate("/partner/home");
+			navigate("/partner/login/complete");
 		} catch {
 			alert("로그인에 실패했습니다. 이메일과 비밀번호를 확인해주세요.");
 		}

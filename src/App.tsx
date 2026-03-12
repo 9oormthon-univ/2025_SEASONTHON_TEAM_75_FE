@@ -39,6 +39,7 @@ import { useAuthActions, useAuthStatus } from "@stores/authStore";
 import { useDistrictActions } from "@stores/userDistrictStore";
 import PartnerLogin from "@routes/partner/onboarding/PartnerLogin";
 import PartnerStart from "@routes/partner/onboarding/PartnerStart";
+import PartnerLoginComplete from "@routes/partner/onboarding/PartnerLoginComplete";
 
 function AuthInitializer() {
   const status = useAuthStatus();
@@ -252,6 +253,14 @@ function App() {
                 element={
                   <Layout showNavbar={false}>
                     <PartnerLogin />
+                  </Layout>
+                }
+              />
+              <Route
+                path="login/complete"
+                element={
+                  <Layout showNavbar={false}>
+                    <PartnerLoginComplete />
                   </Layout>
                 }
               />
