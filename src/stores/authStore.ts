@@ -5,15 +5,18 @@ import { useHistoryStore } from "@stores/historyStore";
 import { useScanResultStore } from "@stores/scanResultStore";
 import { useUserDistrictStore } from "@stores/userDistrictStore";
 
-type AuthStatus = "loading" | "member" | "guest";
+type AuthStatus = "loading" | "member" | "guest" | "partner";
+type CheckAuthResult = AuthStatus | "invalid_token";
 
 interface AuthStore {
   status: AuthStatus;
   info: UserInfo | null;
   actions: {
-    checkAuth: () => Promise<AuthStatus>;
+    checkAuth: () => Promise<CheckAuthResult>;
     loginWithKakao: () => void;
     loginAsGuest: () => Promise<void>;
+    loginAsPartner: (email: string, password: string) => Promise<void>;
+    signupAsPartner: (metadata: { partnerName: string; email: string; address: string; description?: string }, image: File) => Promise<string | null>;
     logout: () => Promise<void>;
     withdraw: () => Promise<void>;
   };
@@ -26,21 +29,47 @@ const useAuthStore = create<AuthStore>((set) => ({
   actions: {
     checkAuth: async () => {
       try {
-        const { data } = await apiClient.get<{ data: UserInfo }>(
-          "/api/v1/users/me"
-        );
-        const user: UserInfo = {
-          userId: data.data.userId,
-          nickName: data.data.nickName,
-          profileImageUrl: data.data.profileImageUrl,
-          createdAt: data.data.createdAt,
-          updatedAt: data.data.updatedAt,
-        };
-        set({ status: "member", info: user });
-        return "member" as const;
-      } catch {
+        const { data: verifyData } = await apiClient.get<{
+          data: {
+            role: "USER" | "GUEST" | "PARTNER";
+            isTokenVerified: boolean;
+          };
+        }>("/api/v1/auth/verify");
+
+        const { role, isTokenVerified } = verifyData.data;
+
+        if (!isTokenVerified) {
+          set({ status: "guest", info: null });
+          return "invalid_token";
+        }
+
+        if (role === "USER") {
+          const { data: userData } = await apiClient.get<{ data: UserInfo }>(
+            "/api/v1/users/me"
+          );
+
+          const user: UserInfo = {
+            userId: userData.data.userId,
+            nickName: userData.data.nickName,
+            profileImageUrl: userData.data.profileImageUrl,
+            createdAt: userData.data.createdAt,
+            updatedAt: userData.data.updatedAt,
+          };
+
+          set({ status: "member", info: user });
+          return "member";
+        } else if (role === "PARTNER") {
+          // 파트너인 경우 추후 처리 추가
+          set({ status: "partner", info: null });
+          return "partner";
+        } else {
+          set({ status: "guest", info: null });
+          return "guest";
+        }
+      } catch (error) {
+        console.error("Auth verify failed:", error);
         set({ status: "guest", info: null });
-        return "guest" as const;
+        return "guest";
       }
     },
 
@@ -56,6 +85,36 @@ const useAuthStore = create<AuthStore>((set) => ({
         set({ status: "guest", info: null });
       } catch (error) {
         console.error("게스트 로그인 API 호출 실패:", error);
+        throw error;
+      }
+    },
+
+    loginAsPartner: async (email: string, password: string) => {
+      try {
+        await apiClient.post("/api/v1/auth/partner/login", {
+          email,
+          password,
+        });
+        set({ status: "partner", info: null });
+      } catch (error) {
+        console.error("파트너 로그인 API 호출 실패:", error);
+        throw error;
+      }
+    },
+
+    signupAsPartner: async (metadata, image) => {
+      try {
+        const formData = new FormData();
+        formData.append(
+          "metadata",
+          new Blob([JSON.stringify(metadata)], { type: "application/json" }),
+        );
+        formData.append("image", image);
+
+        const res = await apiClient.post("/api/v1/partners/sign-up", formData);
+        return res?.data?.data?.password ?? null;
+      } catch (error) {
+        console.error("파트너 회원가입 API 호출 실패:", error);
         throw error;
       }
     },
