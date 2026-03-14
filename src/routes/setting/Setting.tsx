@@ -110,7 +110,7 @@ const Setting = () => {
               <S.PointTop>
                 <S.PointTitle>
                   <h2>나의 포인트</h2>
-                  <h1>2000P</h1>
+                  <h1>2,000P</h1>
                 </S.PointTitle>
                 <img src={PointIcon} alt="포인트" />
               </S.PointTop>
