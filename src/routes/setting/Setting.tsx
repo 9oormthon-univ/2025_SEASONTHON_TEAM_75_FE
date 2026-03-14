@@ -11,7 +11,7 @@ import { useNavigate } from "react-router-dom";
 import { useDefaultDistrict } from "@stores/userDistrictStore";
 import TagItem, { type TagProps } from "@components/setting/TagItem";
 import apiClient from "@utils/apiClient";
-import type { Badge } from "@types";
+import type { Badge, UserPoint } from "@types";
 import { useAuthActions, useMe, useAuthStatus } from "@stores/authStore";
 
 const Setting = () => {
@@ -27,6 +27,23 @@ const Setting = () => {
   const [isLogoutOpen, setIsLogoutOpen] = useState(false);
   const [isWithdrawOpen, setIsWithdrawOpen] = useState(false);
   const [badges, setBadges] = useState<Badge[]>([]); // 뱃지
+  const [totalPoint, setTotalPoint] = useState<number>(0); // 포인트
+
+  // 포인트
+  useEffect(() => {
+    if (authStatus !== "member") {
+      setTotalPoint(0);
+      return;
+    }
+    (async () => {
+      try {
+        const result = await apiClient.get<{ data: UserPoint }>("/api/v1/points");
+        setTotalPoint(result.data?.data?.totalPoint ?? 0);
+      } catch (e) {
+        console.error("포인트 가져오기 실패:", e);
+      }
+    })();
+  }, [authStatus]);
 
   // 뱃지
   useEffect(() => {
@@ -110,7 +127,7 @@ const Setting = () => {
               <S.PointTop>
                 <S.PointTitle>
                   <h2>나의 포인트</h2>
-                  <h1>2,000P</h1>
+                  <h1>{totalPoint.toLocaleString()}P</h1>
                 </S.PointTitle>
                 <img src={PointIcon} alt="포인트" />
               </S.PointTop>

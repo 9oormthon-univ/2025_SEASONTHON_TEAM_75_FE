@@ -14,6 +14,14 @@ export interface UserResponse {
   data: UserInfo;
 }
 
+// 포인트
+export interface UserPoint {
+  userPointId: number;
+  totalPoint: number;
+  createAt: string;
+  updateAt: string;
+}
+
 // 뱃지
 export interface Badge {
   badgeId: number;
