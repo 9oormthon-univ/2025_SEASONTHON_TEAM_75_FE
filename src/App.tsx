@@ -40,7 +40,8 @@ import { useDistrictActions } from "@stores/userDistrictStore";
 import PartnerLogin from "@routes/partner/onboarding/PartnerLogin";
 import PartnerStart from "@routes/partner/onboarding/PartnerStart";
 import PartnerLoginComplete from "@routes/partner/onboarding/PartnerLoginComplete";
-import PurchasedCoupon from "@routes/coupon/PurchasedCoupon";
+import PurchasedCoupon from "@routes/setting/coupon/PurchasedCoupon";
+import PointStore from "@routes/setting/pointstore/PointStore";
 
 function AuthInitializer() {
   const status = useAuthStatus();
@@ -316,6 +317,14 @@ function App() {
                 />
               </Route>
             </Route>
+            <Route
+              path="/store"
+              element={
+                <Layout showNavbar={false}>
+                  <PointStore />
+                </Layout>
+              }
+            />
             <Route
               path="/coupon"
               element={

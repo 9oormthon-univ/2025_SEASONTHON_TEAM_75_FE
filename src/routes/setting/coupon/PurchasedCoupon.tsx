@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import * as C from "./PurchasedCouponStyle";
 import Header from "@components/Header";
 import NoCouponIcon from "@assets/history_zero.svg";
-import CouponCard from "@components/coupon/CouponCard";
+import CouponCard from "@components/setting/coupon/CouponCard";
 
 interface Coupon {
   id: number;
