@@ -42,6 +42,8 @@ import PartnerStart from "@routes/partner/onboarding/PartnerStart";
 import PartnerLoginComplete from "@routes/partner/onboarding/PartnerLoginComplete";
 import PurchasedCoupon from "@routes/setting/coupon/PurchasedCoupon";
 import PointStore from "@routes/setting/pointstore/PointStore";
+import PointStoreDetail from "@routes/setting/pointstore/PointStoreDetail";
+import PurchaseSuccess from "@routes/setting/pointstore/PurchaseSuccess";
 
 function AuthInitializer() {
   const status = useAuthStatus();
@@ -322,6 +324,22 @@ function App() {
               element={
                 <Layout showNavbar={false}>
                   <PointStore />
+                </Layout>
+              }
+            />
+            <Route
+              path="/store/:id"
+              element={
+                <Layout showNavbar={false}>
+                  <PointStoreDetail />
+                </Layout>
+              }
+            />
+            <Route
+              path="/store/:id/success"
+              element={
+                <Layout showNavbar={false}>
+                  <PurchaseSuccess />
                 </Layout>
               }
             />

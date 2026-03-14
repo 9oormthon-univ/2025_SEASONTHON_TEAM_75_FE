@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import * as P from "./PointStoreStyle";
 import Header from "@components/Header";
 import NoCouponIcon from "@assets/history_zero.svg";
@@ -46,6 +47,7 @@ const PointStore = () => {
 	const [sort, setSort] = useState<SortType>("기본순");
 	const [isMenuOpen, setIsMenuOpen] = useState(false);
 	const dropdownRef = useRef<HTMLDivElement>(null);
+	const navigate = useNavigate();
 
 	useEffect(() => {
 		// TODO: API 연동
@@ -121,6 +123,7 @@ const PointStore = () => {
 							isOnline={item.isOnline}
 							title={item.title}
 							points={item.points}
+							onClick={() => navigate(`/store/${item.id}`)}
 						/>
 					))}
 				</P.CardWrapper>
