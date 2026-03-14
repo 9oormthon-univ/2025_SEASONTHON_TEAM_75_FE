@@ -1,13 +1,13 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import * as S from "./PurchaseSuccessStyle";
 import BackIcon from "@assets/back.svg";
 import SuccessClapIcon from "@assets/icon_success_clap.svg";
-
-// TODO: useLocation 또는 props로 브랜드명 받기
-const MOCK_BRAND_NAME = "그린 공방";
+import type { PurchaseResult } from "@types";
 
 const PurchaseSuccess = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const purchase = location.state?.purchase as PurchaseResult | undefined;
 
   return (
     <S.Page>
@@ -18,7 +18,7 @@ const PurchaseSuccess = () => {
       <S.Content>
         <S.Title>할인쿠폰을 구매했어요!</S.Title>
         <S.Description>
-          [{MOCK_BRAND_NAME}] 브랜드에서 사용할 수 있어요!
+          [{purchase?.couponTitle ?? ""}] 브랜드에서 사용할 수 있어요!
         </S.Description>
         <S.SuccessIcon src={SuccessClapIcon} alt="구매 완료" />
       </S.Content>
