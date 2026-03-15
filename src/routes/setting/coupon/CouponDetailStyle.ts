@@ -65,11 +65,11 @@ export const CardContent = styled.div`
   padding: 93px 0 0 0;
 `;
 
-export const QrBox = styled.div`
+export const QrImage = styled.img`
   width: 181px;
   height: 181px;
-  background-color: #f0f0f0;
   border-radius: 8px;
+  object-fit: cover;
   flex-shrink: 0;
 `;
 

@@ -43,6 +43,26 @@ export interface StoreCouponDetail {
   };
 }
 
+// 구매한 쿠폰 상세
+export interface UserCouponDetail {
+  userCouponId: number;
+  couponStatus: "AVAILABLE" | "USED";
+  purchasedAt: string;
+  updateAt: string;
+  couponId: number;
+  couponTitle: string;
+  couponContent: string;
+  couponType: string;
+  qrImageUrl: string;
+  partnerName: string;
+  partnerImageUrl: string;
+  usedAt: string | null;
+  usability: {
+    status: string;
+    reason: string;
+  };
+}
+
 // 구매한 쿠폰
 export interface UserCoupon {
   userCouponId: number;
