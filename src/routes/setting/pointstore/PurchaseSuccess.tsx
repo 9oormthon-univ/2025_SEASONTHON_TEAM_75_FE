@@ -1,6 +1,7 @@
 import { useNavigate, useLocation } from "react-router-dom";
 import * as S from "./PurchaseSuccessStyle";
 import BackIcon from "@assets/back.svg";
+import BgCoupon from "@assets/bg_coupon.png";
 import SuccessClapIcon from "@assets/icon_success_clap.svg";
 import type { PurchaseResult } from "@types";
 
@@ -14,6 +15,8 @@ const PurchaseSuccess = () => {
       <S.BackBtn onClick={() => navigate(-1)}>
         <img src={BackIcon} alt="뒤로가기" />
       </S.BackBtn>
+
+      <S.BgImage src={BgCoupon} alt="배경" />
 
       <S.Content>
         <S.Title>할인쿠폰을 구매했어요!</S.Title>

@@ -7,6 +7,7 @@ import DropdownIcon from "@assets/dropdown.svg";
 import PointStoreCard from "@components/setting/pointstore/PointStoreCard";
 import apiClient from "@utils/apiClient";
 import type { StoreCoupon } from "@types";
+import BannerImg from "@assets/bg_space_earth_bubble.png";
 
 type SortType = "기본순" | "포인트순";
 const SORT_OPTIONS: SortType[] = ["기본순", "포인트순"];
@@ -69,6 +70,8 @@ const PointStore = () => {
   return (
     <P.Container>
       <Header title="포인트 상점" isBackButton={true} isBorder={true} />
+      <P.ScrollArea>
+      <P.BannerImage src={BannerImg} alt="포인트 상점 배너" />
       <P.SubHeader>
         <P.CouponCount>총 {itemCount}장</P.CouponCount>
         <P.SortDropdown ref={dropdownRef}>
@@ -110,6 +113,7 @@ const PointStore = () => {
           ))}
         </P.CardWrapper>
       )}
+      </P.ScrollArea>
     </P.Container>
   );
 };

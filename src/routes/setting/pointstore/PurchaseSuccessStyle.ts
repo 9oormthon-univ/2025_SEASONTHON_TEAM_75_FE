@@ -47,6 +47,12 @@ export const Description = styled.p`
   font-weight: 500;
 `;
 
+export const BgImage = styled.img`
+  width: 100%;
+  display: block;
+  flex-shrink: 0;
+`;
+
 export const SuccessIcon = styled.img`
   width: 120px;
   margin: 80px 0;
