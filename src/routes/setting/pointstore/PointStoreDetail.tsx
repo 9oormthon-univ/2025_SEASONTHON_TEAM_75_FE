@@ -8,7 +8,7 @@ import type { StoreCouponDetail, PurchaseResult } from "@types";
 import type { UserPoint } from "@types";
 
 const PointStoreDetail = () => {
-  const { couponId } = useParams<{ couponId: string }>();
+  const { id: couponId } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
   const [item, setItem] = useState<StoreCouponDetail | null>(null);
@@ -54,9 +54,11 @@ const PointStoreDetail = () => {
       navigate(`/store/${item.couponId}/success`, {
         state: { purchase: result.data?.data },
       });
-    } catch (e) {
-      console.error("구매 실패:", e);
-      alert("구매에 실패했습니다. 다시 시도해주세요.");
+    } catch (e: unknown) {
+      const axiosError = e as { response?: { data?: { message?: string } } };
+      const message = axiosError?.response?.data?.message ?? "구매에 실패했습니다. 다시 시도해주세요.";
+      console.error("구매 실패:", axiosError?.response?.data ?? e);
+      alert(message);
     } finally {
       setIsPurchasing(false);
     }
