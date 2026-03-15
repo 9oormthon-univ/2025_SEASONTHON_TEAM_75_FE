@@ -19,6 +19,14 @@ const Home = () => {
     navigate("/partner/scan");
   };
 
+  const openChatUrl = import.meta.env.VITE_OPEN_CHAT_URL;
+
+  const handleInquiryClick = () => {
+    if (openChatUrl) {
+      window.open(openChatUrl, "_blank");
+    }
+  };
+
   return (
     <H.HomeContainer>
       <H.HomeHeader>
@@ -45,7 +53,7 @@ const Home = () => {
         </H.TodayUsageList>
         <SectionHeader title="쿠폰 사용 통계" />
         <CouponStats />
-        <H.Inquiry>
+        <H.Inquiry onClick={handleInquiryClick}>
           <div>분리특공대에게 문의하기</div>
           <img src={Arrow} alt="화살표" />
         </H.Inquiry>

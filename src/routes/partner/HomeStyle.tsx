@@ -96,6 +96,7 @@ export const Inquiry = styled.div`
   box-sizing: border-box;
   border-radius: 12px;
   background-color: #ffffff;
+  cursor: pointer;
   div {
     font-family: "Pretendard";
     font-weight: 500;
