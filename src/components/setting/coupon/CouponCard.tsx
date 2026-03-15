@@ -4,11 +4,13 @@ import ArrowIcon from "@assets/history_arrow.svg";
 interface CouponCardProps {
   imageUrl: string;
   title: string;
-  expiresAt: string;
+  purchasedAt: string;
+  couponType: "ONLINE" | "OFFLINE";
+  isUsed: boolean;
   onClick?: () => void;
 }
 
-const Card = styled.div<{ $expired: boolean }>`
+const Card = styled.div<{ $used: boolean }>`
   display: flex;
   align-items: center;
   gap: 10px;
@@ -17,9 +19,9 @@ const Card = styled.div<{ $expired: boolean }>`
   border-radius: 12px;
   background-color: white;
   box-sizing: border-box;
-  cursor: ${({ $expired }) => ($expired ? "default" : "pointer")};
+  cursor: ${({ $used }) => ($used ? "default" : "pointer")};
   box-shadow: 0px 0px 6px 0px rgba(0, 0, 0, 0.07);
-  opacity: ${({ $expired }) => ($expired ? 0.4 : 1)};
+  opacity: ${({ $used }) => ($used ? 0.4 : 1)};
 `;
 
 const Thumbnail = styled.img`
@@ -44,7 +46,7 @@ const Title = styled.p`
   font-weight: 600;
 `;
 
-const ExpiresAt = styled.p`
+const PurchasedAt = styled.p`
   margin: 0;
   color: ${({ theme }) => theme.colors.text2};
   font-family: Pretendard;
@@ -52,17 +54,18 @@ const ExpiresAt = styled.p`
   font-weight: 500;
 `;
 
-function CouponCard({ imageUrl, title, expiresAt, onClick }: CouponCardProps) {
-  const isExpired = new Date(expiresAt) < new Date();
+function CouponCard({ imageUrl, title, purchasedAt, couponType, isUsed, onClick }: CouponCardProps) {
+  const formatted = purchasedAt.slice(0, 10).replace(/-/g, ".");
+  const typeLabel = couponType === "ONLINE" ? "[온라인]" : "[오프라인]";
 
   return (
-    <Card $expired={isExpired} onClick={isExpired ? undefined : onClick}>
+    <Card $used={isUsed} onClick={isUsed ? undefined : onClick}>
       <Thumbnail src={imageUrl} alt={title} />
       <Info>
-        <Title>{title}</Title>
-        <ExpiresAt>{expiresAt} 까지</ExpiresAt>
+        <Title>{typeLabel} {title}</Title>
+        <PurchasedAt>{formatted} 구매</PurchasedAt>
       </Info>
-      {!isExpired && <img src={ArrowIcon} alt="이동" />}
+      {!isUsed && <img src={ArrowIcon} alt="이동" />}
     </Card>
   );
 }

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import * as C from "./PurchasedCouponStyle";
 import Header from "@components/Header";
 import NoCouponIcon from "@assets/history_zero.svg";
@@ -7,6 +8,7 @@ import apiClient from "@utils/apiClient";
 import type { UserCoupon } from "@types";
 
 const PurchasedCoupon = () => {
+  const navigate = useNavigate();
   const [coupons, setCoupons] = useState<UserCoupon[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -51,7 +53,10 @@ const PurchasedCoupon = () => {
               key={coupon.userCouponId}
               imageUrl={coupon.partnerImageUrl}
               title={coupon.couponTitle}
-              expiresAt={coupon.purchasedAt}
+              purchasedAt={coupon.purchasedAt}
+              couponType={coupon.couponType}
+              isUsed={coupon.couponStatus === "USED"}
+              onClick={() => navigate(`/coupon/${coupon.userCouponId}`, { state: { coupon } })}
             />
           ))}
         </C.CardWrapper>
