@@ -14,6 +14,12 @@ export const BackBtn = styled.button`
   display: flex;
   align-items: center;
   padding: 16px;
+
+  &:focus-visible {
+    outline: 2px solid ${({ theme }) => theme.colors.main};
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
 `;
 
 export const Logo = styled.img`

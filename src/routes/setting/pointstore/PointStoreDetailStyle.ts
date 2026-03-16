@@ -142,5 +142,8 @@ export const BrandLocation = styled.p`
   font-family: Pretendard;
   font-size: 16px;
   font-weight: 500;
-  max-lines: 1;
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 `;

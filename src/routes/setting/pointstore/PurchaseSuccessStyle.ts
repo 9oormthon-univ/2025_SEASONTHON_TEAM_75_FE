@@ -92,6 +92,11 @@ export const GradientButton = styled.button`
   letter-spacing: -0.165px;
   cursor: pointer;
   box-sizing: border-box;
+
+  &:focus-visible {
+    outline: 2px solid white;
+    outline-offset: 2px;
+  }
 `;
 
 export const SubButton = styled.button`
@@ -106,4 +111,9 @@ export const SubButton = styled.button`
   font-size: 18px;
   font-weight: 500;
   cursor: pointer;
+
+  &:focus-visible {
+    outline: 2px solid ${({ theme }) => theme.colors.main};
+    outline-offset: 2px;
+  }
 `;

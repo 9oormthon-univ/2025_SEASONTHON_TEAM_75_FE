@@ -8,7 +8,7 @@ interface PointStoreCardProps {
   onClick?: () => void;
 }
 
-const Card = styled.div`
+const Card = styled.button`
   display: flex;
   align-items: stretch;
   width: 100%;
@@ -20,6 +20,13 @@ const Card = styled.div`
   cursor: pointer;
   box-sizing: border-box;
   flex-shrink: 0;
+  border: none;
+  padding: 0;
+  text-align: left;
+  &:focus-visible {
+    outline: 2px solid ${({ theme }) => theme.colors.main};
+    outline-offset: 2px;
+  }
 `;
 
 const Thumbnail = styled.img`
@@ -69,7 +76,7 @@ function PointStoreCard({
   onClick,
 }: PointStoreCardProps) {
   return (
-    <Card onClick={onClick}>
+    <Card type="button" onClick={onClick} aria-label={`${isOnline ? "온라인" : "오프라인"} ${title} ${points.toLocaleString()}포인트`}>
       <Thumbnail src={imageUrl} alt={title} />
       <Info>
         <Badge>{isOnline ? "[온라인]" : "[오프라인]"}</Badge>

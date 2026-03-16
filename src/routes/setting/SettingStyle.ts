@@ -119,6 +119,11 @@ export const PointBottom = styled.div`
     align-items: center;
     justify-content: center;
     cursor: pointer;
+
+    &:focus-visible {
+      outline: 2px solid white;
+      outline-offset: 2px;
+    }
   }
 `;
 

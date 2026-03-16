@@ -61,6 +61,11 @@ export const SortTrigger = styled.button`
   color: ${({ theme }) => theme.colors.text2};
   cursor: pointer;
 
+  &:focus-visible {
+    outline: 2px solid ${({ theme }) => theme.colors.main};
+    outline-offset: 2px;
+  }
+
   img {
     width: 8px;
   }

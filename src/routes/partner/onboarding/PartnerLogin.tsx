@@ -12,13 +12,13 @@ const PartnerLogin = () => {
 	const navigate = useNavigate();
 	const { loginAsPartner } = useAuthActions();
 
-	const [id, setId] = useState("");
+	const [email, setEmail] = useState("");
 	const [pw, setPw] = useState("");
 	const [keepLoggedIn, setKeepLoggedIn] = useState(false);
 
 	const handleLogin = async () => {
 		try {
-			await loginAsPartner(id, pw);
+			await loginAsPartner(email, pw);
 			navigate("/partner/login/complete");
 		} catch {
 			alert("로그인에 실패했습니다. 이메일과 비밀번호를 확인해주세요.");
@@ -36,11 +36,11 @@ const PartnerLogin = () => {
 			<L.Form>
 				<L.InputBox>
 					<input
-						type="text"
-						value={id}
-						onChange={(e) => setId(e.target.value)}
-						placeholder="아이디를 입력하세요"
-						autoComplete="username"
+						type="email"
+						value={email}
+						onChange={(e) => setEmail(e.target.value)}
+						placeholder="이메일을 입력하세요"
+						autoComplete="email"
 					/>
 				</L.InputBox>
 
@@ -56,11 +56,15 @@ const PartnerLogin = () => {
 			</L.Form>
 
 			<L.KeepLogin>
-				<img
-					src={keepLoggedIn ? CheckFill : CheckEmpty}
-					alt="로그인 상태 유지"
+				<button
+					type="button"
+					aria-pressed={keepLoggedIn}
+					aria-label="로그인 상태 유지"
 					onClick={() => setKeepLoggedIn((v) => !v)}
-				/>
+					style={{ all: "unset", cursor: "pointer", display: "flex" }}
+				>
+					<img src={keepLoggedIn ? CheckFill : CheckEmpty} alt="" />
+				</button>
 				로그인 상태 유지
 			</L.KeepLogin>
 
@@ -68,7 +72,7 @@ const PartnerLogin = () => {
 				<MainButton
 					title="로그인"
 					onClick={handleLogin}
-					disabled={!id || !pw}
+					disabled={!email || !pw}
 				/>
 			</L.ButtonWrapper>
 		</L.Page>
