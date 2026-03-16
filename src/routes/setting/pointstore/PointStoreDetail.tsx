@@ -75,7 +75,7 @@ const PointStoreDetail = () => {
         { couponId: item.couponId },
       );
       navigate(`/store/${item.couponId}/success`, {
-        state: { purchase: result.data?.data },
+        state: { purchase: result.data?.data, brandName: item.partnerResponse.partnerName },
       });
     } catch (e: unknown) {
       const axiosError = e as { response?: { data?: { message?: string } } };

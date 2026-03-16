@@ -9,6 +9,7 @@ const PurchaseSuccess = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const purchase = location.state?.purchase as PurchaseResult | undefined;
+  const brandName = location.state?.brandName as string | undefined;
 
   if (!purchase) {
     navigate("/store", { replace: true });
@@ -46,7 +47,7 @@ const PurchaseSuccess = () => {
       <S.Content>
         <S.Title>할인쿠폰을 구매했어요!</S.Title>
         <S.Description>
-          [{purchase?.couponTitle ?? ""}] 브랜드에서 사용할 수 있어요!
+          [{brandName ?? ""}] 브랜드에서 사용할 수 있어요!
         </S.Description>
         <S.SuccessIcon src={SuccessClapIcon} alt="구매 완료" />
       </S.Content>
