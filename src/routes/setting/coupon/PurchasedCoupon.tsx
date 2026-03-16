@@ -1,45 +1,28 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import * as C from "./PurchasedCouponStyle";
 import Header from "@components/Header";
 import NoCouponIcon from "@assets/history_zero.svg";
 import CouponCard from "@components/setting/coupon/CouponCard";
-
-interface Coupon {
-  id: number;
-  imageUrl: string;
-  title: string;
-  expiresAt: string;
-}
-
-const MOCK_COUPONS: Coupon[] = [
-  {
-    id: 1,
-    imageUrl: "https://placehold.co/44x44",
-    title: "[오프라인] 공방 10% 할인쿠폰",
-    expiresAt: "2026.06.30",
-  },
-  {
-    id: 2,
-    imageUrl: "https://placehold.co/44x44",
-    title: "[오프라인] 공방 20% 할인쿠폰",
-    expiresAt: "2026.05.15",
-  },
-  {
-    id: 3,
-    imageUrl: "https://placehold.co/44x44",
-    title: "[오프라인] 공방 15% 할인쿠폰",
-    expiresAt: "2025.04.01",
-  },
-];
+import apiClient from "@utils/apiClient";
+import type { UserCoupon } from "@types";
 
 const PurchasedCoupon = () => {
-  const [coupons, setCoupons] = useState<Coupon[]>([]);
+  const navigate = useNavigate();
+  const [coupons, setCoupons] = useState<UserCoupon[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // TODO: API 연동
-    setCoupons(MOCK_COUPONS);
-    setIsLoading(false);
+    (async () => {
+      try {
+        const result = await apiClient.get<{ data: UserCoupon[] }>("/api/v1/my/coupons");
+        setCoupons(result.data?.data ?? []);
+      } catch (e) {
+        console.error("쿠폰 가져오기 실패:", e);
+      } finally {
+        setIsLoading(false);
+      }
+    })();
   }, []);
 
   const couponCount = coupons.length;
@@ -67,10 +50,13 @@ const PurchasedCoupon = () => {
         <C.CardWrapper>
           {coupons.map((coupon) => (
             <CouponCard
-              key={coupon.id}
-              imageUrl={coupon.imageUrl}
-              title={coupon.title}
-              expiresAt={coupon.expiresAt}
+              key={coupon.userCouponId}
+              imageUrl={coupon.partnerImageUrl}
+              title={coupon.couponTitle}
+              purchasedAt={coupon.purchasedAt}
+              couponType={coupon.couponType}
+              isUsed={coupon.couponStatus === "USED"}
+              onClick={() => navigate(`/coupon/${coupon.userCouponId}`, { state: { coupon } })}
             />
           ))}
         </C.CardWrapper>

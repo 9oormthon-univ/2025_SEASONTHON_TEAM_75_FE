@@ -97,7 +97,8 @@ const useAuthStore = create<AuthStore>((set) => ({
         });
         set({ status: "partner", info: null });
       } catch (error) {
-        console.error("파트너 로그인 API 호출 실패:", error);
+        const e = error as { response?: { data?: unknown } };
+        console.error("파트너 로그인 API 호출 실패:", e?.response?.data ?? error);
         throw error;
       }
     },

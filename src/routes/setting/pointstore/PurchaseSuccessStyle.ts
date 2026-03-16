@@ -8,6 +8,17 @@ export const Page = styled.div`
   flex-direction: column;
   align-items: center;
   background-color: white;
+  overflow: hidden;
+`;
+
+export const BgImage = styled.img`
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  height: 100%;
+  width: auto;
+  z-index: 0;
 `;
 
 export const BackBtn = styled.button`
@@ -17,6 +28,7 @@ export const BackBtn = styled.button`
   align-items: center;
   padding: 16px;
   align-self: flex-start;
+  z-index: 1;
 `;
 
 export const Content = styled.div`
@@ -29,6 +41,7 @@ export const Content = styled.div`
   padding: 0 16px;
   text-align: center;
   margin-bottom: 120px;
+  z-index: 1;
 `;
 
 export const Title = styled.h1`
@@ -60,6 +73,7 @@ export const ButtonGroup = styled.div`
   display: flex;
   flex-direction: column;
   gap: 10px;
+  z-index: 1;
 `;
 
 export const GradientButton = styled.button`

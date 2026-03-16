@@ -41,6 +41,7 @@ import PartnerLogin from "@routes/partner/onboarding/PartnerLogin";
 import PartnerStart from "@routes/partner/onboarding/PartnerStart";
 import PartnerLoginComplete from "@routes/partner/onboarding/PartnerLoginComplete";
 import PurchasedCoupon from "@routes/setting/coupon/PurchasedCoupon";
+import CouponDetail from "@routes/setting/coupon/CouponDetail";
 import PointStore from "@routes/setting/pointstore/PointStore";
 import PointStoreDetail from "@routes/setting/pointstore/PointStoreDetail";
 import PurchaseSuccess from "@routes/setting/pointstore/PurchaseSuccess";
@@ -348,6 +349,14 @@ function App() {
               element={
                 <Layout showNavbar={true}>
                   <PurchasedCoupon />
+                </Layout>
+              }
+            />
+            <Route
+              path="/coupon/:userCouponId"
+              element={
+                <Layout showNavbar={false}>
+                  <CouponDetail />
                 </Layout>
               }
             />

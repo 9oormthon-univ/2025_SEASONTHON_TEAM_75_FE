@@ -8,6 +8,24 @@ export const Container = styled.div`
   background-color: ${({ theme }) => theme.colors.box};
 `;
 
+export const ScrollArea = styled.div`
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+`;
+
+export const BannerImage = styled.img`
+  width: 100%;
+  display: block;
+  flex-shrink: 0;
+`;
+
 export const SubHeader = styled.div`
   display: flex;
   justify-content: space-between;
@@ -79,7 +97,6 @@ export const SortOption = styled.li<{ $active: boolean }>`
 `;
 
 export const CardWrapper = styled.div`
-  overflow-x: hidden;
   width: 100%;
   display: flex;
   flex-direction: column;
@@ -88,13 +105,6 @@ export const CardWrapper = styled.div`
   gap: 10px;
   padding: 0 1.5rem 110px 1.5rem;
   box-sizing: border-box;
-  flex: 1;
-  overflow-y: auto;
-  &::-webkit-scrollbar {
-    display: none;
-  }
-  scrollbar-width: none;
-  -ms-overflow-style: none;
 `;
 
 export const NoItemBox = styled.div`
