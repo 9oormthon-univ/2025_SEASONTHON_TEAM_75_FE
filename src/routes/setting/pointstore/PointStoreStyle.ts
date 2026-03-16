@@ -99,6 +99,11 @@ export const SortOption = styled.li<{ $active: boolean }>`
   &:hover {
     background-color: ${({ theme }) => theme.colors.box};
   }
+
+  &:focus-visible {
+    outline: 2px solid ${({ theme }) => theme.colors.main};
+    outline-offset: -2px;
+  }
 `;
 
 export const CardWrapper = styled.div`

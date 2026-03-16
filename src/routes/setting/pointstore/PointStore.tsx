@@ -92,6 +92,15 @@ const PointStore = () => {
                   key={option}
                   $active={sort === option}
                   onClick={() => handleSelect(option)}
+                  role="button"
+                  tabIndex={0}
+                  aria-current={sort === option ? "true" : undefined}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      handleSelect(option);
+                    }
+                  }}
                 >
                   {option}
                 </P.SortOption>

@@ -64,7 +64,17 @@ export interface UserCouponDetail {
 }
 
 // 구매한 쿠폰
+// 파트너 쿠폰 사용 현황
 export interface UserCoupon {
+  id: number;
+  profile: string | null;
+  title: string;
+  userName: string;
+  userId: number;
+}
+
+// 설정 > 구매한 쿠폰
+export interface SettingsUserCoupon {
   userCouponId: number;
   couponStatus: "AVAILABLE" | "USED";
   purchasedAt: string;

@@ -5,17 +5,17 @@ import Header from "@components/Header";
 import NoCouponIcon from "@assets/history_zero.svg";
 import CouponCard from "@components/setting/coupon/CouponCard";
 import apiClient from "@utils/apiClient";
-import type { UserCoupon } from "@types";
+import type { SettingsUserCoupon } from "@types";
 
 const PurchasedCoupon = () => {
   const navigate = useNavigate();
-  const [coupons, setCoupons] = useState<UserCoupon[]>([]);
+  const [coupons, setCoupons] = useState<SettingsUserCoupon[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     (async () => {
       try {
-        const result = await apiClient.get<{ data: UserCoupon[] }>("/api/v1/my/coupons");
+        const result = await apiClient.get<{ data: SettingsUserCoupon[] }>("/api/v1/my/coupons");
         setCoupons(result.data?.data ?? []);
       } catch (e) {
         console.error("쿠폰 가져오기 실패:", e);

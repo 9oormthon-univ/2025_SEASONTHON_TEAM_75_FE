@@ -110,6 +110,7 @@ export const ButtonWrapper = styled.div`
   justify-content: center;
   padding: 0 16px;
   box-sizing: border-box;
+  z-index: 101;
 `;
 
 export const BrandRow = styled.div`

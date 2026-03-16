@@ -24,6 +24,9 @@ const PurchaseSuccess = () => {
     }
     try {
       const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error(`이미지 요청 실패: ${response.status} ${response.statusText}`);
+      }
       const blob = await response.blob();
       const objectUrl = URL.createObjectURL(blob);
       const a = document.createElement("a");
