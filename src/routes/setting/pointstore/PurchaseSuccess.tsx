@@ -10,6 +10,11 @@ const PurchaseSuccess = () => {
   const location = useLocation();
   const purchase = location.state?.purchase as PurchaseResult | undefined;
 
+  if (!purchase) {
+    navigate("/store", { replace: true });
+    return null;
+  }
+
   const handleSaveToGallery = async () => {
     const url = purchase?.qrImageUrl;
     if (!url) {

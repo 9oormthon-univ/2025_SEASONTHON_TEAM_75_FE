@@ -102,9 +102,14 @@ export const BrandDescription = styled.p`
 export const ButtonWrapper = styled.div`
   position: fixed;
   bottom: 38px;
-  left: 0;
-  right: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 393px;
+  display: flex;
+  justify-content: center;
   padding: 0 16px;
+  box-sizing: border-box;
 `;
 
 export const BrandRow = styled.div`

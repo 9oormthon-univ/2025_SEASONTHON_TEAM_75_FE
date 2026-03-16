@@ -16,27 +16,50 @@ const PointStoreDetail = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isPurchasing, setIsPurchasing] = useState(false);
 
+  const [fetchError, setFetchError] = useState(false);
+
   useEffect(() => {
     (async () => {
-      try {
-        const [detailRes, pointRes] = await Promise.all([
-          apiClient.get<{ data: StoreCouponDetail }>(`/api/v1/store/coupons/${couponId}`),
-          apiClient.get<{ data: UserPoint }>("/api/v1/points"),
-        ]);
-        setItem(detailRes.data?.data ?? null);
-        setTotalPoint(pointRes.data?.data?.totalPoint ?? 0);
-      } catch (e) {
-        console.error("상세 정보 가져오기 실패:", e);
-      } finally {
-        setIsLoading(false);
+      const [detailResult, pointResult] = await Promise.allSettled([
+        apiClient.get<{ data: StoreCouponDetail }>(`/api/v1/store/coupons/${couponId}`),
+        apiClient.get<{ data: UserPoint }>("/api/v1/points"),
+      ]);
+
+      if (detailResult.status === "fulfilled") {
+        setItem(detailResult.value.data?.data ?? null);
+        setFetchError(false);
+      } else {
+        console.error("상세 정보 가져오기 실패:", detailResult.reason);
+        setFetchError(true);
       }
+
+      if (pointResult.status === "fulfilled") {
+        setTotalPoint(pointResult.value.data?.data?.totalPoint ?? 0);
+      } else {
+        console.error("포인트 가져오기 실패:", pointResult.reason);
+      }
+
+      setIsLoading(false);
     })();
   }, [couponId]);
 
-  if (isLoading || !item) {
+  if (isLoading) {
     return (
       <D.Page>
         <Header title="포인트 상점" isBackButton={true} />
+      </D.Page>
+    );
+  }
+
+  if (fetchError || !item) {
+    return (
+      <D.Page>
+        <Header title="포인트 상점" isBackButton={true} />
+        <D.BottomSection>
+          <D.NoticeBox>
+            <p>상품 정보를 불러올 수 없습니다.</p>
+          </D.NoticeBox>
+        </D.BottomSection>
       </D.Page>
     );
   }

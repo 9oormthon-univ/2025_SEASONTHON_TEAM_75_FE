@@ -15,24 +15,30 @@ const SORT_OPTIONS: SortType[] = ["기본순", "포인트순"];
 const PointStore = () => {
   const [items, setItems] = useState<StoreCoupon[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(false);
   const [sort, setSort] = useState<SortType>("기본순");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
 
+  const fetchCoupons = async () => {
+    setIsLoading(true);
+    try {
+      const result = await apiClient.get<{ data: StoreCoupon[] }>(
+        "/api/v1/store/coupons",
+      );
+      setError(false);
+      setItems(result.data?.data ?? []);
+    } catch (e) {
+      console.error("포인트 상점 가져오기 실패:", e);
+      setError(true);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
-    (async () => {
-      try {
-        const result = await apiClient.get<{ data: StoreCoupon[] }>(
-          "/api/v1/store/coupons",
-        );
-        setItems(result.data?.data ?? []);
-      } catch (e) {
-        console.error("포인트 상점 가져오기 실패:", e);
-      } finally {
-        setIsLoading(false);
-      }
-    })();
+    fetchCoupons();
   }, []);
 
   useEffect(() => {
@@ -94,7 +100,13 @@ const PointStore = () => {
           )}
         </P.SortDropdown>
       </P.SubHeader>
-      {itemCount === 0 ? (
+      {error ? (
+        <P.NoItemBox>
+          <img src={NoCouponIcon} alt="오류" />
+          상점 정보를 불러오지 못했어요
+          <button type="button" onClick={fetchCoupons}>다시 시도</button>
+        </P.NoItemBox>
+      ) : itemCount === 0 ? (
         <P.NoItemBox>
           <img src={NoCouponIcon} alt="상점 없음" />
           등록된 상점이 없어요

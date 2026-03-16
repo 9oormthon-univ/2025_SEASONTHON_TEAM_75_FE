@@ -41,7 +41,7 @@ const CouponDetail = () => {
         ? "[오프라인]"
         : "";
 
-  if (isLoading) {
+  if (isLoading || !detail) {
     return (
       <D.Page>
         <D.HeaderRow>
@@ -50,6 +50,11 @@ const CouponDetail = () => {
             <img src={CloseIcon} alt="닫기" />
           </D.CloseBtn>
         </D.HeaderRow>
+        {!isLoading && !detail && (
+          <D.NoticeSection>
+            <D.NoticeText>쿠폰 정보를 불러올 수 없습니다.</D.NoticeText>
+          </D.NoticeSection>
+        )}
       </D.Page>
     );
   }
@@ -70,7 +75,7 @@ const CouponDetail = () => {
           <D.Badge>{typeLabel}</D.Badge>
           <D.CouponTitle>{detail?.couponTitle ?? ""}</D.CouponTitle>
           <D.Description>
-            공방에 문하고 사장님께 QR을 제시해주세요!
+            공방에 방문하고 사장님께 QR을 제시해주세요!
           </D.Description>
         </D.CardContent>
       </D.CardWrapper>

@@ -74,5 +74,5 @@ export interface UserCoupon {
   couponType: "ONLINE" | "OFFLINE";
   partnerName: string;
   partnerImageUrl: string;
-  usedAt: string;
+  usedAt: string | null;
 }

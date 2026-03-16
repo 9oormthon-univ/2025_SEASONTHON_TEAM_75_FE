@@ -35,6 +35,12 @@ export const CloseBtn = styled.button`
   align-items: center;
   justify-content: center;
 
+  &:focus-visible {
+    outline: 2px solid ${({ theme }) => theme.colors.main};
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
   img {
     width: 20px;
   }
@@ -141,5 +147,8 @@ export const NoticeText = styled.p`
 
 export const ButtonWrapper = styled.div`
   margin-top: auto;
-  padding: 16px 20px 55px;
+  display: flex;
+  justify-content: center;
+  padding: 16px 16px 55px;
+  box-sizing: border-box;
 `;
