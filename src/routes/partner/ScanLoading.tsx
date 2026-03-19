@@ -54,8 +54,6 @@ const ScanLoading = () => {
           `/api/v1/partner/user-coupons/${userCouponId}`,
         );
 
-        console.log("쿠폰 사용 완료:", patchRes.data);
-
         navigate("/partner/scan/success", {
           state: { couponData: couponInfo },
           replace: true,

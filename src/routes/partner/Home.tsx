@@ -10,6 +10,7 @@ import { useNavigate } from "react-router-dom";
 import type { CouponStatistics } from "@types";
 import { useEffect, useState } from "react";
 import apiClient from "@utils/apiClient";
+import LoadingSpinner from "@components/partner/LoadingSpinner";
 
 const Home = () => {
   const navigate = useNavigate();
@@ -63,23 +64,32 @@ const Home = () => {
           <H.TitleBottom>쿠폰을 스캔하여 사용 처리하세요</H.TitleBottom>
         </H.Titles>
       </H.QRBox>
+
       <H.BgBox>
-        <SectionHeader title="오늘의 사용 현황" />
-        <H.TodayUsageList>
-          <TodayUsage
-            title="사용된 쿠폰"
-            usage={`${stats?.daily.count ?? 0}개`}
-            onClick={TodayUsageClick}
-          />
-          <TodayUsage title="오늘 매출" usage="100,000원" />
-        </H.TodayUsageList>
-        <SectionHeader title="쿠폰 사용 통계" />
-        <CouponStats stats={stats} />
-        <H.Inquiry onClick={handleInquiryClick}>
-          <div>분리특공대에게 문의하기</div>
-          <img src={Arrow} alt="화살표" />
-        </H.Inquiry>
-        <AdBanner />
+        {isLoading ? (
+          <LoadingSpinner message="통계 데이터를 불러오고 있어요..." />
+        ) : (
+          <>
+            <SectionHeader title="오늘의 사용 현황" />
+            <H.TodayUsageList>
+              <TodayUsage
+                title="사용된 쿠폰"
+                usage={`${stats?.daily.count ?? 0}개`}
+                onClick={TodayUsageClick}
+              />
+              <TodayUsage title="오늘 매출" usage="100,000원" />
+            </H.TodayUsageList>
+            <SectionHeader title="쿠폰 사용 통계" />
+            <CouponStats stats={stats} />
+            {openChatUrl && (
+              <H.Inquiry onClick={handleInquiryClick}>
+                <div>분리특공대에게 문의하기</div>
+                <img src={Arrow} alt="화살표" />
+              </H.Inquiry>
+            )}
+            <AdBanner />
+          </>
+        )}
       </H.BgBox>
     </H.HomeContainer>
   );

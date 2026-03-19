@@ -1,4 +1,11 @@
-import styled from "styled-components";
+import styled, { keyframes } from "styled-components";
+
+const fadeInOut = keyframes`
+  0% { opacity: 0; transform: translate(-50%, 10px); }
+  10% { opacity: 1; transform: translate(-50%, 0); }
+  90% { opacity: 1; transform: translate(-50%, 0); }
+  100% { opacity: 0; transform: translate(-50%, -10px); }
+`;
 
 export const Container = styled.div`
   width: 100%;
@@ -264,11 +271,11 @@ export const PointToast = styled.div`
   -webkit-backdrop-filter: blur(8px);
   color: white;
   border-radius: 12px;
-  font-weight: medium;
+  font-weight: 500;
   font-size: 16px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  animation: 3s ease-in-out forwards;
   white-space: nowrap;
+  animation: ${fadeInOut} 3s ease-in-out forwards;
 
   span {
     color: #91fffa;

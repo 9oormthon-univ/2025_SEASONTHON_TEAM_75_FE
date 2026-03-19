@@ -37,6 +37,8 @@ const Scan: React.FC = () => {
                     qrToken: qrToken,
                   },
                 });
+              } else {
+                throw new Error("Missing parameters");
               }
             } catch (error) {
               isScannedRef.current = true;
