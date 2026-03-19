@@ -59,11 +59,79 @@ export const Info = styled.div`
   }
 `;
 
+export const PointContainer = styled.div`
+  background-color: ${({ theme }) => theme.colors.main};
+  border-radius: 12px;
+  margin: 0 16px;
+  padding: 20px 0 16px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+`;
+
+export const PointTop = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 24px;
+`;
+
+export const PointTitle = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  color: #fff;
+  font-family: Pretendard;
+
+  h2 {
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0;
+  }
+
+  h1 {
+    font-size: 28px;
+    font-weight: 600;
+    margin: 0;
+  }
+`;
+
+export const PointBottom = styled.div`
+  display: flex;
+  gap: 9px;
+  padding: 0 16px;
+
+  button {
+    all: unset;
+    flex: 1;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.25);
+
+    color: #fff;
+    font-family: Pretendard;
+    font-size: 15px;
+    font-weight: 600;
+    height: 46px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+
+    &:focus-visible {
+      outline: 2px solid white;
+      outline-offset: 2px;
+    }
+  }
+`;
+
 export const TagContainer = styled.div`
   display: flex;
   flex-direction: column;
   gap: 15px;
-  padding: 10px 16px 20px 16px;
+  padding: 26px 16px 22px 16px;
 
   h1 {
     color: ${({ theme }) => theme.colors.text1};
@@ -92,7 +160,7 @@ export const Feedback = styled.div`
   border-radius: 12px;
   background: var(--white, #fff);
 
-  margin: 20px 16px;
+  margin: 0 16px 14px 16px;
 `;
 
 export const Left = styled.div`

@@ -86,7 +86,10 @@ function Navbar() {
   const location = useLocation();
   const isHomeActive = location.pathname.startsWith("/home");
   const isHistoryActive = location.pathname.startsWith("/history");
-  const isSettingActive = location.pathname.startsWith("/setting");
+  const isSettingActive =
+    location.pathname.startsWith("/setting") ||
+    location.pathname.startsWith("/coupon") ||
+    location.pathname.startsWith("/store");
   return (
     <NavContainer>
       <NavItem to="/home" $isActive={isHomeActive}>
