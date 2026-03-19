@@ -35,6 +35,10 @@ export interface ApiTrashDetail {
   createdAt: string;
   location?: TrashLocation;
   days?: string[];
+  point?: {
+    earnPoints: number;
+    createdAt: string;
+  };
 }
 
 // 히스토리 아이템

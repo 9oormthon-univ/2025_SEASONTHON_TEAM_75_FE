@@ -34,6 +34,7 @@ const ScanResult: React.FC = () => {
     number | null
   >(null);
   const [isUpdating, setIsUpdating] = useState(false);
+  const [showPointToast, setShowPointToast] = useState(false);
 
   const handleNavigateToScan = () => {
     navigate("/scan");
@@ -74,7 +75,7 @@ const ScanResult: React.FC = () => {
         setSelectedSimilarItemId(null);
         try {
           const response = await apiClient.get<{ data: SimilarTrashItem[] }>(
-            `/api/v1/trash/${currentResult.id}/items`
+            `/api/v1/trash/${currentResult.id}/items`,
           );
           setSimilarItems(response.data.data);
         } catch (error) {
@@ -94,12 +95,12 @@ const ScanResult: React.FC = () => {
     setIsUpdating(true);
     try {
       const response = await apiClient.patch<{ data: ApiTrashDetail }>(
-        `/api/v1/trash/${currentResult.id}/items/${selectedItemId}`
+        `/api/v1/trash/${currentResult.id}/items/${selectedItemId}`,
       );
       updateCurrentResult(response.data.data);
       console.log(
         "선택된 타입으로 데이터 업데이트:",
-        response.data.data.itemName
+        response.data.data.itemName,
       );
     } catch (error) {
       console.error("품목 변경에 실패했습니다:", error);
@@ -109,6 +110,16 @@ const ScanResult: React.FC = () => {
     }
   };
 
+  useEffect(() => {
+    if (currentResult?.point?.earnPoints) {
+      setShowPointToast(true);
+      const timer = setTimeout(() => {
+        setShowPointToast(false);
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [currentResult?.id]);
+
   if (!currentResult) {
     return null;
   }
@@ -117,6 +128,12 @@ const ScanResult: React.FC = () => {
 
   return (
     <R.Container>
+      {showPointToast && currentResult?.point && (
+        <R.PointToast>
+          방금 스캔으로 <span>{currentResult.point.earnPoints}포인트</span>
+          적립되었어요.
+        </R.PointToast>
+      )}
       <R.Header>
         <R.BackBtn onClick={() => navigate("/home")}>
           <img src={BackIcon} alt="뒤로 가기" />

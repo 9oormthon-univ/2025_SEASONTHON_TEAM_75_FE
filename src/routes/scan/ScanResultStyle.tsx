@@ -1,4 +1,11 @@
-import styled from "styled-components";
+import styled, { keyframes } from "styled-components";
+
+const fadeInOut = keyframes`
+  0% { opacity: 0; transform: translate(-50%, 10px); }
+  10% { opacity: 1; transform: translate(-50%, 0); }
+  90% { opacity: 1; transform: translate(-50%, 0); }
+  100% { opacity: 0; transform: translate(-50%, -10px); }
+`;
 
 export const Container = styled.div`
   width: 100%;
@@ -245,5 +252,33 @@ export const ChatBtn = styled.div`
   margin-top: 10px;
   @media (max-width: 360px) {
     width: 340px;
+  }
+`;
+
+export const PointToast = styled.div`
+  width: 361px;
+  height: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  top: 75px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999;
+  background-color: rgba(0, 0, 0, 0.47);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: white;
+  border-radius: 12px;
+  font-weight: 500;
+  font-size: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  white-space: nowrap;
+  animation: ${fadeInOut} 3s ease-in-out forwards;
+
+  span {
+    color: #91fffa;
+    margin: 0 3px;
   }
 `;

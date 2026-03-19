@@ -1,4 +1,9 @@
+import type { CouponStatistics } from "@types";
 import styled from "styled-components";
+
+interface CouponStatsProps {
+  stats: CouponStatistics | null;
+}
 
 export const Container = styled.div`
   display: flex;
@@ -38,27 +43,27 @@ export const Divider = styled.div`
   background-color: #f3f3f3f3;
 `;
 
-const CouponStats = () => {
+const CouponStats = ({ stats }: CouponStatsProps) => {
   return (
     <Container>
       <Section>
         <div>이번 주</div>
         <div>
-          <div>5</div>개
+          <div>{stats?.weekly.count ?? 0}</div>개
         </div>
       </Section>
       <Divider />
       <Section>
         <div>이번 달</div>
         <div>
-          <div>50</div>개
+          <div>{stats?.monthly.count ?? 0}</div>개
         </div>
       </Section>
       <Divider />
       <Section>
         <div>전체 사용량</div>
         <div>
-          <div>150</div>개
+          <div>{stats?.total.count ?? 0}</div>개
         </div>
       </Section>
     </Container>

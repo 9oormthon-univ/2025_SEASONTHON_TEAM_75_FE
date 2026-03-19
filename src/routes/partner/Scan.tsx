@@ -24,20 +24,38 @@ const Scan: React.FC = () => {
         videoElem,
         (result) => {
           if (!isScannedRef.current) {
-            console.log("QR 스캔 결과: ", result.data);
-            isScannedRef.current = true;
-            navigate("/partner/scan/loading", {
-              state: { code: result.data },
-            });
+            try {
+              const url = new URL(result.data);
+              const userCouponId = url.searchParams.get("userCouponId");
+              const qrToken = url.searchParams.get("qrToken");
+
+              if (userCouponId && qrToken) {
+                isScannedRef.current = true;
+                navigate("/partner/scan/loading", {
+                  state: {
+                    userCouponId: parseInt(userCouponId, 10),
+                    qrToken: qrToken,
+                  },
+                });
+              } else {
+                throw new Error("Missing parameters");
+              }
+            } catch (error) {
+              isScannedRef.current = true;
+              navigate("/partner/scan/fail", {
+                state: { message: "유효하지 않은 쿠폰 QR입니다." },
+                replace: true,
+              });
+            }
           }
         },
-        QrOptions
+        QrOptions,
       );
 
       qrScanner.start().catch((err) => {
         console.error("카메라 권한 에러:", err);
         alert("카메라 권한을 허용해주세요.");
-        navigate(-1);
+        navigate("/partner/home");
       });
     }
 
@@ -55,7 +73,7 @@ const Scan: React.FC = () => {
       <S.Overlay />
       <S.ScanBox />
       <S.Header>
-        <S.CloseButton onClick={() => navigate(-1)}>
+        <S.CloseButton onClick={() => navigate("/partner/home")}>
           <img src={CloseImg} alt="닫기" />
         </S.CloseButton>
         <S.Title>
