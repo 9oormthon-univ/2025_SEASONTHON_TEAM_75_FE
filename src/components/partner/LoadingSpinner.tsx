@@ -38,7 +38,7 @@ const LoadingSpinner = ({
   message = "데이터를 불러오고 있어요",
 }: LoadingSpinnerProps) => {
   return (
-    <LoadingWrapper>
+    <LoadingWrapper role="status" aria-live="polite" aria-busy="true">
       <Spinner />
       <LoadingText>{message}</LoadingText>
     </LoadingWrapper>
