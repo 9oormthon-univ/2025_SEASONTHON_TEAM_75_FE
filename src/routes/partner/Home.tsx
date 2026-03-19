@@ -7,9 +7,31 @@ import Arrow from "@assets/pt_cs_arrow.svg";
 import TodayUsage from "@components/partner/TodayUsage";
 import CouponStats from "@components/partner/CouponStats";
 import { useNavigate } from "react-router-dom";
+import type { CouponStatistics } from "@types";
+import { useEffect, useState } from "react";
+import apiClient from "@utils/apiClient";
 
 const Home = () => {
   const navigate = useNavigate();
+  const [stats, setStats] = useState<CouponStatistics | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const fetchStatistics = async () => {
+    try {
+      const response = await apiClient.get<{ data: CouponStatistics }>(
+        "/api/v1/partner/coupons/statistics",
+      );
+      setStats(response.data.data);
+    } catch (error) {
+      console.error("통계 데이터를 불러오는 데 실패했습니다.", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchStatistics();
+  }, []);
 
   const TodayUsageClick = () => {
     navigate("/partner/usage");
@@ -46,13 +68,13 @@ const Home = () => {
         <H.TodayUsageList>
           <TodayUsage
             title="사용된 쿠폰"
-            usage="2개"
+            usage={`${stats?.daily.count ?? 0}개`}
             onClick={TodayUsageClick}
           />
           <TodayUsage title="오늘 매출" usage="100,000원" />
         </H.TodayUsageList>
         <SectionHeader title="쿠폰 사용 통계" />
-        <CouponStats />
+        <CouponStats stats={stats} />
         <H.Inquiry onClick={handleInquiryClick}>
           <div>분리특공대에게 문의하기</div>
           <img src={Arrow} alt="화살표" />

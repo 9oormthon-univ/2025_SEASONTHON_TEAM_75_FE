@@ -56,7 +56,7 @@ export const User = styled.div`
 `;
 
 const CouponCard = ({ item }: { item: UserCoupon }) => {
-  const { profile, title, userName, userId } = item;
+  const { profile, title, userName, userTag } = item;
 
   return (
     <Container>
@@ -65,7 +65,7 @@ const CouponCard = ({ item }: { item: UserCoupon }) => {
       </LeftSection>
       <RightSection>
         <User>
-          {userName}님 <span>#{userId}</span>
+          {userName}님 <span>{userTag}</span>
         </User>
         <Title>{title}</Title>
       </RightSection>

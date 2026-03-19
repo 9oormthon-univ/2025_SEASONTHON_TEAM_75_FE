@@ -1,32 +1,34 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import * as U from "@routes/partner/UsageStyle";
 import Header from "@components/Header";
 import NoHistoryIcon from "@assets/history_zero.svg";
 import CouponCard from "@components/partner/CouponCard";
 import { HistoryPageSkeleton } from "@components/history/Skeleton";
-import DummyImg from "../../../public/app_logo.svg";
-import type { UserCoupon } from "@types";
+import apiClient from "@utils/apiClient";
+import type { UsedCouponItem } from "@types";
 
 const Usage = () => {
-  const DUMMY_DATA: UserCoupon[] = [
-    {
-      id: 1,
-      profile: null,
-      title: "[오프라인] 공방 10% 할인쿠폰",
-      userName: "꽃돌이",
-      userId: 111111,
-    },
-    {
-      id: 2,
-      profile: DummyImg,
-      title: "[오프라인] 공방 20% 할인쿠폰",
-      userName: "지구지킴이",
-      userId: 222222,
-    },
-  ];
+  const [couponItems, setCouponItems] = useState<UsedCouponItem[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const couponItems = DUMMY_DATA;
-  const [isLoading, setIsLoading] = useState(false);
+  const fetchUsedCoupons = async () => {
+    try {
+      setIsLoading(true);
+      const response = await apiClient.get<{ data: UsedCouponItem[] }>(
+        "/api/v1/partner/coupons/used",
+      );
+      setCouponItems(response.data.data);
+    } catch (error) {
+      console.error("사용한 쿠폰 목록을 불러오는 데 실패했습니다.", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchUsedCoupons();
+  }, []);
+
   const couponCount = couponItems.length;
 
   return (
@@ -47,7 +49,16 @@ const Usage = () => {
           ) : (
             <U.CardWrapper>
               {couponItems.map((item) => (
-                <CouponCard key={item.id} item={item} />
+                <CouponCard
+                  key={item.UserCouponId}
+                  item={{
+                    id: item.UserCouponId,
+                    title: item.couponTitle,
+                    userName: item.userNickName,
+                    userTag: item.userTag ?? "",
+                    profile: item.userProfileUrl,
+                  }}
+                />
               ))}
             </U.CardWrapper>
           )}

@@ -247,3 +247,31 @@ export const ChatBtn = styled.div`
     width: 340px;
   }
 `;
+
+export const PointToast = styled.div`
+  width: 361px;
+  height: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  top: 75px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999;
+  background-color: rgba(0, 0, 0, 0.47);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: white;
+  border-radius: 12px;
+  font-weight: medium;
+  font-size: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  animation: 3s ease-in-out forwards;
+  white-space: nowrap;
+
+  span {
+    color: #91fffa;
+    margin: 0 3px;
+  }
+`;
